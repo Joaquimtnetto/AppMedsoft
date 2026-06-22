@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Paciente</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+</head>
+<body>
+<section class="crud-page" id="paciente-page">
+    <header class="crud-header">
+        <div>
+            <h2>Pacientes</h2>
+            <p>Consulte e mantenha os dados dos pacientes.</p>
+        </div>
+        <button class="crud-button" id="paciente-include" type="button" title="Incluir paciente">
+            <i class="fa fa-plus"></i> Incluir
+        </button>
+    </header>
+
+    <div class="crud-toolbar">
+        <div class="crud-field">
+            <label for="paciente-busca">Buscar paciente</label>
+            <input class="crud-input" type="text" id="paciente-busca" placeholder="Nome ou código">
+        </div>
+        <button class="crud-button" id="btn-ok" type="button">
+            <i class="fa fa-search"></i> Buscar
+        </button>
+    </div>
+
+    <div class="crud-list" id="paciente-result" aria-live="polite"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/consulta_paciente.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/navigation.js"></script>
+</body>
+</html>

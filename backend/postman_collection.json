@@ -1,0 +1,69 @@
+{
+  "info": {
+    "name": "Medsoft pMobile Backend",
+    "_postman_id": "medsoft-pmobile-collection",
+    "description": "Coleção com requests básicos para testar o backend local",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8072" },
+    { "key": "dbPath", "value": "medsoft_medmigra" },
+    { "key": "user", "value": "seu_usuario" },
+    { "key": "pass", "value": "sua_senha" }
+  ],
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"nome\": \"{{user}}\", \"senha\": \"{{pass}}\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/api/login", "host": ["{{baseUrl}}"], "path": ["api","login"] }
+      }
+    },
+    {
+      "name": "Consulta Paciente",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-DB-PATH", "value": "{{dbPath}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"termo\": \"JOÃO\", \"nome_medico\": \"DR. SILVA\" }"
+        },
+        "url": { "raw": "{{baseUrl}}/api/consulta-paciente", "host": ["{{baseUrl}}"], "path": ["api","consulta-paciente"] }
+      }
+    },
+    {
+      "name": "Consultas Paciente",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-DB-PATH", "value": "{{dbPath}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"codpac\": 123 }" },
+        "url": { "raw": "{{baseUrl}}/api/consultas-paciente", "host": ["{{baseUrl}}"], "path": ["api","consultas-paciente"] }
+      }
+    },
+    {
+      "name": "Agenda (API)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-DB-PATH", "value": "{{dbPath}}" }
+        ],
+        "body": { "mode": "raw", "raw": "{ \"data\": \"2026-06-17\" }" },
+        "url": { "raw": "{{baseUrl}}/api/agenda", "host": ["{{baseUrl}}"], "path": ["api","agenda"] }
+      }
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultas do Paciente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(120deg, #4f8cff, #34e7e4);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .consultas-container {
+            background: #fff;
+            padding: 2rem 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            max-width: 700px;
+            width: 100%;
+        }
+        h2 {
+            color: #4f8cff;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 0.7rem 0.5rem;
+            text-align: left;
+        }
+        th {
+            background: #e3f0ff;
+            color: #357ae8;
+        }
+        @media (max-width: 600px) {
+            .consultas-container {
+                padding: 1rem 0.5rem;
+            }
+            th, td {
+                padding: 0.4rem 0.2rem;
+                font-size: 0.92rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="consultas-container">
+        <h2 id="titulo-consultas">Consultas do Paciente</h2>
+        <div id="consultas-table"></div>
+    </div>
+    <script>
+        function getQueryParam(name) {
+            const url = new URL(window.location.href);
+            return url.searchParams.get(name);
+        }
+        async function carregarConsultas() {
+            const codpac = getQueryParam('codpac');
+            const nomepac = getQueryParam('nomepac') || '';
+            document.getElementById('titulo-consultas').textContent = `Consultas de ${nomepac}`;
+            const resp = await fetch('/api/consultas-paciente', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codpac })
+            });
+            const data = await resp.json();
+            let html = '';
+            if (data.success && data.consultas.length > 0) {
+                html += `<table><thead><tr><th>Dt. Visita</th><th>Diagnóstico</th><th>Histórico</th><th>Clínica</th></tr></thead><tbody>`;
+                data.consultas.forEach(c => {
+                    html += `<tr><td>${c.dtvisita}</td><td>${c.diag}</td><td>${c.historico}</td><td>${c.clinica}</td></tr>`;
+                });
+                html += '</tbody></table>';
+            } else {
+                html = '<p style="color:#e74c3c;text-align:center;">Nenhuma consulta encontrada.</p>';
+            }
+            document.getElementById('consultas-table').innerHTML = html;
+        }
+        window.onload = carregarConsultas;
+    </script>
+    <script src="/static/js/navigation.js"></script>
+</body>
+</html>
