@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+        <style>
+                            .paciente-table tr.separador {
+                                height: 1px;
+                                background: #357ae8;
+                            }
+                            .paciente-table tr.separador td {
+                                padding: 0;
+                                height: 1px;
+                                border: none;
+                            }
+                    .paciente-table tr.paciente-main {
+                        background: #fff;
+                    }
+                    .paciente-table tr.paciente-info {
+                        background: #f3f7ff;
+                    }
+                    .paciente-table td.acao {
+                        text-align: center;
+                    }
+                    .paciente-table .btn-acao {
+                        background: #4f8cff;
+                        color: #fff;
+                        border: none;
+                        border-radius: 6px;
+                        padding: 0.4rem 0.7rem;
+                        font-size: 1rem;
+                        cursor: pointer;
+                        transition: background 0.2s;
+                    }
+                    .paciente-table .btn-acao:hover {
+                        background: #357ae8;
+                    }
+            .consulta-container {
+                background: none;
+                padding: 0;
+                border-radius: 0;
+                box-shadow: none;
+                max-width: 100%;
+                width: 100%;
+                margin: 0;
+            }
+            .consulta-form {
+                display: flex;
+                flex-direction: row;
+                gap: 1rem;
+                align-items: flex-end;
+                margin-bottom: 1.5rem;
+            }
+            .consulta-form input {
+                flex: 1;
+                padding: 0.75rem;
+                border: 1px solid #e0e0e0;
+                border-radius: 8px;
+                font-size: 1rem;
+            }
+            .consulta-form button {
+                padding: 0.75rem 1.5rem;
+                background: #4f8cff;
+                color: #fff;
+                border: none;
+                border-radius: 8px;
+                font-size: 1.1rem;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.2s;
+            }
+            .consulta-form button:hover {
+                background: #357ae8;
+            }
+            .resultado-paciente {
+                margin-top: 0.5rem;
+                text-align: left;
+                max-height: 350px;
+                overflow-y: auto;
+            }
+            table.paciente-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 0.5rem;
+            }
+            table.paciente-table th, table.paciente-table td {
+                border: 1px solid #e0e0e0;
+                padding: 0.7rem 0.5rem;
+                text-align: left;
+            }
+            table.paciente-table th {
+                background: #f3f7ff;
+                color: #357ae8;
+            }
+            @media (max-width: 700px) {
+                .consulta-container {
+                    padding: 1rem;
+                }
+                .consulta-form {
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+            }
+        </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principal - Clínica Médica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(120deg, #4f8cff, #34e7e4);
+            min-height: 100vh;
+        }
+        .main-layout {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            background: #fff;
+            width: 220px;
+            min-width: 60px;
+            transition: width 0.3s;
+            box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .sidebar.collapsed {
+            width: 60px;
+        }
+        .sidebar-header {
+            padding: 1.2rem 1rem 0.5rem 1rem;
+            font-size: 1.2rem;
+            color: #4f8cff;
+            font-weight: bold;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #4f8cff;
+            cursor: pointer;
+        }
+        .logo {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #4f8cff;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .menu {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-top: 1.5rem;
+            gap: 0.5rem;
+        }
+        .menu-btn {
+            background: #4f8cff;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.08rem;
+            font-weight: 500;
+            margin: 0 1rem;
+            padding: 0.9rem 1.2rem;
+            cursor: pointer;
+            transition: box-shadow 0.2s, transform 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 2px 8px rgba(79,140,255,0.08);
+        }
+        .menu-btn i {
+            font-size: 1.2rem;
+        }
+        .menu-btn:hover {
+            box-shadow: 0 4px 16px rgba(79,140,255,0.18);
+            transform: translateY(-2px) scale(1.03);
+        }
+        .sidebar.collapsed .menu-btn {
+            font-size: 0;
+            padding: 1rem 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin: 0.5rem auto;
+            justify-content: center;
+        }
+        .sidebar.collapsed .menu-btn i {
+            font-size: 1.3rem;
+        }
+        .sidebar.collapsed .logo {
+            font-size: 0;
+        }
+        .container {
+            flex: 1;
+            background: #f7faff;
+            padding: 2.5rem 3rem;
+            overflow-y: auto;
+            box-shadow: 0 2px 8px rgba(79,140,255,0.04);
+            border-radius: 18px;
+            margin: 2rem;
+        }
+        .header-info {
+            background: #f8faff;
+            color: #4f8cff;
+            padding: 0.7rem 2rem;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            border-bottom: 1px solid #e0e0e0;
+            border-radius: 0 0 12px 12px;
+        }
+        @media (max-width: 700px) {
+            .main-layout { flex-direction: column; }
+            .container { padding: 1rem; margin: 0.5rem; }
+            .sidebar { width: 100vw; min-width: 100vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-layout">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="menu-toggle" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+                <span class="logo"><i class="fa fa-hospital"></i> MEDSOFT</span>
+            </div>
+            <div class="menu">
+                <button class="menu-btn" onclick="loadTela('consulta_paciente.html')" title="Abrir consulta de paciente"><i class="fa fa-user-md"></i> Consulta Paciente</button>
+                <button class="menu-btn" onclick="loadTela('agenda.html')" title="Abrir consulta de agenda"><i class="fa fa-calendar-alt"></i> Consulta Agenda</button>
+            </div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;">
+            <div class="header-info">
+                <span><i class="fa fa-user"></i> Usuário: <span id="usuario-logado">Usuário</span></span>
+            </div>
+            <div class="container" id="container">
+                <h2 style="color:#4f8cff;">Bem-vindo!</h2>
+                <p>Selecione uma opção no menu à esquerda.</p>
+            </div>
+        </div>
+    </div>
+    <script>
+                // Ativa JS da busca de paciente para conteúdo dinâmico
+                function ativarBuscaPaciente() {
+                    const form = document.getElementById('form-consulta-paciente');
+                    if (!form) return;
+                    form.addEventListener('submit', async function(event) {
+                        event.preventDefault();
+                        const termo = document.getElementById('busca-paciente').value;
+                        const resultadoDiv = document.getElementById('resultado-paciente');
+                        resultadoDiv.innerHTML = '';
+                        if (!termo) {
+                            resultadoDiv.innerHTML = '<span style="color:#e74c3c;">Digite um nome ou código.</span>';
+                            return;
+                        }
+                        const response = await fetch('/api/consulta-paciente', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ termo })
+                        });
+                        const data = await response.json();
+                        resultadoDiv.innerHTML += `
+                            <table class="paciente-table">
+                                <thead>
+                                    <tr>
+                                        <th>Paciente</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${data.success && data.pacientes.length > 0 ?
+                                        data.pacientes.map((p, idx, arr) => `
+                                            <tr class="paciente-main">
+                                                <td><b>${p.nomecli}</b></td>
+                                                <td class="acao" rowspan="2">
+                                                    <button class="btn-acao" title="Histórico" onclick="abrirHistoricoPaciente('${p.codcli}', '${p.nomecli}')">
+                                                        <i class="fa fa-notes-medical"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr class="paciente-info">
+                                                <td colspan="2">Idade: ${p.idade} &nbsp; | &nbsp; Convênio: ${p.nomeplano1}</td>
+                                            </tr>
+                                            ${(idx < arr.length - 1) ? '<tr class="separador"><td colspan="2"></td></tr>' : ''}
+                                        `).join('')
+                                        : `<tr><td colspan='2' style='text-align:center;color:#e74c3c;'>Nenhum paciente encontrado.</td></tr>`}
+                                </tbody>
+                            </table>
+                        `;
+                    });
+                }
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        }
+        function loadTela(url) {
+            // Recolhe o menu ao clicar em uma opção
+            document.getElementById('sidebar').classList.add('collapsed');
+            fetch(url)
+                .then(resp => resp.text())
+                .then(html => {
+                    document.getElementById('container').innerHTML = html;
+                    // Ativa JS da busca se for tela de paciente
+                    setTimeout(ativarBuscaPaciente, 50);
+                    // Atualiza nome do usuário no topo
+                    setTimeout(atualizarUsuarioTopo, 10);
+                })
+                .catch(() => {
+                    document.getElementById('container').innerHTML = '<p>Erro ao carregar a tela.</p>';
+                });
+                function atualizarUsuarioTopo() {
+                    var usuario = localStorage.getItem('usuario_logado');
+                    var el = document.getElementById('usuario-logado');
+                    if (el) {
+                        if (usuario && usuario.trim()) {
+                            el.textContent = usuario;
+                        } else {
+                            el.textContent = 'Usuário';
+                        }
+                    }
+                }
+                document.addEventListener('DOMContentLoaded', atualizarUsuarioTopo);
+                // Sempre atualizar ao carregar tela dinâmica
+                atualizarUsuarioTopo();
+        }
+        // Função para buscar e exibir histórico do paciente
+        function abrirHistoricoPaciente(codcli, nomecli) {
+            fetch('/api/consultas-paciente', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ codpac: codcli })
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                let conteudo = `<h3>Histórico de ${nomecli}</h3>`;
+                if (data.success && data.consultas && data.consultas.length > 0) {
+                    conteudo += '<ul style="max-height:300px;overflow:auto;text-align:left;">';
+                    data.consultas.forEach(c => {
+                        conteudo += `<li><b>Data:</b> ${c.dtvisita} <br><b>Diagnóstico:</b> ${c.diag || ''} <br><b>Histórico:</b> ${c.historico || ''}</li><hr>`;
+                    });
+                    conteudo += '</ul>';
+                } else {
+                    conteudo += '<p style="color:#e74c3c;">Nenhum histórico encontrado.</p>';
+                }
+                exibirModal(conteudo);
+            })
+            .catch(() => {
+                exibirModal('<p style="color:#e74c3c;">Erro ao buscar histórico.</p>');
+            });
+        }
+
+        // Função para exibir modal simples
+        function exibirModal(html) {
+            let modal = document.getElementById('modal-historico');
+            if (!modal) {
+                modal = document.createElement('div');
+                modal.id = 'modal-historico';
+                modal.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;z-index:9999;';
+                modal.innerHTML = `<div style='background:#fff;padding:2rem 1.5rem;border-radius:16px;max-width:420px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.18);text-align:left;position:relative;'>
+                    <button onclick="document.getElementById('modal-historico').remove()" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#888;">&times;</button>
+                    <div id='modal-historico-content'></div>
+                </div>`;
+                document.body.appendChild(modal);
+            }
+            document.getElementById('modal-historico-content').innerHTML = html;
+        }
+    </script>
+    <script src="/static/js/navigation.js"></script>
+</body>
+</html>

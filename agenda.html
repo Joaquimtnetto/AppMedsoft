@@ -1,0 +1,29 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page" id="agenda-page">
+    <header class="crud-header">
+        <div>
+            <h2>Agenda</h2>
+            <p>Consulte e mantenha os compromissos do dia.</p>
+        </div>
+        <button class="crud-button" id="agenda-include" type="button" title="Incluir compromisso">
+            <i class="fa fa-plus"></i> Incluir
+        </button>
+    </header>
+
+    <div class="crud-toolbar">
+        <div class="crud-field">
+            <label for="agenda-date">Data da agenda</label>
+            <input class="crud-input" type="date" id="agenda-date">
+        </div>
+        <button class="crud-button" id="btn-ok" type="button">
+            <i class="fa fa-search"></i> Buscar
+        </button>
+    </div>
+
+    <div class="crud-list" id="agenda-result" aria-live="polite"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/agenda.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/navigation.js"></script>

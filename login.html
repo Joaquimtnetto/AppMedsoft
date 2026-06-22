@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - MedSoft</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="{{ url_for('static', filename='Med.png') }}" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(120deg, #eaf6ff 60%, #cbe7ff 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-bg-img {
+      position: absolute;
+      top: 0; right: 0;
+      width: 160px;
+      opacity: 0.13;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .login-container {
+      position: relative;
+      z-index: 1;
+      background: #fff;
+      padding: 38px 28px 32px 28px;
+      border-radius: 18px;
+      border: 1.5px solid #4f8cff;
+      box-shadow: 0 8px 32px rgba(79,140,255,0.10), 0 1.5px 0 #4f8cff;
+      width: 100%;
+      max-width: 370px;
+      margin: 0 auto;
+      animation: fadeIn 0.6s cubic-bezier(.4,1.4,.6,1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .login-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #eaf6ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px auto;
+      box-shadow: 0 2px 8px rgba(79,140,255,0.10);
+      font-size: 2.2em;
+      color: #4f8cff;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 18px;
+      color: #357ae8;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    .input-group {
+      width: 100%;
+      margin-bottom: 1.1rem;
+      position: relative;
+    }
+    .input-group i {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #4f8cff;
+      font-size: 1.1em;
+      opacity: 0.85;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 0.7rem 0.7rem 0.7rem 2.3rem;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: #f7fbff;
+      transition: border 0.2s;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .input-group input:focus {
+      border: 1.5px solid #4f8cff;
+      background: #f0f7ff;
+    }
+    .login-btn {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(90deg, #4f8cff 60%, #357ae8 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.13em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 0.7rem;
+      box-shadow: 0 2px 8px rgba(79,140,255,0.10);
+      transition: background 0.2s, transform 0.1s;
+    }
+    .login-btn:hover {
+      background: #357ae8;
+      transform: translateY(-2px) scale(1.03);
+    }
+    .error-message {
+      color: #e74c3c;
+      text-align: center;
+      margin-bottom: 1rem;
+      display: none;
+      font-size: 1.01em;
+    }
+    .success-message {
+      color: #27ae60;
+      text-align: center;
+      margin-bottom: 1rem;
+      display: none;
+      font-size: 1.01em;
+    }
+    .forgot-link {
+      display: block;
+      text-align: right;
+      color: #4f8cff;
+      text-decoration: underline;
+      font-size: 0.98rem;
+      margin-top: 0.2rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover {
+      color: #357ae8;
+    }
+    @media (max-width: 600px) {
+      .login-container {
+        max-width: 98vw;
+        padding: 22px 6vw 18px 6vw;
+      }
+      .login-bg-img {
+        width: 90px;
+        top: unset;
+        bottom: 0;
+        right: 0;
+        opacity: 0.10;
+      }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .build-info {
+      width: 100%;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid #e6edf7;
+      color: #66758c;
+      font-size: 0.82em;
+      line-height: 1.45;
+      text-align: center;
+    }
+    .build-info strong {
+      display: block;
+      color: #357ae8;
+      font-size: 0.92em;
+      letter-spacing: 0.4px;
+    }
+  </style>
+</head>
+<body>
+  <div style="display:flex;align-items:center;justify-content:center;gap:38px;width:100%;max-width:700px;margin:0 auto;">
+    <div class="login-container">
+      <div class="login-logo" style="margin-bottom:8px;"><img src="{{ url_for('static', filename='Med.png') }}" alt="MedSoft" style="width:48px;height:48px;object-fit:contain;"></div>
+      <h2 style="margin-bottom:7px;">MedSoft</h2>
+      <div style="color:#357ae8;font-size:1.08em;font-weight:500;margin-bottom:18px;text-align:center;">Soluções inteligentes para a área médica</div>
+      <div id="error" class="error-message"></div>
+      <div id="success" class="success-message"></div>
+      <form id="login-form" autocomplete="on">
+        <div class="input-group">
+          <i class="fa fa-user"></i>
+          <input type="text" id="nome" name="nome" placeholder="Usuário" autocomplete="username" required autofocus>
+        </div>
+        <div class="input-group">
+          <i class="fa fa-lock"></i>
+          <input type="password" id="senha" name="senha" placeholder="Senha" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="login-btn">Entrar</button>
+      </form>
+      <div style="width:100%;margin-top:8px;">
+        <a href="/esqueci-senha" class="forgot-link">Esqueci a senha</a>
+      </div>
+      <div style="margin-top:18px;font-size:0.98em;color:#888;text-align:center;">
+        <span>Powered by <a href="https://medsoft.com.br/" target="_blank" style="color:#357ae8;font-weight:600;text-decoration:none;">MedSoft</a></span>
+      </div>
+      <div style="width:100%;margin-top:6px;font-size:0.95em;color:#555;text-align:center;">
+        Deseja usar o sistema, entre em contato: <a href="https://medsoft.com.br/entre-em-contato-conosco/" target="_blank" style="color:#357ae8;font-weight:600;text-decoration:none;">https://medsoft.com.br/entre-em-contato-conosco/</a>
+      </div>
+      <div class="build-info" title="Identificação da versão instalada">
+        <strong>VERSÃO COMPILADA</strong>
+        <span>{{ build_datetime }}</span>
+      </div>
+    </div>
+  </div>
+  <script>
+    // Exibe ilustração só em telas médias/grandes
+    function updateLoginIllustration() {
+      var illu = document.querySelector('.login-illustration');
+      if (!illu) return;
+      if (window.innerWidth > 700) {
+        illu.style.display = 'block';
+      } else {
+        illu.style.display = 'none';
+      }
+    }
+    updateLoginIllustration();
+    window.addEventListener('resize', updateLoginIllustration);
+  </script>
+  <script>
+    document.getElementById('login-form').addEventListener('submit', async function(event) {
+      event.preventDefault();
+      const nome = document.getElementById('nome').value.trim();
+      const senha = document.getElementById('senha').value;
+      const errorDiv = document.getElementById('error');
+      const successDiv = document.getElementById('success');
+      errorDiv.style.display = 'none';
+      successDiv.style.display = 'none';
+      try {
+        const resp = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, senha })
+        });
+        const data = await resp.json();
+        if (data.success) {
+                    // Salva nome_medico no localStorage
+                    if (data.nome_medico) {
+                      localStorage.setItem('nome_medico', data.nome_medico);
+                      console.log('[MedSoft] nome_medico salvo no localStorage:', data.nome_medico);
+                    } else {
+                      localStorage.removeItem('nome_medico');
+                    }
+          // Salva o nome do usuário exatamente como retornado pelo backend
+          if (data.nome) {
+            localStorage.setItem('usuario_logado', data.nome);
+          } else {
+            localStorage.setItem('usuario_logado', nome);
+          }
+          // Salva db_path retornado pelo backend
+          if (data.db_path) {
+            localStorage.setItem('db_path', data.db_path);
+            console.log('[MedSoft] db_path salvo no localStorage:', data.db_path);
+          } else {
+            localStorage.removeItem('db_path');
+          }
+          successDiv.textContent = 'Login realizado com sucesso!';
+          successDiv.style.display = 'block';
+          setTimeout(() => { window.location.href = 'menu.html'; }, 700);
+        } else {
+          errorDiv.textContent = data.message || 'Erro ao fazer login.';
+          errorDiv.style.display = 'block';
+        }
+      } catch (e) {
+        errorDiv.textContent = 'Erro de conexão com o servidor.';
+        errorDiv.style.display = 'block';
+      }
+    });
+  </script>
+  <script src="/static/js/navigation.js"></script>
+</body>
+</html>

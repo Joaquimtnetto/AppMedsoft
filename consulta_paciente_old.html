@@ -1,0 +1,309 @@
+
+<style>
+        .consulta-resultado-center {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 100%;
+        }
+        @media (min-width: 900px) {
+            .resultado-paciente {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            table.paciente-table {
+                max-width: 900px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+        .paciente-table th.acao-col, .paciente-table td.acao-col {
+            background: #eaf6ff !important;
+            color: #1976d2 !important;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.13em;
+            width: 70px;
+            vertical-align: middle;
+        }
+        .paciente-table td.acao-col {
+            text-align: center;
+            vertical-align: middle;
+            height: 100%;
+            padding: 0;
+        }
+        .paciente-table td.acao-col > * {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 100% !important;
+            min-height: 48px;
+            margin: 0 auto;
+        }
+        .paciente-table td.acao-col button, .paciente-table td.acao-col a {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.3em;
+            color: #357ae8;
+            transition: color 0.2s;
+            padding: 0.2em 0.4em;
+        }
+        .paciente-table td.acao-col button:hover, .paciente-table td.acao-col a:hover {
+            color: #1976d2;
+        }
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .consulta-container {
+        background: none;
+        padding: 0 2vw;
+        border-radius: 0;
+        box-shadow: none;
+        max-width: 100vw;
+        width: 100vw;
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
+    }
+    .consulta-container h2 {
+        text-align: left;
+        margin-left: 0;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+        font-size: 2em;
+        color: #357ae8;
+        max-width: 900px;
+        width: 100%;
+        padding-left: 0.75rem;
+    }
+    @media (max-width: 900px) {
+                                table.paciente-table th, table.paciente-table td {
+                                    padding: 0.7rem 0.3rem !important;
+                                }
+                                table.paciente-table th.paciente-col, table.paciente-table td.paciente-col {
+                                    width: 65vw !important;
+                                    max-width: 65vw !important;
+                                }
+                                table.paciente-table th.acao-col, table.paciente-table td.acao-col {
+                                    min-width: 80px !important;
+                                    width: 80px !important;
+                                    max-width: 80px !important;
+                                    text-align: center !important;
+                                    white-space: nowrap !important;
+                                }
+                        .consulta-form {
+                            display: flex !important;
+                            flex-direction: row !important;
+                            gap: 0.4rem !important;
+                            align-items: center !important;
+                            width: 100% !important;
+                        }
+                        .consulta-form input {
+                            font-size: 0.98rem !important;
+                            padding: 0.5rem 0.6rem !important;
+                            min-width: 0;
+                            width: 100% !important;
+                            max-width: 100% !important;
+                            flex: 1 1 auto !important;
+                        }
+                        .consulta-form button {
+                            font-size: 0.98rem !important;
+                            padding: 0.5rem 0.9rem !important;
+                            min-width: 0;
+                            width: auto;
+                            white-space: nowrap;
+                            flex: 0 0 auto !important;
+                        }
+                html, body {
+                    padding-left: 0 !important;
+                    margin-left: 0 !important;
+                    padding-right: 0 !important;
+                    margin-right: 0 !important;
+                    width: 100vw !important;
+                    max-width: 100vw !important;
+                    box-sizing: border-box;
+                    overflow-x: hidden !important;
+                }
+                .consulta-container {
+                    width: 85vw !important;
+                    max-width: 85vw !important;
+                    margin: 0 auto !important;
+                    padding-left: 0 !important;
+                    padding-right: 0 !important;
+                    box-sizing: border-box;
+                    background: #fff;
+                    border-radius: 0 !important;
+                    box-shadow: none !important;
+                }
+        .consulta-container h2 {
+            padding-left: 0 !important;
+            text-align: center !important;
+        }
+        .consulta-form {
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 100vw;
+            padding: 0 0.2rem;
+        }
+        /* Mobile agora herda o visual do desktop, sem overrides */
+            font-weight: 600;
+            word-break: break-word;
+        }
+    }
+    }
+    .consulta-form {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        align-items: flex-end;
+        margin-bottom: 0.5rem;
+        width: 100%;
+        max-width: 900px;
+    }
+    .consulta-form input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+    .consulta-form button {
+        padding: 0.75rem 1.5rem;
+        background: #4f8cff;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .consulta-form button:hover {
+        background: #357ae8;
+    }
+    .resultado-paciente {
+        margin-top: 0.1rem;
+        text-align: left;
+        max-height: 60vh;
+        overflow-y: auto;
+        width: 100%;
+        max-width: 98vw;
+    }
+    table.paciente-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 0.5rem;
+    }
+    table.paciente-table th, table.paciente-table td {
+        border: 1px solid #e0e0e0;
+        padding: 0.7rem 0.5rem;
+        text-align: left;
+    }
+    table.paciente-table th {
+        background: #f3f7ff;
+        color: #357ae8;
+    }
+    @media (max-width: 900px) {
+        .consulta-container {
+            padding: 0 0.2vw 0 0vw;
+            margin-left: 0 !important;
+        }
+        .consulta-form {
+            flex-direction: column;
+            gap: 0.7rem;
+            max-width: 100vw;
+        }
+        .consulta-container h2 {
+            text-align: center;
+            margin-left: 0;
+        }
+    }
+</style>
+</head>
+<body>
+    <div class="consulta-container">
+        <h2 class="consulta-titulo">Consulta de Paciente</h2>
+        <form class="consulta-form" id="form-consulta-paciente" onsubmit="event.preventDefault(); buscarPaciente(event); return false;">
+            <input id="busca-paciente" type="text" placeholder="Digite o nome ou código">
+            <button type="submit">Buscar</button>
+        </form>
+        <div id="resultado-paciente" class="resultado-paciente"></div>
+    </div>
+    <style>
+        .consulta-container {
+            max-width: 600px;
+            margin: 2.5vh 0 0 2vw;
+            /* margem esquerda bem pequena */
+            padding: 1.5rem 1.2rem 2.5rem 1.2rem;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 16px 0 rgba(44, 62, 80, 0.10);
+        }
+        .consulta-titulo {
+            text-align: center;
+            font-size: 2.1rem;
+            color: #357ae8;
+            margin-bottom: 1.2rem;
+            margin-top: 0.2rem;
+            font-weight: 600;
+        }
+        #resultado-paciente {
+            margin: 1.2rem auto 0 auto;
+            padding: 1.1rem 0.7rem;
+            background: #f8fbff;
+            border-radius: 10px;
+            min-height: 48px;
+            max-width: 100%;
+            box-shadow: 0 1px 6px 0 rgba(44, 62, 80, 0.07);
+            font-size: 1.08rem;
+            color: #222;
+            text-align: left;
+            word-break: break-word;
+        }
+        @media (max-width: 900px) {
+            .consulta-container {
+                max-width: 100vw;
+                margin: 0;
+                padding: 0.7rem 0 1rem 0;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .consulta-titulo {
+                font-size: 1.08rem;
+                margin-bottom: 0.5rem;
+                margin-top: 0.1rem;
+            }
+            #resultado-paciente {
+                padding: 0.4rem 0.05rem;
+                font-size: 0.93rem;
+                border-radius: 0;
+                box-shadow: none;
+            }
+            .consulta-form input, .consulta-form button {
+                font-size: 1rem;
+            }
+        }
+    </style>
+    <script>
+    // Substitui ícone de ação por algo mais atraente ao renderizar a tabela
+    const observer = new MutationObserver(() => {
+        document.querySelectorAll('.paciente-table td.acao-col button, .paciente-table td.acao-col a').forEach(btn => {
+            if (!btn.classList.contains('custom-icone')) {
+                btn.innerHTML = '<i class="fa fa-notes-medical"></i>';
+                btn.classList.add('custom-icone');
+            }
+        });
+    });
+    observer.observe(document.getElementById('resultado-paciente'), { childList: true, subtree: true });
+    </script>
+
+    <script src="/static/js/consulta_paciente.js"></script>
+    <script src="/static/js/navigation.js"></script>

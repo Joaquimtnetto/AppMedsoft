@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0">
+    <title>Login - Clínica Médica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+                .login-logo {
+                    width: 56px;
+                    height: 56px;
+                    margin: 0 0 1.2rem 0;
+                    display: block;
+                    float: left;
+                }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            min-width: 100vw;
+            width: 100vw;
+            height: 100vh;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(120deg, #4f8cff, #34e7e4);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+        .login-container {
+            background: #fff;
+            padding: 2rem 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            max-width: 350px;
+            width: 95vw;
+            min-width: 0;
+            box-sizing: border-box;
+            text-align: center;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-container h1 {
+            margin-bottom: 1.5rem;
+            color: #4f8cff;
+        }
+        .login-container input {
+            width: 100%;
+            min-width: 0;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .login-container button {
+            width: 100%;
+            min-width: 0;
+            padding: 0.75rem;
+            background: #4f8cff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .login-container button:hover {
+            background: #357ae8;
+        }
+        .error-message {
+            color: #e74c3c;
+            margin-bottom: 1rem;
+        }
+        @media (max-width: 500px) {
+            html, body {
+                height: 100%;
+                min-height: 100vh;
+                min-width: 100vw;
+                padding: 0;
+                margin: 0;
+            }
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 100vw;
+                height: 100vh;
+                min-height: 100vh;
+                min-width: 100vw;
+                overflow-x: hidden;
+            }
+            .login-container {
+                padding: 1rem 0.5rem;
+                max-width: 98vw;
+                min-width: 0;
+                margin: 0 auto;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+        @media (max-width: 350px) {
+            .login-container {
+                padding: 0.5rem 0.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="{{ url_for('static', filename='Med.png') }}" alt="Usuário" class="login-logo" />
+        <div id="error" class="error-message" style="display:none;"></div>
+        <input type="text" id="nome" placeholder="Usuário" autocomplete="username">
+        <input type="password" id="senha" placeholder="Senha" autocomplete="current-password">
+        <button onclick="login()">Entrar</button>
+        <div style="margin-top:0.7rem;">
+            <a href="#" onclick="openPasswordPopup();return false;" style="color:#4f8cff;text-decoration:underline;font-size:0.98rem;">Esqueci/Mudar Senha</a>
+        </div>
+    </div>
+    <!-- Popup de mudança de senha -->
+    <div id="password-popup" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;z-index:1000;">
+        <div style="background:#fff;padding:2rem 1.5rem;border-radius:16px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.18);text-align:center;position:relative;">
+            <button onclick="closePasswordPopup()" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#888;">&times;</button>
+            <h3 style="color:#4f8cff;margin-bottom:1rem;">Redefinir Senha</h3>
+            <input id="popup-nome" type="text" placeholder="Usuário" style="width:100%;padding:0.7rem;margin-bottom:0.7rem;border-radius:8px;border:1px solid #e0e0e0;font-size:1rem;">
+            <input id="popup-nova-senha" type="password" placeholder="Nova Senha" style="width:100%;padding:0.7rem;margin-bottom:0.7rem;border-radius:8px;border:1px solid #e0e0e0;font-size:1rem;">
+            <input id="popup-confirmar-senha" type="password" placeholder="Confirmar Nova Senha" style="width:100%;padding:0.7rem;margin-bottom:1rem;border-radius:8px;border:1px solid #e0e0e0;font-size:1rem;">
+            <div id="popup-erro" style="color:#e74c3c;margin-bottom:0.7rem;display:none;"></div>
+            <button onclick="changePassword()" style="width:100%;padding:0.8rem;background:#4f8cff;color:#fff;border:none;border-radius:8px;font-size:1.1rem;font-weight:bold;cursor:pointer;">Alterar Senha</button>
+        </div>
+    </div>
+    <script>
+        async function login() {
+            const nome = document.getElementById('nome').value;
+            const senha = document.getElementById('senha').value;
+            const errorDiv = document.getElementById('error');
+            errorDiv.style.display = 'none';
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, senha })
+            });
+            const data = await response.json();
+            if (data.success) {
+                localStorage.setItem('usuario_logado', nome);
+                window.location.href = 'principal.html';
+            } else {
+                errorDiv.textContent = data.message;
+                errorDiv.style.display = 'block';
+            }
+        }
+        function openPasswordPopup() {
+            document.getElementById('password-popup').style.display = 'flex';
+        }
+        function closePasswordPopup() {
+            document.getElementById('password-popup').style.display = 'none';
+            document.getElementById('popup-erro').style.display = 'none';
+        }
+        async function changePassword() {
+            const nome = document.getElementById('popup-nome').value;
+            const novaSenha = document.getElementById('popup-nova-senha').value;
+            const confirmarSenha = document.getElementById('popup-confirmar-senha').value;
+            const erroDiv = document.getElementById('popup-erro');
+            erroDiv.style.display = 'none';
+            if (!nome || !novaSenha || !confirmarSenha) {
+                erroDiv.textContent = 'Preencha todos os campos.';
+                erroDiv.style.display = 'block';
+                return;
+            }
+            if (novaSenha !== confirmarSenha) {
+                erroDiv.textContent = 'As senhas não coincidem.';
+                erroDiv.style.display = 'block';
+                return;
+            }
+            // Chamada para API de alteração de senha
+            const response = await fetch('/api/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nome, novaSenha })
+            });
+            const data = await response.json();
+            if (data.success) {
+                alert('Senha alterada com sucesso!');
+                closePasswordPopup();
+                setTimeout(function(){ window.location.href = 'index.html'; }, 300);
+            } else {
+                erroDiv.textContent = data.message;
+                erroDiv.style.display = 'block';
+            }
+        }
+    </script>
+    <script src="/static/js/navigation.js"></script>
+</body>
+</html>
