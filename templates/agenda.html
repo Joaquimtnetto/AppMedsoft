@@ -1,29 +1,71 @@
-<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
-
-<section class="crud-page" id="agenda-page">
-    <header class="crud-header">
-        <div>
-            <h2>Agenda</h2>
-            <p>Consulte e mantenha os compromissos do dia.</p>
-        </div>
-        <button class="crud-button" id="agenda-include" type="button" title="Incluir compromisso">
-            <i class="fa fa-plus"></i> Incluir
-        </button>
-    </header>
-
-    <div class="crud-toolbar">
-        <div class="crud-field">
-            <label for="agenda-date">Data da agenda</label>
-            <input class="crud-input" type="date" id="agenda-date">
-        </div>
-        <button class="crud-button" id="btn-ok" type="button">
-            <i class="fa fa-search"></i> Buscar
-        </button>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Agenda Simples</title>
+    <style>
+        body {
+            background: #f7faff;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 400px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px 0 rgba(44, 62, 80, 0.10);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        button {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            background: #357ae8;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 1.2rem;
+        }
+        button:hover {
+            background: #225bb5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Agenda Simples</h2>
+        <input type="date" id="agenda-date" style="margin-bottom: 1.2rem; padding: 0.7rem; border-radius: 8px; border: 1.5px solid #e0e0e0; font-size: 1.08em;" />
+        <button id="btn-ok">Buscar</button>
+        <div id="agenda-result" style="width:100%;max-width:500px;margin-top:1.5rem;"></div>
     </div>
-
-    <div class="crud-list" id="agenda-result" aria-live="polite"></div>
-</section>
-
-<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
-<script src="/static/js/agenda.js?v={{ build_version|default('1') }}"></script>
-<script src="/static/js/navigation.js"></script>
+    <script>
+        // Preenche o input de data com a data de hoje se estiver vazio
+        function setTodayIfEmpty() {
+            var input = document.getElementById('agenda-date');
+            if (input && !input.value) {
+                var today = new Date();
+                var yyyy = today.getFullYear();
+                var mm = String(today.getMonth() + 1).padStart(2, '0');
+                var dd = String(today.getDate()).padStart(2, '0');
+                input.value = yyyy + '-' + mm + '-' + dd;
+            }
+        }
+        setTodayIfEmpty();
+        document.getElementById('btn-ok').onclick = function() {
+            var input = document.getElementById('agenda-date');
+            if (input && input.value) {
+                // Mostra a data selecionada no formato brasileiro
+                var data = input.value.split('-');
+                var dataFormatada = data[2] + '/' + data[1] + '/' + data[0];
+                alert('Data selecionada: ' + dataFormatada);
+            } else {
+                alert('Selecione uma data.');
+            }
+        };
+    </script>
+</body>
+</html>

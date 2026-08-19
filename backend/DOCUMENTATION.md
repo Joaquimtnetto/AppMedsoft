@@ -7,10 +7,10 @@ Este documento reúne a visão geral, instruções de execução, descrição de
 ## 1. Visão geral
 - Propósito: Backend Flask que fornece autenticação, busca de pacientes, histórico de consultas e API de agenda.
 - Arquivo principal que inicia a aplicação: [backend/medsoft_app.py](backend/medsoft_app.py#L1-L400).
-- A aplicação usa PostgreSQL via `psycopg2`.
+-- A aplicação usa PostgreSQL por padrão (via `psycopg2`). A opção Firebird ainda está presente, mas desativada por padrão.
 
 ## 2. Dependências
-- Veja [backend/requirements.txt](backend/requirements.txt#L1-L20): `flask`, `psycopg2-binary`.
+- Veja [backend/requirements.txt](backend/requirements.txt#L1-L20): `flask`, `fdb`.
 - Instalação:
 
 ```bash
@@ -100,7 +100,7 @@ Observação de segurança: evite deixar credenciais em código; prefira variáv
   - Inicializa Flask, registra Blueprints (`consultas_bp`, `consulta_paciente_bp`, `agenda_bp`, `agenda_api_bp`), rotas de templates e endpoints `login` e `change-password`.
 
 - `medsoft_core.py`
-  - `get_db_connection(database=None)` — conecta ao PostgreSQL usando as configurações de ambiente.
+  - `get_db_connection(db_path=None)` — conecta ao Firebird usando host `24.152.36.178` e credenciais hard-coded (mover para configuração).
 
 - `consulta_paciente.py`
   - Blueprint ativo com `POST /api/consulta-paciente` que busca pacientes no `Pacient` e retorna `nomecli`, `codcli`, `idade`, `nomeplano1`, `nomed`.

@@ -13,11 +13,11 @@ graph LR
   ConsultaBP -->|usa|get_db_connection[medsoft_core.get_db_connection]
   PacienteBP -->|usa|get_db_connection
   AgendaBP -->|usa|get_db_connection
-  get_db_connection -->|connect| PostgreSQL[PostgreSQL (Banco principal / Empresa)]
+  get_db_connection -->|connect| Firebird[Firebird DB (medicoraiz.fdb / Empresa DB)]
   App -->|serve| Templates[templates/ static/]
 ```
 
-**Legenda:** o `App` registra Blueprints que executam queries via `medsoft_core.get_db_connection` para conectar ao PostgreSQL.
+**Legenda:** o `App` registra Blueprints que executam queries via `medsoft_core.get_db_connection` para conectar ao Firebird.
 
 **2) Sequência: Login**
 
@@ -25,7 +25,7 @@ graph LR
 sequenceDiagram
   participant C as Client
   participant A as medsoft_app
-  participant DBroot as PostgreSQL principal
+  participant DBroot as medicoraiz.fdb
   participant DBuser as EmpresaDB
 
   C->>A: POST /api/login {nome, senha}
@@ -77,7 +77,7 @@ graph TD
   request[Request HTTP] --> app[medsoft_app]
   app --> route[Blueprint route]
   route --> core[get_db_connection]
-  core --> db[Banco PostgreSQL]
+  core --> db[Arquivo Firebird (.fdb)]
   db --> result[Rows]
   result --> route
   route --> response[JSON]

@@ -7,7 +7,7 @@
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost:8072" },
-    { "key": "dbPath", "value": "medsoft_medmigra" },
+    { "key": "dbPath", "value": "medicoraiz.fdb" },
     { "key": "user", "value": "seu_usuario" },
     { "key": "pass", "value": "sua_senha" }
   ],

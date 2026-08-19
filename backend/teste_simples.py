@@ -1,11 +1,27 @@
-from medsoft_core import get_db_connection
+import fdb
 
+config = {
+    'host': '24.152.36.178',
+    'database': 'C:/JTN/Medsoft/2-Migracao/BD/medico3.fdb',
+    'user': 'sysdba',
+    'password': 'masterkey',
+    'port': 3050
+}
+
+termo_busca = '%joa%'
+nome_medico = 'CARLOS RODRIGUES BRODSKY'
 
 try:
-    connection = get_db_connection()
-    cursor = connection.cursor()
-    cursor.execute('SELECT 1')
-    print(cursor.fetchone())
-    connection.close()
-except Exception as exc:
-    print(f'Erro ao testar a conexão: {exc}')
+    con = fdb.connect(**config)
+    cur = con.cursor()
+    query = '''
+        SELECT nomecli, codcli, datanasc_, nomeplano1, nomed
+        FROM Pacient
+        WHERE UPPER(nomecli) LIKE UPPER(?)
+          AND UPPER(nomed) = UPPER(?)
+        ORDER BY nomecli
+    '''
+    cur.execute(query, (termo_busca, nome_medico))
+    rows = cur.fetchall()
+    con.close()
+except Exception as e:

@@ -16,10 +16,15 @@ def remover_acentos(txt):
 def consulta_paciente():
     data = request.json
     termo = data.get('termo', '').strip() if data else ''
-    if not termo:
-        return jsonify({'success': False, 'message': 'Informe o nome ou código do paciente.', 'pacientes': []}), 400
+    nome_medico = data.get('nome_medico', '').strip() if data else ''
+    usa_like_medico = False
+    if not nome_medico:
+        nome_medico = '%'
+        usa_like_medico = True
+    if not termo or not nome_medico:
+        return jsonify({'success': False, 'message': 'Informe nome/código e nome do médico.', 'pacientes': []}), 400
     try:
-        # Usa a conexão PostgreSQL configurada.
+        # Usa conexão Postgres configurada (MEDSOFT_DB_TYPE=postgres)
         db_path = request.headers.get('X-DB-PATH') or None
         con = get_db_connection(db_path)
         cur = con.cursor()
@@ -29,29 +34,27 @@ def consulta_paciente():
             query = '''
                 SELECT nomecli, codcli,
                        COALESCE(EXTRACT(YEAR FROM age(CURRENT_DATE, datanasc_)), 0)::int AS idade,
-                       nomeplano1, nomed, COALESCE(telefone, '') as telefone
+                       nomeplano1, nomed
                 FROM public.pacient
                 WHERE nomecli ILIKE %s
-                   OR CAST(codcli AS TEXT) = %s
+                  AND nomed ILIKE %s
                 ORDER BY nomecli
-                LIMIT 100
             '''
-            logging.info(f'Executando busca em public.pacient por nomecli/codcli db_path={db_path}')
-            cur.execute(query, (termo_busca, termo_limpo))
+            logging.info(f'Executando query public.pacient: {query} params={(termo_busca, nome_medico)} db_path={db_path}')
+            cur.execute(query, (termo_busca, nome_medico))
         else:
             con.close()
             return jsonify({'success': False, 'message': 'Termo inválido.', 'pacientes': []}), 400
         pacientes = []
         rows = cur.fetchall()
         for row in rows:
-            nomecli, codcli, idade, nomeplano1, nomed, telefone = row
+            nomecli, codcli, idade, nomeplano1, nomed = row
             pacientes.append({
                 'nomecli': nomecli,
                 'codcli': codcli,
                 'idade': idade,
                 'nomeplano1': nomeplano1,
-                'nomed': nomed,
-                'telefone': telefone
+                'nomed': nomed
             })
         con.close()
         if not rows:

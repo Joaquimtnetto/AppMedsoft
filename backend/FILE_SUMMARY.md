@@ -7,14 +7,14 @@ Este documento descreve responsabilidades e funções principais dos arquivos do
 - Define `app.secret_key` e registra Blueprints: `consultas_bp`, `consulta_paciente_bp`, `agenda_bp`, `agenda_api_bp`.
 - Rotas principais:
   - `GET /` → `login.html`
-  - `POST /api/login` → autentica usuário no PostgreSQL, obtém o banco da empresa e guarda em `session`.
+  - `POST /api/login` → autentica usuário na base `medicoraiz.fdb`, obtém `db_path` da empresa, guarda em `session`.
   - `POST /api/change-password` → atualiza senha na tabela `senha` (atenção: armazenamento em texto claro aparenta ocorrer).
   - Rotas para servir templates (`/principal.html`, `/menu.html`, `/consulta_paciente.html`, `/consultas_paciente.html`).
-- Observações: gerencia as variáveis globais `db_path_global`, `usuario_global` e `empresa_global`.
+- Observações: gerencia variáveis globais `db_path_global`, `usuario_global`, `empresa_global` e configura caminhos para o cliente Firebird.
 
 ## medsoft_core.py
-- Função `get_db_connection(database=None)` — cria e retorna uma conexão PostgreSQL.
-- Uso: se `database` não for informado, usa `MEDSOFT_PG_DB`.
+- Função `get_db_connection(db_path=None)` — cria e retorna uma conexão Firebird usando `fdb.connect`.
+- Uso: se `db_path` não informado, usa `medicoraiz.fdb`; monta caminho base `C:/JTN/Medsoft/2-Migracao/BD` quando necessário.
 
 ## paciente_routes.py
 - Blueprint `paciente_bp` com rota `POST /api/consulta-paciente` (há duplicidade de lógica comentada; existe também `consulta_paciente.py`).
@@ -36,10 +36,10 @@ Este documento descreve responsabilidades e funções principais dos arquivos do
 
 ## agenda_api.py
 - Blueprint `agenda_api_bp` com `POST /api/agenda` que recebe `data` (yyyy-mm-dd), usa `session['nome_medico']` e `X-DB-PATH` para consultar agenda do dia.
-- Formata os dados de data antes de executar a consulta.
+- Formata data para Firebird (`dd.mm.YYYY`) antes de executar a query.
 
 ## requirements.txt
-- Contém `flask` e `psycopg2-binary`. Confirme versões em um ambiente controlado antes do deploy.
+- Contém `flask` e `fdb`. Confirme versões em um ambiente controlado antes de deploy.
 
 ## Notas gerais e riscos conhecidos
 - `app.secret_key` está codificada; troque por variável de ambiente em produção.

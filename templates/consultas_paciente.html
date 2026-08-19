@@ -43,6 +43,17 @@
             background: #e3f0ff;
             color: #357ae8;
         }
+        .btn-voltar {
+            background: #e74c3c;
+            color: #fff;
+            padding: 0.7rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
         @media (max-width: 600px) {
             .consultas-container {
                 padding: 1rem 0.5rem;
@@ -58,11 +69,23 @@
     <div class="consultas-container">
         <h2 id="titulo-consultas">Consultas do Paciente</h2>
         <div id="consultas-table"></div>
+        <button class="btn-voltar" onclick="voltar()">Voltar</button>
     </div>
     <script>
         function getQueryParam(name) {
             const url = new URL(window.location.href);
             return url.searchParams.get(name);
+        }
+        function voltar() {
+            // Se estiver rodando dentro do SPA principal.html, use loadTela
+            if (window.parent && window.parent.loadTela) {
+                window.parent.loadTela('consulta_paciente.html');
+            } else if (window.loadTela) {
+                loadTela('consulta_paciente.html');
+            } else {
+                // Não está no SPA, força redirecionamento para principal.html
+                window.location.href = 'principal.html';
+            }
         }
         async function carregarConsultas() {
             const codpac = getQueryParam('codpac');
@@ -88,6 +111,5 @@
         }
         window.onload = carregarConsultas;
     </script>
-    <script src="/static/js/navigation.js"></script>
 </body>
 </html>

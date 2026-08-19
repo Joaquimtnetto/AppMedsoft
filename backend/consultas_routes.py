@@ -1,5 +1,5 @@
 
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 from medsoft_core import get_db_connection, DBConnectionError
 
 consultas_bp = Blueprint('consultas', __name__)
@@ -12,8 +12,7 @@ def consultas_paciente():
         if not codpac:
             return jsonify({'success': False, 'message': 'Código do paciente não informado.', 'consultas': []}), 400
         try:
-            db_path = request.headers.get('X-DB-PATH') or session.get('db_path') or None
-            con = get_db_connection(db_path)
+            con = get_db_connection()
         except Exception as e:
             if isinstance(e, DBConnectionError):
                 return jsonify({'success': False, 'message': str(e), 'consultas': []}), 503
@@ -26,23 +25,20 @@ def consultas_paciente():
             con.close()
             return jsonify({'success': False, 'message': 'Código do paciente inválido.', 'consultas': []}), 400
         query = '''
-            SELECT c.dtvisita, c.diag, c.historico, p.nomecli
-            FROM public.consulta c
-            INNER JOIN public.pacient p ON p.codcli = c.codpac
-            WHERE c.codpac = %s
-            ORDER BY c.dtvisita DESC, c.cod DESC
+            SELECT c.DTVISITA, c.DIAG, c.HISTORICO, cl.NOMECLI, p.nomecli
+            FROM CONSULTA c
+            LEFT JOIN CLINICA cl ON c.CODCLIN = cl.CODCLIN
+            INNER JOIN PACIENT p ON c.CODPAC = p.CODCLI
+            WHERE c.CODPAC = %s
+            ORDER BY c.DTVISITA DESC
         '''
         cur.execute(query, (codpac_int,))
         rows = cur.fetchall()
         for idx, row in enumerate(rows):
-            dtvisita, diag, historico, nomepac = row
-            if isinstance(historico, memoryview):
-                historico = historico.tobytes()
+            dtvisita, diag, historico, nomecli, nomepac = row
+            # Corrige: decodifica se for bytes ou blob
             if isinstance(historico, bytes):
-                try:
-                    historico = historico.decode('utf-8')
-                except UnicodeDecodeError:
-                    historico = historico.decode('latin-1', errors='replace')
+                historico = historico.decode(errors='ignore')
             elif hasattr(historico, 'read'):
                 historico = historico.read().decode(errors='ignore')
             # Formata o texto do histórico preservando quebras de linha
@@ -57,7 +53,7 @@ def consultas_paciente():
                 'dtvisita': dtvisita.strftime('%d/%m/%Y') if dtvisita else '',
                 'diag': diag or '',
                 'historico': historico or '',
-                'clinica': '',
+                'clinica': nomecli or '',
                 'nomepac': nomepac or '',
                 'separador': separador
             })

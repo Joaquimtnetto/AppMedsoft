@@ -86,7 +86,7 @@ Exemplo curl:
 ```bash
 curl -X POST http://localhost:8072/api/consultas-paciente \
   -H "Content-Type: application/json" \
-  -H "X-DB-PATH: medsoft_medmigra" \
+  -H "X-DB-PATH: medicoraiz.fdb" \
   -d '{"codpac":123}'
 ```
 

@@ -1,14 +1,12 @@
 
 from medsoft_core import get_db_connection
-from build_info import BUILD_DATETIME, BUILD_VERSION
 import config
-from config import SECRET_KEY
+from config import SECRET_KEY, FB_BASE_DIR, FB_HOST, FB_PORT, FB_USER, FB_PASS
 # Importa o Blueprint de consulta_paciente
 from consulta_paciente import consulta_paciente_bp
 from consultas_routes import consultas_bp
 from agenda import agenda_bp
 from agenda_api import agenda_api_bp
-from paciente_api import paciente_api_bp
 
 db_path_global = None
 usuario_global = None
@@ -18,7 +16,7 @@ def get_user_empresa_db(login, senha):
     # A tabela atual é `ic_usuario_geral` e os campos de autenticação são `login` e `senha`.
     # Muitos esquemas não possuem a coluna `nome_medico`; para evitar erro, retornamos
     # um valor nulo para `nome_medico` quando a coluna não existir.
-    con = get_db_connection()
+    con = get_db_connection()  # usa Postgres (DB_TYPE=postgres)
     cur = con.cursor()
     cur.execute("""
         SELECT ug.idusuario, ug.idempresa, ug.nome, eg.database, eg.nome as empresa, NULL::text as nome_medico
@@ -33,14 +31,39 @@ def get_user_empresa_db(login, senha):
     idusuario, idempresa, nome, db_path, empresa_nome, nome_medico = user
     return idusuario, idempresa, nome, db_path, empresa_nome, nome_medico
 
+def get_user_db_config(db_path):
+    # Ajusta caminho relativo usando base configurada
+    base_dir = FB_BASE_DIR
+    if not os.path.isabs(db_path):
+        db_path = os.path.join(base_dir, db_path)
+    return {
+        'host': FB_HOST,
+        'database': db_path,
+        'user': FB_USER,
+        'password': FB_PASS,
+        'port': FB_PORT
+    }
+
 import os
 import sys
+# Ajuste de DLL/SO do Firebird conforme o sistema operacional
+if os.name == 'nt':
+    # Windows: garantir fbclient.dll local
+    if hasattr(os, 'add_dll_directory'):
+        os.add_dll_directory(os.path.dirname(os.path.abspath(sys.argv[0])))
+    os.environ['PATH'] = os.path.dirname(os.path.abspath(sys.argv[0])) + os.pathsep + os.environ['PATH']
+else:
+    # Linux: garantir libfbclient.so no LD_LIBRARY_PATH
+    fbclient_dir = os.path.dirname(os.path.abspath(sys.argv[0]))
+    os.environ['LD_LIBRARY_PATH'] = fbclient_dir + os.pathsep + os.environ.get('LD_LIBRARY_PATH', '')
+    # Comentário: certifique-se que libfbclient.so está instalado no Linux
 
-from flask import Flask, request, jsonify, render_template, session, redirect, url_for
+from flask import Flask, request, jsonify, render_template, session
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 import smtplib
 from email.message import EmailMessage
 import logging
+import fdb
 from consultas_routes import consultas_bp
 import traceback
 import datetime
@@ -55,9 +78,10 @@ def resource_path(relative_path):
 from flask import send_from_directory
 
 
-# No executável, os recursos são extraídos pelo PyInstaller em sys._MEIPASS.
-template_folder = resource_path('templates')
-static_folder = resource_path('static')
+# Ajuste para localizar templates e static na raiz do projeto pMobile
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+template_folder = os.path.join(project_root, 'templates')
+static_folder = os.path.join(project_root, 'static')
 
 
 
@@ -67,26 +91,6 @@ app = Flask(
     static_folder=static_folder
 )
 app.secret_key = SECRET_KEY
-
-PUBLIC_ENDPOINTS = {
-    'index',
-    'login',
-    'esqueci_senha_form',
-    'esqueci_senha_post',
-    'reset_password_form',
-    'reset_password_post',
-    'static',
-}
-
-
-@app.before_request
-def require_authentication():
-    if request.endpoint in PUBLIC_ENDPOINTS or session.get('usuario'):
-        return None
-    if request.path.startswith('/api/'):
-        return jsonify({'success': False, 'message': 'Sessão expirada. Faça login novamente.'}), 401
-    return redirect(url_for('index'))
-
 # Validar configuração inicial e falhar com mensagem clara se estiver incorreta
 validation_errors = config.validate_config()
 if validation_errors:
@@ -98,7 +102,6 @@ app.register_blueprint(consultas_bp)
 app.register_blueprint(consulta_paciente_bp)
 app.register_blueprint(agenda_bp)
 app.register_blueprint(agenda_api_bp)
-app.register_blueprint(paciente_api_bp)
 
 # Serializer para tokens de redefinição de senha
 serializer = URLSafeTimedSerializer(app.secret_key)
@@ -147,6 +150,9 @@ def consultas_paciente_html():
     return render_template('consultas_paciente.html')
 
 
+# --- Força uso da fbclient.dll local ---
+
+
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.json
@@ -163,16 +169,15 @@ def login():
         db_path_global = db_path
         usuario_global = nome
         empresa_global = empresa_nome
+        session['db_path'] = db_path
+        session['nome_medico'] = nome_medico
+        session['usuario'] = nome
         # Testa conexão com banco do usuário
         try:
             con_user = get_db_connection(db_path)
             con_user.close()
         except Exception as e:
-            session.clear()
             return jsonify({'success': False, 'message': f'Erro ao conectar ao banco da empresa: {str(e)}'}), 500
-        session['db_path'] = db_path
-        session['nome_medico'] = nome_medico
-        session['usuario'] = nome
         return jsonify({
             'success': True,
             'message': 'Login realizado com sucesso.',
@@ -185,12 +190,6 @@ def login():
         })
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
-
-
-@app.route('/api/logout', methods=['POST'])
-def logout():
-    session.clear()
-    return jsonify({'success': True})
 
 
 @app.route('/api/change-password', methods=['POST'])
@@ -313,11 +312,7 @@ def reset_password_post():
 # Rota para servir o login.html como página inicial
 @app.route('/')
 def index():
-    return render_template(
-        'login.html',
-        build_datetime=BUILD_DATETIME,
-        build_version=BUILD_VERSION,
-    )
+    return render_template('login.html')
 
 # Rota para servir arquivos HTML da pasta frontend
 
@@ -331,13 +326,7 @@ def principal():
 def menu():
     db_path = session.get('db_path', '')
     nome_medico = session.get('nome_medico', '')
-    return render_template(
-        'menu.html',
-        db_path=db_path,
-        nome_medico=nome_medico,
-        build_datetime=BUILD_DATETIME,
-        build_version=BUILD_VERSION,
-    )
+    return render_template('menu.html', db_path=db_path, nome_medico=nome_medico)
 
 @app.route('/consulta_paciente.html')
 def consulta_paciente_html():

@@ -14,7 +14,7 @@ import os
 import sys
 
 BASE_URL = os.environ.get('MEDSOFT_BASE_URL', 'http://localhost:8072')
-DB_PATH = os.environ.get('MEDSOFT_DB_PATH', os.environ.get('MEDSOFT_PG_DB', 'medsoft_medmigra'))
+DB_PATH = os.environ.get('MEDSOFT_DB_PATH', 'medicoraiz.fdb')
 USER = os.environ.get('MEDSOFT_USER', 'seu_usuario')
 PASS = os.environ.get('MEDSOFT_PASS', 'sua_senha')
 

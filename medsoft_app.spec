@@ -1,17 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-from datetime import datetime
-from pathlib import Path
-
-
-build_time = datetime.now().astimezone()
-build_info = Path(SPECPATH) / 'backend' / 'build_info.py'
-build_info.write_text(
-    f"BUILD_DATETIME = '{build_time:%d/%m/%Y %H:%M}'\n"
-    f"BUILD_VERSION = '{build_time:%Y%m%d%H%M%S}'\n",
-    encoding='utf-8',
-)
-
 
 a = Analysis(
     ['backend\\medsoft_app.py'],
