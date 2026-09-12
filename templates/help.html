@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ajuda do Sistema MedSoft</title>
+  <style>
+    :root {
+      --azul: #0b5ea8;
+      --azul-escuro: #083e70;
+      --cinza: #f4f7fb;
+      --texto: #263238;
+      --borda: #d8e2ef;
+      --verde: #198754;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--texto);
+      background: var(--cinza);
+      line-height: 1.55;
+    }
+    header {
+      background: linear-gradient(135deg, var(--azul), var(--azul-escuro));
+      color: #fff;
+      padding: 28px 36px;
+    }
+    header h1 { margin: 0; font-size: 30px; }
+    header p { margin: 8px 0 0; opacity: .95; }
+    .layout { display: flex; min-height: calc(100vh - 120px); }
+    nav {
+      width: 285px;
+      background: #fff;
+      border-right: 1px solid var(--borda);
+      padding: 22px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    nav h2 { font-size: 16px; margin: 0 0 12px; color: var(--azul-escuro); }
+    nav a {
+      display: block;
+      padding: 8px 10px;
+      color: var(--texto);
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    nav a:hover { background: #eaf3ff; color: var(--azul); }
+    main { flex: 1; padding: 26px 34px 60px; max-width: 1100px; }
+    section {
+      background: #fff;
+      border: 1px solid var(--borda);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.035);
+    }
+    h2 { color: var(--azul-escuro); margin-top: 0; }
+    h3 { color: var(--azul); margin-bottom: 6px; }
+    .tag {
+      display: inline-block;
+      background: #eaf3ff;
+      color: var(--azul-escuro);
+      border: 1px solid #c7def8;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 12px;
+      margin: 3px 4px 3px 0;
+    }
+    .passos { counter-reset: passo; padding-left: 0; }
+    .passos li {
+      list-style: none;
+      margin: 8px 0;
+      padding-left: 34px;
+      position: relative;
+    }
+    .passos li:before {
+      counter-increment: passo;
+      content: counter(passo);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--azul);
+      color: #fff;
+      text-align: center;
+      line-height: 24px;
+      font-size: 13px;
+      font-weight: bold;
+    }
+    .box {
+      border-left: 5px solid var(--azul);
+      background: #f8fbff;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin: 12px 0;
+    }
+    .ok { border-left-color: var(--verde); }
+    .tela-detalhes { margin-top: 18px; border-top: 1px solid var(--borda); padding-top: 14px; }
+    .tela-detalhes summary {
+      display: inline-block; cursor: pointer; color: var(--azul); font-weight: bold;
+      text-decoration: underline; list-style: none; padding: 5px 0;
+    }
+    .tela-detalhes summary::-webkit-details-marker { display: none; }
+    .tela-conteudo { margin-top: 12px; padding: 16px; background: #f8fbff; border: 1px solid var(--borda); border-radius: 10px; }
+    .tela-conteudo h3 { margin-top: 18px; }
+    .tela-conteudo h3:first-child { margin-top: 0; }
+    .campos { margin: 8px 0 14px; padding-left: 20px; }
+    .campos li { margin: 5px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid var(--borda); padding: 10px; text-align: left; vertical-align: top; }
+    th { background: #f0f6ff; color: var(--azul-escuro); }
+    code { background: #eef3f8; padding: 2px 5px; border-radius: 4px; }
+    footer { color: #667; font-size: 13px; margin-top: 24px; }
+    @media (max-width: 900px) {
+      .layout { display: block; }
+      nav { width: auto; height: auto; position: relative; border-right: 0; border-bottom: 1px solid var(--borda); }
+      main { padding: 18px; }
+    }
+    @media print {
+      nav { display: none; }
+      main { max-width: none; padding: 0; }
+      section { page-break-inside: avoid; box-shadow: none; }
+      header { background: #fff; color: #000; border-bottom: 2px solid #000; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Ajuda do Sistema MedSoft</h1>
+  <p>Ajuda das principais funcionalidades do sistema.</p>
+</header>
+<div class="layout">
+<nav>
+  <h2>Menu de Ajuda</h2>
+  <a href="#visao-geral">Visão geral</a>
+  <a href="#login">Login e senha</a>
+  <a href="#menu">Menu principal</a>
+  <a href="#pacientes">Pacientes</a>
+  <a href="#agenda">Agenda</a>
+  <a href="#planos">Planos</a>
+  <a href="#anamnese">Padrões</a>
+  <a href="#prof-saude">Profissionais de saúde</a>
+  <a href="#relatorios">Relatórios</a>
+  <a href="#faturamento">Financeiro</a>
+  <a href="#crm">CRM</a>
+  <a href="#crm-whatsapp">↳ Whatzap</a>
+  <a href="#crm-email">↳ E-mail</a>
+  <a href="#mensagens-enviadas">↳ Mensagens enviadas</a>
+  <a href="#configuracoes">Configuração</a>
+  <a href="#clinicas">Clínicas</a>
+  <a href="#usuarios">Usuários</a>
+  <a href="#procedimentos">Procedimentos</a>
+  <a href="#config-email">Configuração de e-mail</a>
+  <a href="#config-whatsapp">Configuração de WhatsApp</a>
+  <a href="#perfil">Perfil de acesso</a>
+  <a href="#empresa">Empresa</a>
+  <a href="#plano-med">Plano Med</a>
+  <a href="#chat-interno">Chat interno</a>
+  <a href="#boas-praticas">Boas práticas</a>
+</nav>
+<main>
+<section id="visao-geral">
+  <h2>1. Visão geral</h2>
+  <p>O MedSoft reúne o atendimento clínico, a agenda, cadastros, comunicação com pacientes, relatórios, controle financeiro e administração da clínica em um único sistema.</p>
+  <div class="box ok"><strong>Fluxo recomendado:</strong> configure a empresa, a clínica, os perfis e usuários; cadastre profissionais, planos, procedimentos e padrões; depois cadastre pacientes, organize a agenda e use o CRM para a comunicação.</div>
+  <p><span class="tag">Paciente</span><span class="tag">Agenda</span><span class="tag">Plano</span><span class="tag">Padrões</span><span class="tag">Prof. Saúde</span><span class="tag">Relatórios</span><span class="tag">Financeiro</span><span class="tag">CRM</span><span class="tag">Configuração</span><span class="tag">Chat interno</span></p>
+</section>
+
+<section id="login">
+  <h2>2. Login e recuperação de senha</h2>
+  <p>A tela inicial permite acessar o sistema com usuário e senha.</p>
+  <ol class="passos">
+    <li>Informe o usuário/login.</li>
+    <li>Informe a senha.</li>
+    <li>Clique em <strong>Entrar</strong>.</li>
+  </ol>
+  <h3>Esqueci minha senha</h3>
+  <p>Use a opção de recuperação de senha para receber um link no e-mail cadastrado. O link permite redefinir a senha de acesso.</p>
+</section>
+
+<section id="menu">
+  <h2>3. Menu principal</h2>
+  <p>Após o login, o usuário acessa o painel do MedSoft. O menu apresenta os módulos disponíveis conforme o perfil de acesso.</p>
+  <table>
+    <tr><th>Módulo</th><th>Finalidade</th></tr>
+    <tr><td>Paciente</td><td>Cadastrar pacientes, consultar histórico clínico e armazenar exames.</td></tr>
+    <tr><td>Agenda</td><td>Visualizar horários, registrar atendimentos e enviar confirmações.</td></tr>
+    <tr><td>Plano</td><td>Manter os convênios e planos aceitos pela clínica.</td></tr>
+    <tr><td>Padrões</td><td>Cadastrar textos reutilizáveis para anamnese, receitas, exames, procedimentos e mensagens.</td></tr>
+    <tr><td>Prof. Saúde</td><td>Cadastrar profissionais e seus dados de atendimento.</td></tr>
+    <tr><td>Relatórios</td><td>Consultar e exportar informações operacionais e financeiras.</td></tr>
+    <tr><td>Financeiro</td><td>Registrar receitas e despesas, importar atendimentos e consultar totalizações.</td></tr>
+    <tr><td>CRM</td><td>Conversar por Whatzap ou e-mail e consultar mensagens enviadas.</td></tr>
+    <tr><td>Configuração</td><td>Administrar clínica, usuários, procedimentos, comunicações, perfis, empresa e Plano Med.</td></tr>
+    <tr><td>Chat interno</td><td>Trocar mensagens rápidas entre os usuários da mesma empresa conectados ao MedSoft.</td></tr>
+  </table>
+  <div class="box"><strong>Acesso por perfil:</strong> alguns módulos ou botões podem não aparecer quando o perfil do usuário ou o plano contratado não permite o recurso.</div>
+</section>
+
+<section id="pacientes">
+  <h2>4. Pacientes</h2>
+  <p>A tela <strong>Paciente</strong> permite localizar, incluir e alterar pacientes. Cada registro apresenta dados básicos, plano, profissional responsável e situação ativa.</p>
+  <ol class="passos">
+    <li>Clique em <strong>Pacientes</strong> no menu.</li>
+    <li>Escolha a busca por nome, sobrenome, CPF ou telefone e informe o valor.</li>
+    <li>Clique em <strong>Buscar</strong>.</li>
+    <li>Para criar novo cadastro, clique em <strong>Incluir</strong>.</li>
+  </ol>
+  <h3>Cadastro e profissional responsável</h3>
+  <p>O cadastro é dividido em três etapas. Na primeira ficam nome, telefone, plano, e-mail, situação e <strong>Prof. Saúde</strong>. Nas etapas seguintes ficam dados pessoais, endereço, documentos, segundo plano e observações. Ao alterar o paciente, é possível selecionar outro profissional da clínica; a escolha atualiza o campo <code>nomed</code>.</p>
+  <h3>Histórico e exames</h3>
+  <p>Use <strong>Histórico</strong> para registrar consultas, aplicar um padrão de anamnese, ditar e organizar o texto, emitir receita e revisar atendimentos anteriores. Use <strong>Exames</strong> para anexar documentos ou imagens ao prontuário.</p>
+  <div class="box"><strong>Dica:</strong> antes de incluir um novo paciente, pesquise para evitar cadastros duplicados.</div>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo">
+    <h3>1. Busca</h3><ul class="campos">
+      <li><strong>Buscar por:</strong> Nome, Sobrenome, CPF ou Telefone define como localizar o cadastro.</li><li><strong>Buscar paciente:</strong> recebe o valor da pesquisa.</li><li><strong>Buscar:</strong> apresenta os resultados; <strong>Incluir</strong> abre um cadastro novo.</li>
+      <li><strong>Resultado:</strong> mostra código, idade, telefone, plano, Prof. Saúde e situação, com ações Histórico, Exames, Cadastro 2/3, Cadastro 3/3, Alterar e Excluir.</li>
+    </ul>
+    <h3>2.1 Cadastro 1/3</h3><ul class="campos"><li><strong>Nome:</strong> identificação obrigatória.</li><li><strong>Prof. Saúde:</strong> profissional responsável selecionado entre os cadastrados na clínica.</li><li><strong>Telefone, Plano e E-mail:</strong> contato e convênio principal.</li><li><strong>Ativo:</strong> mantém ou retira o paciente das operações.</li></ul>
+    <h3>2.2 Cadastro 2/3</h3><ul class="campos"><li><strong>Nascimento, Sexo, CPF e RG:</strong> dados pessoais.</li><li><strong>CEP, UF, Endereço, Cidade e Bairro:</strong> localização; o CEP pode completar o endereço.</li><li><strong>Estado civil e Cor:</strong> informações complementares.</li></ul>
+    <h3>2.3 Cadastro 3/3</h3><ul class="campos"><li><strong>Foto, Nº do Plano e Validade:</strong> imagem e carteira principal.</li><li><strong>Nome do Pai, Nome da Mãe, Profissão, Natural e Recomendação:</strong> dados complementares.</li><li><strong>Plano 2, Data da última consulta, Matrícula e Observação:</strong> segundo convênio e controle administrativo.</li></ul>
+    <h3>3. Histórico</h3><ul class="campos"><li><strong>Data, Tipo e Padrão:</strong> identificam o atendimento e inserem um modelo.</li><li><strong>Histórico:</strong> texto clínico; Teleconsulta abre a comunicação, Ditado por voz transcreve e Organizar texto distribui o conteúdo conforme o padrão.</li><li><strong>Receita:</strong> prepara a prescrição; <strong>Salvar:</strong> grava o atendimento.</li><li>A lista inferior mostra Data, Prof. Saúde e Histórico das consultas anteriores.</li></ul>
+    <h3>4. Exames</h3><ul class="campos"><li><strong>Nome e Data:</strong> identificam o exame.</li><li><strong>Documentos:</strong> anexa imagem, PDF ou arquivo aceito.</li><li><strong>Observação:</strong> informação complementar; <strong>Remover documento atual:</strong> exclui o anexo durante a alteração.</li><li>A lista permite abrir, alterar ou excluir o exame.</li></ul>
+  </div></details>
+</section>
+
+<section id="agenda">
+  <h2>5. Agenda</h2>
+  <p>A agenda permite acompanhar horários por data, profissional de saúde e paciente.</p>
+  <ol class="passos">
+    <li>Acesse o menu <strong>Agenda</strong>.</li>
+    <li>Informe a <strong>Data da agenda</strong>.</li>
+    <li>Selecione o <strong>Prof. Saúde</strong>, quando necessário.</li>
+    <li>Informe ou selecione o <strong>Paciente</strong>.</li>
+    <li>Use <strong>Intervalo</strong> para organizar a visualização dos horários.</li>
+    <li>Clique em <strong>Buscar</strong> ou <strong>Incluir</strong>, conforme a operação desejada.</li>
+  </ol>
+  <h3>Confirmação de agendamento</h3>
+  <p>O sistema pode enviar confirmações por e-mail ou Whatzap. Quando o paciente recebe o link, pode confirmar sua presença. A agenda também permite visualizar por dia ou período, alterar o intervalo dos horários e registrar a situação do atendimento.</p>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo">
+    <h3>Busca e visualização</h3><ul class="campos"><li><strong>Data da agenda:</strong> dia consultado.</li><li><strong>Prof. Saúde:</strong> filtra pelo profissional.</li><li><strong>Paciente:</strong> pesquisa pelo nome.</li><li><strong>Visualização e Intervalo:</strong> definem a forma e a grade de horários.</li></ul>
+    <h3>Agendamento</h3><ul class="campos"><li><strong>Data e Horário:</strong> momento da consulta.</li><li><strong>Paciente e Prof. Saúde:</strong> pessoas vinculadas.</li><li><strong>Telefone, E-mail e Plano:</strong> contato e convênio.</li><li><strong>Status:</strong> Atendido, Agendado, Confirmado ou Solicitado confirmação.</li><li><strong>Procedimento e Observação:</strong> serviço e informação complementar.</li></ul>
+    <p>As ações permitem cadastrar um paciente sem sair da agenda, alterar, duplicar, excluir, abrir o paciente e enviar confirmação por mensagem padrão.</p>
+  </div></details>
+</section>
+
+<section id="prof-saude">
+  <h2>6. Profissionais de saúde</h2>
+  <p>A tela <strong>Prof. Saúde</strong> é usada para cadastrar e consultar profissionais vinculados ao sistema.</p>
+  <ol class="passos">
+    <li>Acesse <strong>Prof. Saúde</strong>.</li>
+    <li>Use <strong>Buscar profissional</strong> para localizar registros existentes.</li>
+    <li>Clique em <strong>Incluir</strong> para cadastrar um novo profissional.</li>
+    <li>Revise os dados antes de salvar.</li>
+  </ol>
+  <p>Além dos dados cadastrais, o profissional pode possuir horários de atendimento, preferências de impressão e textos próprios usados em receitas, exames, procedimentos e mensagens.</p>
+  <div class="box"><strong>Importante:</strong> mantenha nome, registro profissional, especialidade, contatos e vínculos atualizados. O nome cadastrado é usado na Agenda e na vinculação do paciente.</div>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><h3>Busca e cadastro 1/4</h3><p><strong>Buscar profissional</strong> localiza pelo nome. No cadastro: Nome, CEP, UF, Município, Endereço, Bairro, E-mail, Telefone, Celular, CPF, Conselho, Nº do Conselho, Especialidade, Subespecialidade e Observação.</p><h3>Cadastro 2/4 — horários</h3><p>Para cada dia da semana, informe horário de início e término do atendimento. Esses horários formam a disponibilidade exibida na Agenda.</p><h3>Cadastro 3/4 — receita</h3><p>Logo da Clínica, Títulos 1 a 3, Logo da Receita, Rodapés 1 e 2, Cidade, fonte e tamanho de cada título e do rodapé, exibição e grossura das linhas de cabeçalho e rodapé.</p><h3>Cadastro 4/4 — textos</h3><p>Nome e Observação do modelo próprio do profissional. As ações permitem incluir, alterar e excluir.</p></div></details>
+</section>
+
+<section id="clinicas">
+  <h2>7. Clínicas</h2>
+  <p>Permite cadastrar e pesquisar as clínicas associadas ao sistema, mantendo os dados usados nos atendimentos e nas comunicações.</p>
+  <ol class="passos">
+    <li>Acesse <strong>Clínica</strong>.</li>
+    <li>Pesquise em <strong>Buscar clínica</strong>.</li>
+    <li>Clique em <strong>Incluir</strong> para novo cadastro.</li>
+  </ol>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p><strong>Buscar clínica</strong> localiza registros. O cadastro contém Empresa, Nome, UF, CEP, Município, Endereço, Bairro, Especialidade, Nº do Conselho, Conselho, CNPJ, Telefone, Celular, E-mail e Observação. O CEP auxilia no preenchimento do endereço. Use Alterar para corrigir e Excluir para remover conforme a permissão.</p></div></details>
+</section>
+
+<section id="planos">
+  <h2>8. Planos</h2>
+  <p>A tela <strong>Cadastro de Plano</strong> permite consultar e incluir planos usados nos atendimentos.</p>
+  <ol class="passos">
+    <li>Acesse <strong>Plano</strong>.</li>
+    <li>Use <strong>Buscar plano</strong> para localizar um plano.</li>
+    <li>Clique em <strong>Incluir</strong> para cadastrar novo plano.</li>
+  </ol>
+  <p>A opção de visualização geral pode exibir registros de todas as empresas apenas para usuários autorizados. Não confunda este cadastro de convênios com <strong>Plano Med</strong>, que controla os planos comerciais do sistema.</p>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p><strong>Buscar plano</strong> localiza pelo nome; <strong>Todos</strong> exibe os planos autorizados. O cadastro contém Nome, Tabela de referência (AMB, TUSS, SIGTAP ou CBHPM), ANS, CEP, Endereço, Bairro, Cidade, Banco, Prazo em dias, Valor CH, Telefone e Observação. Use Incluir, Alterar ou Excluir conforme necessário.</p></div></details>
+</section>
+
+<section id="usuarios">
+  <h2>9. Usuários</h2>
+  <p>Permite cadastrar usuários que terão acesso ao sistema.</p>
+  <ol class="passos">
+    <li>Acesse <strong>Usuário</strong>.</li>
+    <li>Pesquise em <strong>Buscar usuário</strong>.</li>
+    <li>Clique em <strong>Incluir</strong> para criar novo acesso.</li>
+    <li>Defina corretamente o perfil/permissão e, quando aplicável, vincule o Prof. Saúde.</li>
+  </ol>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p><strong>Buscar usuário</strong> pesquisa acessos existentes. Campos: Login, Senha, Perfil, Prof. Saúde e Empresa. Perfil determina permissões; Prof. Saúde associa o login a um profissional; Empresa define o ambiente acessado. A senha deve ser preenchida com cuidado e não deve ser compartilhada.</p></div></details>
+</section>
+
+<section id="perfil">
+  <h2>10. Perfil de acesso</h2>
+  <p>O módulo <strong>Perfil</strong> organiza os tipos de acesso dos usuários.</p>
+  <ol class="passos">
+    <li>Acesse <strong>Perfil</strong>.</li>
+    <li>Use <strong>Buscar perfil</strong> para localizar perfis existentes.</li>
+    <li>Clique em <strong>Incluir perfil</strong> para criar novo perfil.</li>
+  </ol>
+  <p>Em cada perfil, defina quais menus podem ser acessados e quais informações clínicas, como histórico e exames, podem ser visualizadas.</p>
+  <div class="box"><strong>Dica:</strong> use perfis para separar funções administrativas, atendimento, faturamento e operação.</div>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p><strong>Buscar perfil</strong> localiza regras existentes. Campos: Perfil, Descrição e grade de Permissões dos menus. Na grade, marque os módulos liberados e as permissões específicas de visualização de histórico e exames. Alterações afetam os usuários vinculados ao perfil.</p></div></details>
+</section>
+
+<section id="empresa">
+  <h2>11. Empresa</h2>
+  <p>O módulo <strong>Empresa</strong> permite cadastrar e pesquisar empresas/organizações que utilizam o sistema e associar suas informações comerciais.</p>
+  <ol class="passos">
+    <li>Acesse <strong>Empresa</strong>.</li>
+    <li>Pesquise em <strong>Buscar empresa</strong>.</li>
+    <li>Clique em <strong>Incluir empresa</strong> para novo cadastro.</li>
+  </ol>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p>Campos: Empresa, Banco de dados, E-mail, Telefone, WhatsApp, Plano, Data de início, Pago e Títulos 1 e 2. <strong>Banco de dados</strong> identifica a base da empresa; <strong>Plano</strong> define recursos e limites; <strong>Pago</strong> registra a situação administrativa.</p></div></details>
+</section>
+
+<section id="procedimentos">
+  <h2>12. Procedimentos</h2>
+  <p>Permite cadastrar procedimentos utilizados nos atendimentos, na agenda e no financeiro, incluindo descrição e valores aplicáveis.</p>
+  <ol class="passos">
+    <li>Acesse <strong>Procedimentos</strong>.</li>
+    <li>Use <strong>Buscar procedimento</strong>.</li>
+    <li>Clique em <strong>Incluir</strong> para registrar novo procedimento.</li>
+  </ol>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p><strong>Buscar procedimento</strong> localiza pelo texto informado. Campos: Descrição, Plano e Valor. O Plano relaciona o procedimento ao convênio e o Valor é usado na agenda e no financeiro. A lista permite alterar ou excluir.</p></div></details>
+</section>
+
+<section id="faturamento">
+  <h2>13. Financeiro</h2>
+  <p>A tela <strong>Financeiro</strong> controla receitas e despesas. O recurso pode depender do plano contratado pela empresa.</p>
+  <ol class="passos">
+    <li>Acesse <strong>Faturamento</strong>.</li>
+    <li>Informe o <strong>Mês</strong>.</li>
+    <li>Selecione o <strong>Tipo</strong>.</li>
+    <li>Clique em <strong>Buscar</strong>.</li>
+    <li>Use <strong>Incluir</strong> para registrar um novo lançamento.</li>
+    <li>Use <strong>Importar agenda</strong> para gerar lançamentos a partir de atendimentos concluídos.</li>
+    <li>Use <strong>Totalizar</strong> para consultar os totais do período.</li>
+  </ol>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><h3>Busca</h3><p>Buscar financeiro pesquisa pela descrição; Mês restringe o período; Tipo filtra Receita ou Despesa.</p><h3>Lançamento</h3><p>Campos: Descrição, Tipo, Data prevista, Data realizada, Valor previsto e Valor realizado. Valores previstos representam planejamento; realizados registram o movimento efetivo.</p><h3>Totalização e importação</h3><p>Totalização usa Data inicial, Data final e Tipo. Importar agenda cria lançamentos a partir dos atendimentos marcados como realizados, evitando digitação repetida.</p></div></details>
+</section>
+
+<section id="anamnese">
+  <h2>14. Anamnese / Padrões</h2>
+  <p>A tela <strong>Padrões</strong> permite cadastrar textos reutilizáveis para anamnese, receita, exames, procedimentos e mensagens automáticas.</p>
+  <ol class="passos">
+    <li>Acesse <strong>Padrões</strong>.</li>
+    <li>Use <strong>Buscar padrão</strong> para localizar um modelo.</li>
+    <li>Clique em <strong>Incluir</strong> para criar um novo padrão.</li>
+  </ol>
+  <p>Ao criar o padrão, informe um nome claro, o tipo correto e o conteúdo. Os modelos ficam disponíveis nos recursos compatíveis, reduzindo a digitação repetitiva. Usuários autorizados também podem consultar padrões gerais.</p>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p><strong>Buscar padrão</strong> localiza pelo nome; a visualização geral mostra modelos autorizados de outras empresas. Campos: <strong>Tipo</strong>, que define onde o padrão será usado; <strong>Nome</strong>, identificação do modelo; <strong>Msg HTML</strong>, indica conteúdo formatado; e <strong>Texto/HTML do e-mail</strong>, conteúdo inserido. A pré-visualização permite conferir mensagens HTML antes de salvar.</p></div></details>
+</section>
+
+<section id="relatorios">
+  <h2>15. Relatórios</h2>
+  <p>O módulo permite consultar relatórios de <strong>Paciente</strong>, <strong>Agenda</strong>, <strong>Plano</strong>, <strong>Prof. Saúde</strong>, <strong>Procedimentos</strong> e <strong>Financeiro</strong>.</p>
+  <ol class="passos">
+    <li>Acesse <strong>Relatórios</strong>.</li>
+    <li>Escolha o tipo de relatório.</li>
+    <li>Preencha os filtros apresentados para o relatório selecionado.</li>
+    <li>Clique em <strong>Buscar</strong>.</li>
+    <li>Quando disponível, selecione registros e use a opção de exportação ou envio de mensagem.</li>
+  </ol>
+  <div class="box"><strong>Dica:</strong> o relatório da Agenda pode ser filtrado por profissional; o relatório de pacientes oferece filtros como plano, sexo, aniversário e última consulta.</div>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p><strong>Relatório:</strong> seleciona Paciente, Agenda, Plano, Prof. Saúde, Procedimentos ou Financeiro. Após a escolha, a tela exibe filtros próprios: pacientes por busca e características; agenda por período e profissional; planos, profissionais e procedimentos por cadastro; financeiro por período e tipo. <strong>Buscar</strong> gera o resultado. Quando exibidos, seleção, exportação e envio utilizam apenas os registros marcados.</p></div></details>
+</section>
+
+<section id="crm">
+  <h2>16. CRM</h2>
+  <p>O menu <strong>CRM</strong> concentra a comunicação com pacientes. Ele possui os submenus <strong>Whatzap</strong>, <strong>E-mail</strong> e <strong>Msg Enviadas</strong>.</p>
+  <details class="tela-detalhes"><summary>Tela — ver fluxo</summary><div class="tela-conteudo"><p>Entre primeiro na configuração do canal e confirme que ele está conectado. Em seguida, abra Whatzap ou E-mail, pesquise o paciente, selecione a conversa e envie a mensagem. Consulte <strong>Msg Enviadas</strong> para verificar o registro do disparo.</p></div></details>
+</section>
+
+<section id="crm-whatsapp">
+  <h2>17. CRM · Whatzap</h2>
+  <p>Exibe o estado da conexão, as conversas sincronizadas e os contatos do telefone. Permite pesquisar pacientes e iniciar ou continuar uma conversa.</p>
+  <ul>
+    <li><strong>Período do histórico:</strong> últimos 7, 30 ou 90 dias, período personalizado ou todo o histórico disponível.</li>
+    <li><strong>Histórico de mensagens:</strong> lista conversas e mensagens recebidas ou enviadas.</li>
+    <li><strong>Contatos do telefone:</strong> consulta os contatos sincronizados e permite atualizá-los.</li>
+    <li><strong>Nova conversa:</strong> inicia uma conversa diretamente por telefone.</li>
+  </ul>
+  <div class="box"><strong>Atenção:</strong> mensagens novas continuam sendo recebidas independentemente do período escolhido para importar o histórico. Após conectar ou reiniciar o serviço, aguarde a sincronização das notificações pendentes.</div>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><ul class="campos"><li><strong>Estado da conexão e Atualizar:</strong> informam se o serviço está disponível e renovam os dados.</li><li><strong>Período:</strong> 7, 30 ou 90 dias, personalizado com Data inicial/Data final, ou todo o histórico.</li><li><strong>Buscar por e Paciente:</strong> pesquisa por Nome, CPF ou Telefone; Buscar e Exibir todos carregam os pacientes.</li><li><strong>Histórico de mensagens:</strong> busca conversa por paciente ou telefone, mostra mensagens e permite responder.</li><li><strong>Contatos do telefone:</strong> busca nomes ou números; Atualizar contatos solicita nova sincronização.</li><li><strong>Nova conversa:</strong> informe o telefone, abra a conversa, escreva a mensagem e envie.</li></ul></div></details>
+</section>
+
+<section id="crm-email">
+  <h2>18. CRM · E-mail</h2>
+  <p>Permite buscar pacientes, selecionar destinatários com e-mail cadastrado, consultar a conversa e enviar mensagens. A conta SMTP precisa estar configurada antes do envio.</p>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p><strong>Atualizar</strong> renova as conversas. <strong>Buscar por</strong> escolhe Nome, CPF ou Telefone; <strong>Paciente</strong> recebe o termo; Buscar e Exibir todos carregam os registros. Após selecionar o paciente, a área de conversa mostra o histórico. Preencha assunto e mensagem nos campos apresentados, confira o destinatário e envie.</p></div></details>
+</section>
+
+<section id="mensagens-enviadas">
+  <h2>19. Mensagens enviadas</h2>
+  <p>Apresenta o registro das comunicações automáticas e manuais. Use data inicial, data final, tipo e destino para filtrar os resultados. A lista diferencia e-mail automático, e-mail manual e Whatzap e possui navegação entre páginas.</p>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p><strong>Data inicial e Data final:</strong> delimitam o período; <strong>Tipo:</strong> Todos, E-mail automático, E-mail manual ou WhatsApp; <strong>Destino:</strong> procura pelo destinatário. Pesquisar aplica os filtros, Limpar restaura a consulta e Anterior/Próxima navegam pelas páginas. O resultado informa canal, destino, data, conteúdo e situação disponível.</p></div></details>
+</section>
+
+<section id="configuracoes">
+  <h2>20. Configuração</h2>
+  <p>O menu <strong>Configuração</strong> reúne os submenus <strong>Clínica</strong>, <strong>Usuário</strong>, <strong>Procedimentos</strong>, <strong>Config. e-mail</strong>, <strong>Config. Watzap</strong>, <strong>Perfil</strong>, <strong>Empresa</strong> e <strong>Plano Med</strong>. A disponibilidade depende das permissões do usuário.</p>
+  <details class="tela-detalhes"><summary>Tela — ver fluxo</summary><div class="tela-conteudo"><p>Use Clínica para dados da unidade, Usuário para acessos, Procedimentos para serviços, Config. e-mail e Config. Watzap para comunicação, Perfil para permissões, Empresa para ambientes e Plano Med para os planos comerciais do sistema.</p></div></details>
+</section>
+
+<section id="config-email">
+  <h2>21. Configuração de e-mail</h2>
+  <p>A tela <strong>Config. e-mail</strong> define os parâmetros SMTP para envio de mensagens pelo sistema.</p>
+  <table>
+    <tr><th>Campo</th><th>Descrição</th></tr>
+    <tr><td>Servidor SMTP</td><td>Endereço do servidor de envio de e-mail.</td></tr>
+    <tr><td>Porta</td><td>Porta SMTP usada pelo provedor.</td></tr>
+    <tr><td>Usuário</td><td>Conta usada para autenticação.</td></tr>
+    <tr><td>Senha</td><td>Senha da conta ou senha de aplicativo.</td></tr>
+    <tr><td>E-mail remetente</td><td>Endereço exibido como remetente.</td></tr>
+    <tr><td>Usar TLS / SSL</td><td>Marque conforme orientação do provedor de e-mail.</td></tr>
+  </table>
+  <ol class="passos">
+    <li>Preencha os dados SMTP.</li>
+    <li>Clique em <strong>Testar conexão</strong>.</li>
+    <li>Se o teste funcionar, clique em <strong>Salvar e-mail</strong>.</li>
+  </ol>
+  <h3>Automatização de e-mail</h3>
+  <p>Defina os intervalos e os textos padrão usados para agendamento, retorno do agendamento, aniversário e eventos. Os textos são escolhidos entre os padrões cadastrados.</p>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><h3>Conta SMTP</h3><ul class="campos"><li><strong>Servidor SMTP e Porta:</strong> endereço e porta do provedor.</li><li><strong>Usuário e Senha:</strong> credenciais da conta ou senha de aplicativo.</li><li><strong>E-mail remetente:</strong> endereço apresentado no envio.</li><li><strong>Usar TLS/SSL:</strong> segurança exigida pelo provedor; use somente a opção compatível.</li><li><strong>Testar conexão:</strong> valida os dados antes de salvar.</li></ul><h3>Automatizações</h3><p>Para Agendamento, Retorno, Aniversário e Evento, o campo de tempo define a antecedência em minutos e o campo Texto seleciona o padrão usado no envio. <strong>Salvar e-mail</strong> grava toda a configuração.</p></div></details>
+</section>
+
+<section id="config-whatsapp">
+  <h2>22. Configuração de WhatsApp</h2>
+  <p>A tela de WhatsApp permite configurar o envio pela API oficial ou pela conexão MedSoft via Baileys, com QR Code e envio direto pelo servidor.</p>
+  <table>
+    <tr><th>Campo</th><th>Descrição</th></tr>
+    <tr><td>Celular MedSoft</td><td>Número de telefone usado para comunicação.</td></tr>
+    <tr><td>Phone Number ID</td><td>Identificador do número na API oficial.</td></tr>
+    <tr><td>Access Token</td><td>Token de acesso da API.</td></tr>
+    <tr><td>Versão da API</td><td>Versão utilizada para integração.</td></tr>
+    <tr><td>Idioma do modelo</td><td>Idioma configurado no modelo aprovado.</td></tr>
+    <tr><td>Nome do modelo aprovado</td><td>Template aprovado para envio.</td></tr>
+  </table>
+  <h3>Conexão simplificada</h3>
+  <p>No modo Whatzap do MedSoft, leia o QR Code pelo celular em <strong>Aparelhos conectados</strong>. A tela permite atualizar o QR, reiniciar o serviço, desconectar e abrir o WhatsApp Web. O estado conectado deve ser confirmado antes de usar o CRM.</p>
+  <h3>Automatização de WhatsApp</h3>
+  <p>Defina os intervalos e textos para agendamento, retorno, aniversário e eventos, da mesma forma utilizada na automatização de e-mail.</p>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><h3>Modo Whatzap do MedSoft</h3><p>Selecione o modo simplificado. QR Code associa o celular; Atualizar QR gera um novo código; Reiniciar serviço reinicia o Baileys; Desconectar remove a sessão; Abrir WhatsApp Web auxilia na conferência. O indicador informa o estado real da conexão.</p><h3>Modo WhatsApp Business</h3><p>Campos: Celular MedSoft, Phone Number ID, Access Token, Versão da API, Idioma do modelo e Nome do modelo aprovado.</p><h3>Automatizações</h3><p>Agendamento, Retorno, Aniversário e Evento possuem tempo em minutos e Texto padrão. <strong>Salvar Watzap</strong> grava as opções.</p></div></details>
+</section>
+
+<section id="plano-med">
+  <h2>23. Plano Med</h2>
+  <p>Cadastro administrativo dos planos comerciais oferecidos pelo MedSoft. Permite pesquisar, incluir e alterar regras do plano, incluindo a disponibilidade de módulos como o Financeiro. É diferente do menu principal <strong>Plano</strong>, que registra convênios dos pacientes.</p>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo"><p><strong>Buscar plano:</strong> localiza planos comerciais. Campos: Nome do plano, Descrição, Valor, Quantidade de Usuários, Quantidade de Pacientes, disponibilidade do Financeiro, Data Máxima e Dias de uso. Quantidades e prazo definem limites; a permissão de Financeiro controla a exibição do módulo para as empresas vinculadas.</p></div></details>
+</section>
+
+<section id="chat-interno">
+  <h2>24. Chat interno</h2>
+  <p>O <strong>Chat interno</strong> permite a troca de mensagens rápidas entre os usuários vinculados à mesma empresa no MedSoft. Ele fica disponível pelo botão flutuante azul com o ícone de conversa, no canto inferior direito da tela.</p>
+  <ol class="passos">
+    <li>Clique no botão flutuante de conversa para abrir o painel.</li>
+    <li>Confira no título do painel qual usuário está conectado.</li>
+    <li>Digite a mensagem no campo inferior.</li>
+    <li>Pressione <strong>Enter</strong> ou clique no botão de envio.</li>
+    <li>Use o botão <strong>X</strong> para fechar o painel sem sair do sistema.</li>
+  </ol>
+  <div class="box"><strong>Notificações:</strong> quando o painel estiver fechado, o número sobre o botão informa a quantidade de mensagens novas ainda não visualizadas.</div>
+  <details class="tela-detalhes"><summary>Tela — ver campos e operações</summary><div class="tela-conteudo">
+    <ul class="campos">
+      <li><strong>Chat interno — usuário:</strong> o cabeçalho identifica o login que está utilizando o chat.</li>
+      <li><strong>Área de mensagens:</strong> apresenta o remetente, o texto e o horário. As mensagens do próprio usuário e dos demais participantes aparecem com identificação visual diferente.</li>
+      <li><strong>Digite e pressione Enter:</strong> campo para escrever mensagens de até 2.000 caracteres. Enter envia; para inserir uma nova linha, use Shift + Enter.</li>
+      <li><strong>Enviar:</strong> botão com avião de papel que envia o conteúdo digitado.</li>
+      <li><strong>Limpar histórico:</strong> botão com borracha que apaga o histórico do chat interno da empresa após a confirmação.</li>
+      <li><strong>Indicador de mensagens:</strong> mostra novas mensagens recebidas enquanto o painel está fechado.</li>
+      <li><strong>Fechar:</strong> recolhe o painel; as mensagens continuam sendo atualizadas automaticamente.</li>
+    </ul>
+    <p>O histórico é compartilhado somente entre os usuários da empresa ativa e mantém até as 200 mensagens mais recentes. O chat é indicado para comunicação operacional breve e não substitui o prontuário ou o histórico clínico do paciente.</p>
+  </div></details>
+</section>
+
+<section id="boas-praticas">
+  <h2>25. Boas práticas</h2>
+  <ul>
+    <li>Pesquise antes de incluir novos registros para evitar duplicidade.</li>
+    <li>Mantenha usuários e perfis atualizados.</li>
+    <li>Revise configurações de e-mail e WhatsApp antes de enviar mensagens a pacientes.</li>
+  </ul>
+</section>
+</main>
+</div>
+</body>
+</html>

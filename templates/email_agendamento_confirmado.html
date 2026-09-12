@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="pt-BR">
+<body style="margin:0;background:#f2f5fa;font-family:Arial,sans-serif;color:#1c2a40">
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f2f5fa;padding:28px 12px">
+<tr><td align="center">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#fff;border-radius:14px;overflow:hidden">
+    <tr><td style="padding:24px 28px;background:#347bea;color:#fff;font-size:25px;font-weight:bold">✚ MedSoft</td></tr>
+    <tr><td style="padding:30px 28px">
+      <div style="padding:13px 16px;background:#e9f8ef;color:#08783f;border-radius:9px;font-weight:bold">✓ Consulta confirmada</div>
+      <h1 style="margin:24px 0 10px;font-size:23px">Olá, {{ appointment.paciente }}</h1>
+      <p style="line-height:1.6">Sua <strong>{{ appointment.procedimento }}</strong> com <strong>{{ appointment.profissional }}</strong> foi confirmada.</p>
+      <div style="margin-top:20px;border:1px solid #d9e2ef;border-radius:12px;padding:20px">
+        <div style="margin:8px 0">📅 {{ appointment.data.strftime('%d/%m/%Y') }}</div>
+        <div style="margin:8px 0">🕐 {{ appointment.hora }}</div>
+      </div>
+      <p style="margin:22px 0 0;color:#60728c;font-size:13px">Mensagem automática enviada pela MedSoft.</p>
+    </td></tr>
+  </table>
+</td></tr>
+</table>
+</body>
+</html>

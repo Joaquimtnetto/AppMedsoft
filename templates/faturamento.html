@@ -1,0 +1,62 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page faturamento-page" id="faturamento-page">
+    <header class="crud-header">
+        <div>
+            <h2>Financeiro</h2>
+        </div>
+        <div class="faturamento-header-actions">
+            <button class="crud-button crud-button-secondary" id="faturamento-totalizacao" type="button" title="Totalizar financeiro">
+                <i class="fa fa-calculator"></i> Totalização
+            </button>
+            <button class="crud-button crud-button-secondary" id="faturamento-import-agenda" type="button" title="Incluir financeiros da agenda atendida">
+                <i class="fa fa-calendar-check"></i> Incluir da Agenda
+            </button>
+            <button class="crud-button" id="faturamento-include" type="button" title="Incluir financeiro">
+                <i class="fa fa-plus"></i> Incluir
+            </button>
+        </div>
+    </header>
+
+    <div class="crud-toolbar">
+        <div class="crud-field">
+            <label for="faturamento-busca">Buscar financeiro</label>
+            <input class="crud-input" type="text" id="faturamento-busca" placeholder="Descrição ou código">
+        </div>
+        <div class="crud-field">
+            <label for="faturamento-mes">Mês</label>
+            <select class="crud-input" id="faturamento-mes">
+                <option value="">Todos</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+            </select>
+        </div>
+        <div class="crud-field">
+            <label for="faturamento-tipo">Tipo</label>
+            <select class="crud-input" id="faturamento-tipo">
+                <option value="">Todos</option>
+                <option value="Receita">Receita</option>
+                <option value="Despesa">Despesa</option>
+            </select>
+        </div>
+        <button class="crud-button" id="faturamento-buscar" type="button">
+            <i class="fa fa-search"></i> Buscar
+        </button>
+    </div>
+
+    <div class="crud-list faturamento-list" id="faturamento-result" aria-live="polite"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/faturamento.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/navigation.js"></script>

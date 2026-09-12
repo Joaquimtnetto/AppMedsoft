@@ -1,0 +1,81 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page configuracao-page" id="configuracao-page" data-configuracao-tela="email">
+    <header class="crud-header">
+        <div>
+            <h2>Config. e-mail</h2>
+        </div>
+    </header>
+
+    <div id="configuracao-status" aria-live="polite"></div>
+    <form class="configuracao-form" id="configuracao-form">
+        <section class="configuracao-card">
+            <div class="configuracao-card-title">
+                <i class="fa fa-envelope"></i>
+                <div><h3>E-mail (SMTP)</h3><p>Conta usada para enviar as confirmações.</p></div>
+            </div>
+            <div class="configuracao-grid">
+                <label class="crud-field configuracao-wide"><span>Servidor SMTP</span>
+                    <input class="crud-input" name="smtp_host" maxlength="255"></label>
+                <label class="crud-field"><span>Porta</span>
+                    <input class="crud-input" name="smtp_porta" type="number" min="0" max="65535"></label>
+                <label class="crud-field"><span>Usuário</span>
+                    <input class="crud-input" name="smtp_usuario" maxlength="255"></label>
+                <label class="crud-field"><span>Senha</span>
+                    <span class="configuracao-password-wrap">
+                        <input class="crud-input" name="smtp_senha" type="password" autocomplete="new-password">
+                        <button type="button" class="configuracao-password-toggle" id="toggle-smtp-senha"
+                                title="Exibir senha" aria-label="Exibir senha" aria-pressed="false">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                    </span>
+                </label>
+                <label class="crud-field configuracao-wide"><span>E-mail remetente</span>
+                    <input class="crud-input" name="smtp_remetente" type="email" maxlength="255"></label>
+                <label class="configuracao-check"><input name="smtp_tls" type="checkbox"> Usar TLS</label>
+                <label class="configuracao-check"><input name="smtp_ssl" type="checkbox"> Usar SSL</label>
+            </div>
+            <div class="configuracao-email-test">
+                <button type="button" class="crud-button crud-button-secondary" id="configuracao-test-email">
+                    <i class="fa fa-plug"></i> Testar conexão
+                </button>
+                <div id="configuracao-email-test-result" aria-live="polite"></div>
+            </div>
+        </section>
+
+        <section class="configuracao-card">
+            <div class="configuracao-card-title">
+                <i class="fa fa-robot"></i>
+                <div><h3>Automatização de e-mail</h3><p>Mensagens automáticas usadas nos disparos.</p></div>
+            </div>
+            <div class="configuracao-grid">
+                <label class="crud-field"><span>Agendamento Email (Tempo em Minutos)</span>
+                    <input class="crud-input" name="autlembraagendaemail" type="number" min="0" step="1"></label>
+                <label class="crud-field"><span>Texto Agendamento Email</span>
+                    <select class="crud-input configuracao-texto-select" name="textolembraagendaemail"></select></label>
+
+                <label class="crud-field"><span>Retorno agendamento Email (Tempo em Minutos)</span>
+                    <input class="crud-input" name="autlembraretagendaemail" type="number" min="0" step="1"></label>
+                <label class="crud-field"><span>Texto Retorno do Agendamento Email</span>
+                    <select class="crud-input configuracao-texto-select" name="textolembraretagendaemail"></select></label>
+
+                <label class="crud-field"><span>Lembra Aniversário Email (Tempo em Minutos)</span>
+                    <input class="crud-input" name="autlembraniveremail" type="number" min="0" step="1"></label>
+                <label class="crud-field"><span>Texto Aniversário Email</span>
+                    <select class="crud-input configuracao-texto-select" name="textolembraniveremail"></select></label>
+
+                <label class="crud-field"><span>Lembra Evento Email (Tempo em Minutos)</span>
+                    <input class="crud-input" name="autlembraeventemail" type="number" min="0" step="1"></label>
+                <label class="crud-field"><span>Texto Evento Email</span>
+                    <select class="crud-input configuracao-texto-select" name="textolembraeventemail"></select></label>
+            </div>
+        </section>
+
+        <div class="configuracao-actions">
+            <button type="submit" class="crud-button"><i class="fa fa-check"></i> Salvar e-mail</button>
+        </div>
+    </form>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/configuracao.js?v={{ build_version|default('1') }}"></script>

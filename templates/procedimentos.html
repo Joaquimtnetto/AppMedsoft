@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page procedimento-page" id="procedimento-page">
+    <header class="crud-header">
+        <div>
+            <h2>Procedimentos</h2>
+        </div>
+        <button class="crud-button" id="procedimento-include" type="button" title="Incluir procedimento">
+            <i class="fa fa-plus"></i> Incluir
+        </button>
+    </header>
+
+    <div class="crud-toolbar procedimento-toolbar">
+        <div class="crud-field">
+            <label for="procedimento-busca">Buscar procedimento</label>
+            <input class="crud-input" type="text" id="procedimento-busca" placeholder="Descricao ou valor">
+        </div>
+        <button class="crud-button" id="procedimento-btn-buscar" type="button">
+            <i class="fa fa-search"></i> Buscar
+        </button>
+    </div>
+
+    <div class="crud-list procedimento-list" id="procedimento-result" aria-live="polite"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/procedimentos.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/navigation.js"></script>

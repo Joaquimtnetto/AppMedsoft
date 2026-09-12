@@ -1,0 +1,59 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page mensagens-page" id="mensagens-enviadas-page">
+    <header class="crud-header">
+        <div>
+            <h2>Mensagens Enviadas</h2>
+            <p class="mensagens-subtitle">Histórico de mensagens encaminhadas por e-mail e WhatsApp.</p>
+            <p class="mensagens-subtitle">
+                Para e-mails, "Sim" indica que o servidor aceitou o envio; a entrega final ao destinatário pode gerar retorno posterior.
+            </p>
+        </div>
+    </header>
+
+    <div class="crud-toolbar mensagens-toolbar">
+        <div class="crud-field">
+            <label for="mensagens-data-inicial">Data inicial</label>
+            <input class="crud-input" id="mensagens-data-inicial" type="date">
+        </div>
+        <div class="crud-field">
+            <label for="mensagens-data-final">Data final</label>
+            <input class="crud-input" id="mensagens-data-final" type="date">
+        </div>
+        <div class="crud-field">
+            <label for="mensagens-tipo">Tipo</label>
+            <select class="crud-input" id="mensagens-tipo">
+                <option value="">Todos</option>
+                <option value="Email Auto">E-mail automático</option>
+                <option value="Email Manual">E-mail manual</option>
+                <option value="Whatzap">WhatsApp</option>
+            </select>
+        </div>
+        <div class="crud-field mensagens-destino-field">
+            <label for="mensagens-destino">Destino</label>
+            <input class="crud-input" id="mensagens-destino" type="search"
+                   maxlength="255" placeholder="Telefone ou e-mail">
+        </div>
+        <button class="crud-button" id="mensagens-pesquisar" type="button">
+            <i class="fa fa-search"></i> Pesquisar
+        </button>
+        <button class="crud-button crud-button-secondary" id="mensagens-limpar" type="button">
+            <i class="fa fa-eraser"></i> Limpar
+        </button>
+    </div>
+
+    <div id="mensagens-resumo" class="mensagens-resumo" aria-live="polite"></div>
+    <div id="mensagens-result" class="mensagens-table-wrap" aria-live="polite"></div>
+    <div class="mensagens-pagination" id="mensagens-pagination" hidden>
+        <button class="crud-button crud-button-secondary" id="mensagens-anterior" type="button">
+            <i class="fa fa-chevron-left"></i> Anterior
+        </button>
+        <span id="mensagens-pagina"></span>
+        <button class="crud-button crud-button-secondary" id="mensagens-proxima" type="button">
+            Próxima <i class="fa fa-chevron-right"></i>
+        </button>
+    </div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/mensagens_enviadas.js?v={{ build_version|default('1') }}"></script>

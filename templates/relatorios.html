@@ -1,0 +1,31 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page" id="relatorios-page" data-empresa="{{ empresa_nome|default('') }}">
+    <header class="crud-header">
+        <div class="relatorios-title">
+            <h2>Relatórios</h2>
+            {% if empresa_nome %}<span class="relatorios-company">{{ empresa_nome }}</span>{% endif %}
+        </div>
+    </header>
+    <div class="crud-toolbar">
+        <div class="crud-field">
+            <label for="relatorios-tipo">Relatório</label>
+            <select class="crud-input" id="relatorios-tipo">
+                <option value="">Selecione</option>
+                <option value="paciente">Paciente</option>
+                <option value="agenda">Agenda</option>
+                <option value="plano">Plano</option>
+                <option value="prof-saude">Prof. Saúde</option>
+                <option value="procedimentos">Procedimentos</option>
+                <option value="financeiro">Financeiro</option>
+            </select>
+        </div>
+        <button class="crud-button" id="relatorios-buscar" type="button">
+            <i class="fa fa-search"></i> Buscar
+        </button>
+    </div>
+
+    <div id="relatorios-result" class="crud-list" aria-live="polite">
+        <div class="crud-empty">Selecione o relatório desejado.</div>
+    </div>
+</section>

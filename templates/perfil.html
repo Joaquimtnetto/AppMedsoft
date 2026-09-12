@@ -1,0 +1,25 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page" id="perfil-page">
+    <header class="crud-header">
+        <div>
+            <h2>Perfil</h2>
+        </div>
+        <button class="crud-button" id="perfil-incluir"><i class="fa fa-plus"></i> Incluir perfil</button>
+    </header>
+
+    <div class="crud-toolbar">
+        <div class="crud-field">
+            <label for="perfil-busca">Buscar perfil</label>
+            <input class="crud-input" id="perfil-busca" type="search" placeholder="Nome ou descrição">
+        </div>
+        <button class="crud-button crud-button-secondary" id="perfil-pesquisar" type="button">
+            <i class="fa fa-search"></i> Pesquisar
+        </button>
+    </div>
+
+    <div id="perfil-result" class="crud-list" aria-live="polite"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/perfil.js?v={{ build_version|default('1') }}"></script>

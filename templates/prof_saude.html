@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page prof-saude-page" id="prof-saude-page">
+    <header class="crud-header">
+        <div>
+            <h2>Prof. Saúde</h2>
+        </div>
+        <button class="crud-button" id="prof-saude-include" type="button" title="Incluir profissional">
+            <i class="fa fa-plus"></i> Incluir
+        </button>
+    </header>
+
+    <div class="crud-toolbar">
+        <div class="crud-field">
+            <label for="prof-saude-busca">Buscar profissional</label>
+            <input class="crud-input" type="text" id="prof-saude-busca" placeholder="Nome ou código">
+        </div>
+        <button class="crud-button" id="btn-ok" type="button">
+            <i class="fa fa-search"></i> Buscar
+        </button>
+    </div>
+
+    <div class="crud-list prof-saude-list" id="prof-saude-result" aria-live="polite"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/prof_saude.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/navigation.js"></script>

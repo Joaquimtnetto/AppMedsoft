@@ -1,0 +1,106 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page configuracao-page" id="configuracao-page" data-configuracao-tela="whatsapp">
+    <header class="crud-header">
+        <div>
+            <h2>Config. Watzap</h2>
+        </div>
+    </header>
+
+    <div id="configuracao-status" aria-live="polite"></div>
+    <form class="configuracao-form" id="configuracao-form">
+        <section class="configuracao-card">
+            <div class="configuracao-card-title">
+                <i class="fa-brands fa-whatsapp"></i>
+                <div><h3>WhatsApp</h3><p>Escolha entre a API oficial ou a conexão Whatzap do MedSoft.</p></div>
+            </div>
+            <fieldset class="configuracao-mode">
+                <legend>Modo de envio</legend>
+                <label class="whatsapp-mode-simplificado"><input type="radio" name="whatsapp_modo" value="simplificado" checked>
+                    <span><strong>Whatzap</strong><small>Envia diretamente pela conta conectada ao MedSoft.</small></span>
+                </label>
+                <label class="whatsapp-mode-business"><input type="radio" name="whatsapp_modo" value="business">
+                    <span><strong>WhatsApp Business</strong><small>Envio automático pela API oficial.</small></span>
+                </label>
+            </fieldset>
+            <div class="configuracao-simplified-note" hidden>
+                <div class="whatsapp-connection" id="whatsapp-connection">
+                    <div class="whatsapp-connection-visual">
+                        <div class="crud-loading">Preparando QR Code...</div>
+                    </div>
+                    <div class="whatsapp-connection-info">
+                        <h4>Conectar WhatsApp</h4>
+                        <p id="whatsapp-connection-message">Aguarde enquanto a conexão é preparada.</p>
+                        <p class="whatsapp-connected-phone" id="whatsapp-connected-phone" hidden></p>
+                        <ol>
+                            <li>Abra o WhatsApp no celular.</li>
+                            <li>Acesse <strong>Aparelhos conectados</strong>.</li>
+                            <li>Toque em <strong>Conectar um aparelho</strong> e leia o QR Code.</li>
+                            <li>Aguarde aparecer <strong>WhatsApp conectado</strong>. Apenas exibir o QR Code não conclui a conexão.</li>
+                        </ol>
+                        <div class="whatsapp-connection-actions">
+                            <button type="button" class="crud-button secondary" id="whatsapp-refresh-qr">
+                                <i class="fa-solid fa-rotate"></i> Atualizar QR
+                            </button>
+                            <button type="button" class="crud-button secondary" id="whatsapp-restart-service">
+                                <i class="fa-solid fa-power-off"></i> Reiniciar serviço
+                            </button>
+                            <button type="button" class="crud-button danger" id="whatsapp-disconnect" hidden>
+                                <i class="fa-solid fa-link-slash"></i> Desconectar
+                            </button>
+                            <button type="button" class="crud-button" id="whatsapp-open-web">
+                                <i class="fa-brands fa-whatsapp"></i> Abrir WhatsApp Web
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="configuracao-grid">
+                <label class="crud-field whatsapp-business-only"><span>Celular MedSoft</span>
+                    <input class="crud-input" name="whatsapp_remetente" inputmode="numeric" maxlength="15"></label>
+                <label class="crud-field whatsapp-business-only"><span>Phone Number ID</span>
+                    <input class="crud-input" name="whatsapp_phone_number_id" maxlength="80"></label>
+                <label class="crud-field configuracao-wide whatsapp-business-only"><span>Access Token</span>
+                    <input class="crud-input" name="whatsapp_token" type="password" autocomplete="new-password"></label>
+                <label class="crud-field whatsapp-business-only"><span>Versão da API</span>
+                    <input class="crud-input" name="whatsapp_api_version" placeholder="Ex.: vXX.X" maxlength="20"></label>
+                <label class="crud-field whatsapp-business-only"><span>Idioma do modelo</span>
+                    <input class="crud-input" name="whatsapp_idioma" placeholder="pt_BR" maxlength="10"></label>
+                <label class="crud-field configuracao-wide whatsapp-business-only"><span>Nome do modelo aprovado</span>
+                    <input class="crud-input" name="whatsapp_template" maxlength="120"></label>
+            </div>
+        </section>
+
+        <section class="configuracao-card">
+            <div class="configuracao-card-title">
+                <i class="fa fa-robot"></i>
+                <div><h3>Automatização de WhatsApp</h3><p>Mensagens automáticas usadas nos disparos.</p></div>
+            </div>
+            <div class="configuracao-grid">
+                <label class="crud-field"><span>Agendamento WhatsApp (Tempo em Minutos)</span>
+                    <input class="crud-input" name="autlembraagendawhatzap" type="number" min="0" step="1"></label>
+                <label class="crud-field"><span>Texto Agendamento WhatsApp</span>
+                    <select class="crud-input configuracao-texto-select" name="textolembraagendawahtzap"></select></label>
+
+                <label class="crud-field"><span>Retorno agendamento WhatsApp (Tempo em Minutos)</span>
+                    <input class="crud-input" name="autlembraretagendawhatzap" type="number" min="0" step="1"></label>
+                <label class="crud-field"><span>Texto Retorno do Agendamento WhatsApp</span>
+                    <select class="crud-input configuracao-texto-select" name="textolembraretagendawahtzap"></select></label>
+
+                <label class="crud-field"><span>Lembra Aniversário WhatsApp (Tempo em Minutos)</span>
+                    <input class="crud-input" name="autlembraniverwahtzap" type="number" min="0" step="1"></label>
+                <label class="crud-field"><span>Texto Aniversário WhatsApp</span>
+                    <select class="crud-input configuracao-texto-select" name="textolembraniverwahtzap"></select></label>
+
+                <label class="crud-field"><span>Lembra Evento WhatsApp (Tempo em Minutos)</span>
+                    <input class="crud-input" name="autlembraeventowahtzap" type="number" min="0" step="1"></label>
+                <label class="crud-field"><span>Texto Evento WhatsApp</span>
+                    <select class="crud-input configuracao-texto-select" name="textolembraeventwahtzap"></select></label>
+            </div>
+        </section>
+
+        <div class="configuracao-actions">
+            <button type="submit" class="crud-button"><i class="fa fa-check"></i> Salvar Watzap</button>
+        </div>
+    </form>
+</section>

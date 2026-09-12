@@ -1,0 +1,45 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page crm-whatsapp-page" id="crm-email-page">
+    <header class="crud-header crm-whatsapp-header">
+        <div>
+            <h2>CRM · E-mail</h2>
+            <p>Conversas e histórico de e-mails dos pacientes.</p>
+        </div>
+        <button type="button" class="crud-button crud-button-secondary" id="crm-email-refresh">
+            <i class="fa fa-rotate"></i> Atualizar
+        </button>
+    </header>
+    <section class="crm-patient-selector" data-crm-patient-selector data-channel="email">
+        <div class="crm-patient-selector-title">
+            <div><h3>Selecionar pacientes</h3><p>Marque os pacientes que receberão a mensagem por e-mail.</p></div>
+        </div>
+        <div class="crm-patient-search-row">
+            <div class="crud-field"><label>Buscar por</label><select class="crud-input" data-patient-search-field>
+                <option value="nome">Nome</option><option value="cpf">CPF</option><option value="telefone">Telefone</option>
+            </select></div>
+            <div class="crud-field crm-patient-search-input"><label>Paciente</label><input class="crud-input" data-patient-search placeholder="Digite o paciente"></div>
+            <button class="crud-button" type="button" data-patient-search-button><i class="fa fa-search"></i> Buscar</button>
+            <button class="crud-button crud-button-secondary" type="button" data-patient-show-all>Exibir todos</button>
+        </div>
+        <div class="crm-patient-filters" data-patient-filters hidden></div>
+        <div class="crm-patient-results" data-patient-results><div class="crud-empty">Busque um paciente ou clique em “Exibir todos”.</div></div>
+    </section>
+    <div class="crm-whatsapp-layout">
+        <aside class="crm-conversations-panel">
+            <div class="crm-conversations-search"><i class="fa fa-search"></i>
+                <input id="crm-email-search" type="search" placeholder="Buscar paciente ou e-mail">
+            </div>
+            <div class="crm-conversations-list" id="crm-email-list" aria-live="polite">
+                <div class="crud-loading">Carregando conversas...</div>
+            </div>
+        </aside>
+        <section class="crm-chat-panel crm-email-chat" id="crm-email-chat">
+            <div class="crm-chat-empty"><i class="fa fa-envelope"></i><h3>Selecione uma conversa</h3>
+                <p>Escolha um paciente ou endereço para visualizar o histórico.</p></div>
+        </section>
+    </div>
+</section>
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/crm_patient_selector.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/crm_email.js?v={{ build_version|default('1') }}"></script>

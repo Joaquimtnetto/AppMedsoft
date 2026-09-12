@@ -1,0 +1,27 @@
+.app-back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 42px;
+    min-height: 42px;
+    padding: 8px 12px;
+    border: 1px solid #d8e2f0;
+    border-radius: 10px;
+    background: #fff;
+    color: #31517e;
+    box-shadow: 0 2px 10px rgba(44, 62, 80, 0.12);
+    font: 700 0.95rem 'Segoe UI', Arial, sans-serif;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.app-back-button:hover { background: #357ae8; color: #fff; transform: translateX(-2px); }
+.app-back-button-fixed { position: fixed; top: 18px; left: 18px; z-index: 9000; }
+.app-back-button-inline { position: sticky; top: 0; z-index: 50; margin: 0 0 14px; }
+.app-back-icon { font-size: 1.35rem; line-height: 1; }
+
+@media (max-width: 640px) {
+    .app-back-button-fixed { top: 10px; left: 10px; }
+    .app-back-label { display: none; }
+}

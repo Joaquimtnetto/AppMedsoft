@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# Build / PyInstaller
+build/
+dist/
+*.spec
+*.toc
+*.pkg
+*.pyz
+*.exe
+
+# Environment
+.env
+.env.local
+!.env.example
+.medsoft_secret_key
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database dumps/backups
+backup/
+backups/
+*.fbk
+*.sqlite
+*.sqlite3
+
+# Uploads
+uploads/
+instance/
+
+# Serviço WhatsApp/Baileys
+whatsapp-baileys/node_modules/
+whatsapp-baileys/sessions/

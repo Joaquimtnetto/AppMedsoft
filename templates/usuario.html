@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page usuario-page" id="usuario-page">
+    <header class="crud-header">
+        <div>
+            <h2>Usuario</h2>
+        </div>
+        <button class="crud-button" id="usuario-include" type="button" title="Incluir usuario">
+            <i class="fa fa-plus"></i> Incluir
+        </button>
+    </header>
+
+    <div class="crud-toolbar">
+        <div class="crud-field">
+            <label for="usuario-busca">Buscar usuario</label>
+            <input class="crud-input" type="text" id="usuario-busca" placeholder="Nome ou perfil">
+        </div>
+        <button class="crud-button" id="btn-ok" type="button">
+            <i class="fa fa-search"></i> Buscar
+        </button>
+    </div>
+
+    <div class="crud-list usuario-list" id="usuario-result" aria-live="polite"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/usuario.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/navigation.js"></script>

@@ -1,0 +1,571 @@
+.crud-page {
+    width: min(100%, 980px);
+    margin: 0 auto;
+    color: #24324a;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.crud-header,
+.crud-toolbar,
+.crud-actions,
+.crud-card-header {
+    display: flex;
+    align-items: center;
+}
+
+.crud-header {
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.crud-header h2 { margin: 0; }
+.crud-toolbar { gap: 10px; flex-wrap: wrap; }
+.crud-actions { gap: 8px; flex-wrap: wrap; }
+.crud-card-header { gap: 12px; }
+.faturamento-header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+
+.agenda-toolbar-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.agenda-search-toolbar {
+    flex: 1 1 auto;
+}
+
+.agenda-paciente-busca-field {
+    width: min(230px, 100%);
+}
+
+.agenda-interval-field {
+    width: 112px;
+    margin-left: auto;
+}
+
+.crud-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.crud-field-hidden {
+    display: none;
+}
+
+.crud-field label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #4d5d78;
+}
+
+.crud-input {
+    box-sizing: border-box;
+    min-height: 42px;
+    padding: 9px 11px;
+    border: 1px solid #ccd6e6;
+    border-radius: 8px;
+    background: #fff;
+    color: #24324a;
+    font: inherit;
+}
+
+.crud-static-field {
+    box-sizing: border-box;
+    min-height: 42px;
+    padding: 9px 11px;
+    color: #24324a;
+}
+
+.crud-input:focus {
+    border-color: #357ae8;
+    outline: 3px solid rgba(53, 122, 232, 0.14);
+}
+
+.crud-image-field {
+    display: grid;
+    gap: 10px;
+}
+
+.crud-image-preview {
+    width: 132px;
+    height: 132px;
+    object-fit: cover;
+    border: 1px solid #ccd6e6;
+    border-radius: 8px;
+    background: #f3f6fb;
+}
+
+.crud-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 0;
+    border-radius: 8px;
+    background: #357ae8;
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.crud-button:hover { background: #225bb5; }
+.crud-button:disabled { cursor: not-allowed; opacity: 0.65; }
+.crud-button-secondary { background: #eef3fb; color: #31517e; }
+.crud-button-secondary:hover { background: #dce7f7; }
+.crud-button-secondary.crud-button-active { background: #dce7f7; color: #183d73; }
+.crud-button-danger { background: #d94242; }
+.crud-button-danger:hover { background: #b82d2d; }
+
+.crud-list {
+    display: grid;
+    gap: 12px;
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+    padding: 2px 4px 8px 2px;
+}
+
+.agenda-availability {
+    margin: 14px 0;
+}
+
+.agenda-availability-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    color: #24324a;
+}
+
+.agenda-availability-header span {
+    color: #55708f;
+    font-size: 0.88rem;
+    font-weight: 650;
+}
+
+.agenda-availability-empty {
+    padding: 16px;
+    border: 1px dashed #ccd6e6;
+    border-radius: 10px;
+    background: #f8fafd;
+    color: #55708f;
+    font-weight: 650;
+}
+
+.agenda-slots {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+    gap: 10px;
+}
+
+.agenda-slot {
+    min-height: 58px;
+    border: 1px solid #ccd6e6;
+    border-radius: 8px;
+    background: #fff;
+    color: #24324a;
+    font: inherit;
+    cursor: pointer;
+}
+
+.agenda-slot strong,
+.agenda-slot span {
+    display: block;
+}
+
+.agenda-slot strong {
+    font-size: 1rem;
+}
+
+.agenda-slot span {
+    margin-top: 3px;
+    font-size: 0.78rem;
+    font-weight: 650;
+}
+
+.agenda-slot-free {
+    border-color: #bce7d4;
+    background: #e9f8f1;
+    color: #087a53;
+}
+
+.agenda-slot-free:hover {
+    border-color: #0aa66f;
+    background: #d8f2e6;
+}
+
+.agenda-slot-busy {
+    background: #f3f6fb;
+    color: #8795aa;
+    text-decoration: line-through;
+    cursor: not-allowed;
+}
+
+.crud-card {
+    padding: 16px;
+    border: 1px solid #e1e8f2;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(44, 62, 80, 0.08);
+}
+
+.crud-card-main { flex: 1; min-width: 0; }
+.crud-card-title { font-size: 1.05rem; font-weight: 750; }
+.crud-card-details { display: flex; gap: 16px; flex-wrap: wrap; margin: 10px 0 14px; color: #55708f; }
+.crud-time { padding: 7px 9px; border-radius: 8px; background: #357ae8; color: #fff; font-weight: 750; }
+
+.crud-empty,
+.crud-loading,
+.crud-error {
+    padding: 24px;
+    border-radius: 10px;
+    background: #f3f6fb;
+    text-align: center;
+    font-weight: 650;
+}
+
+.crud-error { background: #fff0f0; color: #a52626; }
+
+.crud-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(22, 35, 55, 0.48);
+}
+
+.crud-modal {
+    width: min(100%, 580px);
+    max-height: calc(100vh - 36px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(22, 35, 55, 0.28);
+}
+
+.crud-modal:has(.plano-form) {
+    width: min(100%, 760px);
+}
+
+.crud-modal:has(.prof-saude-form) {
+    width: min(100%, 760px);
+}
+
+.crud-modal:has(.clinica-form) {
+    width: min(100%, 760px);
+}
+
+.crud-modal:has(.usuario-form) {
+    width: min(100%, 680px);
+}
+
+.crud-modal:has(.faturamento-form) {
+    width: min(100%, 760px);
+}
+
+.faturamento-totalizacao-modal {
+    width: min(100%, 720px);
+    padding: 22px;
+}
+
+.faturamento-totalizacao-modal h3 {
+    margin: 0 0 18px;
+}
+
+.faturamento-totalizacao-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 0.9fr;
+    gap: 14px;
+    align-items: end;
+}
+
+.faturamento-totalizacao-output {
+    margin-top: 18px;
+}
+
+.faturamento-totalizacao-result {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.faturamento-totalizacao-card {
+    border: 1px solid #e1e8f2;
+    border-radius: 8px;
+    padding: 14px;
+    background: #f8fafd;
+}
+
+.faturamento-totalizacao-card h4 {
+    margin: 0 0 10px;
+}
+
+.faturamento-totalizacao-card p {
+    margin: 7px 0;
+    color: #31517e;
+}
+
+.faturamento-totalizacao-saldo {
+    grid-column: 1 / -1;
+}
+
+.faturamento-totalizacao-loading,
+.faturamento-totalizacao-error {
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-weight: 650;
+}
+
+.faturamento-totalizacao-loading {
+    background: #eef3fb;
+    color: #31517e;
+}
+
+.faturamento-totalizacao-error {
+    background: #fdeaea;
+    color: #a82626;
+}
+
+.crud-modal-title { margin: 0; padding: 20px 22px 0; }
+.crud-complement-header {
+    margin: 12px 22px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #eef3fb;
+    color: #24324a;
+    font-weight: 750;
+}
+.crud-form { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px 22px 22px; }
+.crud-form .crud-field-wide { grid-column: 1 / -1; }
+.crud-modal-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+
+.plano-form {
+    grid-template-columns: 1.7fr 0.65fr 0.75fr;
+}
+
+.prof-saude-form {
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+}
+
+.clinica-form {
+    grid-template-columns: 1.3fr 0.65fr 0.9fr;
+}
+
+.usuario-form {
+    grid-template-columns: 1fr 1fr;
+}
+
+.clinica-form .clinica-field-nome,
+.clinica-form .clinica-field-endereco,
+.clinica-form .clinica-field-email,
+.clinica-form .clinica-field-observacao {
+    grid-column: span 2;
+}
+
+.usuario-form .usuario-field-nome,
+.usuario-form .usuario-field-data {
+    grid-column: 1 / -1;
+}
+
+.prof-saude-form:has(.prof-field-horario-titulo:not(.crud-field-hidden)) {
+    grid-template-columns: 0.48fr 1fr 1fr;
+}
+
+.prof-saude-form .prof-field-nome,
+.prof-saude-form .prof-field-endereco,
+.prof-saude-form .prof-field-observacao,
+.prof-saude-form .prof-field-horario-titulo {
+    grid-column: 1 / -1;
+}
+
+.prof-saude-form .prof-field-horario-titulo .crud-static-field {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #24324a;
+    font-size: 1.2rem;
+    font-weight: 800;
+}
+
+.prof-saude-form .prof-field-dia .crud-static-field {
+    display: flex;
+    align-items: center;
+    min-height: 42px;
+    padding: 9px 0;
+    font-weight: 750;
+}
+
+.prof-saude-form .prof-field-horario-head .crud-static-field {
+    padding: 0 0 4px;
+    color: #24324a;
+    font-weight: 800;
+}
+
+.plano-form .plano-field-nome,
+.plano-form .plano-field-endereco,
+.plano-form .plano-field-banco {
+    grid-column: span 1;
+}
+
+.plano-form .plano-field-observacao,
+.plano-form .crud-field-wide {
+    grid-column: 1 / -1;
+}
+
+.plano-code {
+    margin-top: 3px;
+    color: #55708f;
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+.crud-toast {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 11000;
+    padding: 12px 16px;
+    border-radius: 9px;
+    background: #24324a;
+    color: #fff;
+    box-shadow: 0 8px 28px rgba(22, 35, 55, 0.24);
+}
+
+.crud-toast-error { background: #a52626; }
+
+.historico-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(22, 35, 55, 0.55);
+}
+
+.historico-dialog {
+    width: min(1180px, 100%);
+    max-height: calc(100vh - 36px);
+    overflow: hidden;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 18px 50px rgba(22, 35, 55, 0.28);
+    display: flex;
+    flex-direction: column;
+}
+
+.historico-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #e1e8f2;
+}
+
+.historico-header h3 {
+    margin: 0;
+    color: #24324a;
+}
+
+.historico-header span {
+    display: block;
+    margin-top: 4px;
+    color: #55708f;
+    font-size: 0.9rem;
+}
+
+.historico-close {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 8px;
+    background: #eef3fb;
+    color: #31517e;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.historico-close:hover { background: #dce7f7; }
+
+.historico-table-wrap {
+    overflow: auto;
+    padding: 0 20px 20px;
+}
+
+.historico-table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+    color: #24324a;
+    font-size: 0.9rem;
+}
+
+.historico-table th,
+.historico-table td {
+    padding: 10px 9px;
+    border-bottom: 1px solid #e1e8f2;
+    text-align: left;
+    vertical-align: top;
+}
+
+.historico-table th {
+    position: sticky;
+    top: 0;
+    background: #f3f6fb;
+    font-weight: 750;
+}
+
+.historico-texto {
+    width: 100%;
+    min-width: 520px;
+    white-space: normal;
+}
+
+.historico-data {
+    width: 120px;
+    white-space: nowrap;
+    font-weight: 650;
+}
+
+@media (max-width: 640px) {
+    .crud-header { align-items: stretch; flex-direction: column; }
+    .faturamento-header-actions { justify-content: flex-start; }
+    .agenda-toolbar-row { align-items: stretch; flex-direction: column; }
+    .agenda-paciente-busca-field,
+    .agenda-interval-field { width: 100%; margin-left: 0; }
+    .crud-toolbar .crud-field { flex: 1; }
+    .crud-form { grid-template-columns: 1fr; }
+    .plano-form { grid-template-columns: 1fr; }
+    .prof-saude-form { grid-template-columns: 1fr; }
+    .clinica-form { grid-template-columns: 1fr; }
+    .usuario-form { grid-template-columns: 1fr; }
+    .faturamento-form { grid-template-columns: 1fr; }
+    .faturamento-totalizacao-form,
+    .faturamento-totalizacao-result { grid-template-columns: 1fr; }
+    .crud-form .crud-field-wide { grid-column: auto; }
+    .plano-form .crud-field { grid-column: auto; }
+    .prof-saude-form .crud-field { grid-column: auto; }
+    .clinica-form .crud-field { grid-column: auto; }
+    .usuario-form .crud-field { grid-column: auto; }
+    .faturamento-form .crud-field { grid-column: auto; }
+    .crud-modal-actions { grid-column: auto; }
+    .crud-card-header { align-items: flex-start; }
+    .crud-actions { justify-content: flex-end; }
+    .crud-button-label { display: none; }
+    .historico-modal { padding: 10px; }
+    .historico-header { padding: 14px; }
+    .historico-table-wrap { padding: 0 14px 14px; }
+}

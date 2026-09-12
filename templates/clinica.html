@@ -1,0 +1,28 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page clinica-page" id="clinica-page">
+    <header class="crud-header">
+        <div>
+            <h2>Clínica</h2>
+        </div>
+        <button class="crud-button" id="clinica-include" type="button" title="Incluir clínica">
+            <i class="fa fa-plus"></i> Incluir
+        </button>
+    </header>
+
+    <div class="crud-toolbar">
+        <div class="crud-field">
+            <label for="clinica-busca">Buscar clínica</label>
+            <input class="crud-input" type="text" id="clinica-busca" placeholder="Nome ou código">
+        </div>
+        <button class="crud-button" id="btn-ok" type="button">
+            <i class="fa fa-search"></i> Buscar
+        </button>
+    </div>
+
+    <div class="crud-list clinica-list" id="clinica-result" aria-live="polite"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/clinica.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/navigation.js"></script>

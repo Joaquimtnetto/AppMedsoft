@@ -1,0 +1,62 @@
+﻿<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page" id="agenda-page">
+    <header class="crud-header">
+        <div>
+            <h2>Agenda</h2>
+        </div>
+        <button class="crud-button" id="agenda-include" type="button" title="Incluir agenda de paciente">
+            <i class="fa fa-plus"></i> Incluir
+        </button>
+    </header>
+
+    <div class="agenda-toolbar-row">
+        <div class="crud-toolbar agenda-search-toolbar">
+            <div class="crud-field">
+                <label for="agenda-date">Data da agenda</label>
+                <input class="crud-input" type="date" id="agenda-date">
+            </div>
+            <div class="crud-field">
+                <label for="agenda-profissional">Prof. Saúde</label>
+                <select class="crud-input" id="agenda-profissional"></select>
+            </div>
+            <div class="crud-field agenda-paciente-busca-field">
+                <label for="agenda-paciente">Paciente</label>
+                <input class="crud-input" type="text" id="agenda-paciente" placeholder="Digite o paciente">
+            </div>
+            <button class="crud-button" id="btn-ok" type="button">
+                <i class="fa fa-search"></i> Buscar
+            </button>
+            <div class="crud-field agenda-view-field">
+                <label for="agenda-view">Visualização</label>
+                <select class="crud-input" id="agenda-view">
+                    <option value="dia" selected>Dia</option>
+                    <option value="semana">Semana</option>
+                    <option value="mes">Mês</option>
+                    <option value="ano">Ano</option>
+                </select>
+            </div>
+        </div>
+        <div class="crud-field agenda-interval-field">
+            <label for="agenda-interval">Intervalo</label>
+            <select class="crud-input" id="agenda-interval">
+                <option value="10">10 min</option>
+                <option value="20">20 min</option>
+                <option value="30" selected>30 min</option>
+                <option value="40">40 min</option>
+                <option value="50">50 min</option>
+                <option value="60">60 min</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="agenda-calendar" id="agenda-calendar" aria-live="polite"></div>
+
+    <div class="agenda-availability" id="agenda-availability" aria-live="polite"></div>
+
+    <div class="crud-list" id="agenda-result" aria-live="polite"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/agenda.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/navigation.js"></script>

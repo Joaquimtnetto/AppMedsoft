@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Confirmação de agendamento - MedSoft</title>
+  <meta property="og:title" content="Confirmação de Agendamento">
+  <meta property="og:description" content="Confirme seu agendamento MedSoft com segurança.">
+  <style>
+    *{box-sizing:border-box} body{margin:0;background:#eef3f9;color:#1b2b43;font-family:Arial,sans-serif}
+    header{padding:22px;text-align:center;background:#fff;color:#347bea;font-size:28px;font-weight:800}
+    main{width:min(92%,580px);margin:38px auto}.brand{text-align:center;margin-bottom:25px}
+    .brand h1{margin:8px 0;font-size:24px}.card{padding:28px;background:#fff;border-radius:18px;box-shadow:0 14px 40px #20385d1f}
+    .status{margin-bottom:16px;padding:12px 16px;border-radius:10px;background:#e9f8ef;color:#08783f;font-weight:800}
+    .detail{margin:12px 0}.professional{font-size:20px;font-weight:800}.muted{color:#647792}
+    button{width:100%;margin-top:22px;padding:15px;border:0;border-radius:12px;background:#347bea;color:#fff;font-size:16px;font-weight:800;cursor:pointer}
+    button:disabled{background:#77a2e8}.invalid{text-align:center;color:#a52626}
+    .notice{margin-top:16px;padding:12px 14px;border-radius:10px;font-weight:700}.notice-ok{background:#e9f8ef;color:#08783f}.notice-error{background:#fff0f0;color:#a52626}
+  </style>
+</head>
+<body>
+<header>✚ MedSoft</header>
+<main>
+  {% if invalid %}
+    <div class="card invalid"><h1>Não foi possível confirmar</h1><p>{{ message }}</p></div>
+  {% else %}
+    <div class="brand"><h1>Confirmação de agendamento</h1><p class="muted">Atendimento organizado pela MedSoft</p></div>
+    <div class="card">
+      <div class="status">{% if confirmed %}✓ Consulta confirmada{% else %}● Consulta aguardando confirmação{% endif %}</div>
+      <div class="professional">{{ appointment.profissional }}</div>
+      <div class="detail"><strong>{{ appointment.procedimento }}</strong> para {{ appointment.paciente }}</div>
+      <div class="detail">📅 {{ appointment.data.strftime('%d/%m/%Y') }} &nbsp; 🕐 {{ appointment.hora }}</div>
+      {% if not confirmed %}
+      <form method="post" action="{{ url_for('agenda_api.confirm_appointment', token=token) }}">
+        <button type="submit">Confirmar agendamento</button>
+      </form>
+      {% else %}<button type="button" disabled>Agendamento confirmado</button>{% endif %}
+      {% if email_notice %}<div class="notice {% if email_success %}notice-ok{% else %}notice-error{% endif %}">{{ email_notice }}</div>{% endif %}
+      {% if whatsapp_url %}<a href="{{ whatsapp_url }}" target="medsoft_whatsapp"><button type="button">Enviar confirmação pelo WhatsApp</button></a>{% endif %}
+    </div>
+  {% endif %}
+</main>
+{% if not invalid and confirmed %}
+<script>
+try {
+  localStorage.setItem('medsoft-agenda-confirmed', JSON.stringify({
+    id: {{ appointment.id|tojson }},
+    status: 'CO',
+    updatedAt: Date.now()
+  }));
+} catch (error) {
+  // A confirmação no servidor já foi concluída; a sincronização entre abas é opcional.
+}
+</script>
+{% endif %}
+</body>
+</html>

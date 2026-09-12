@@ -1,0 +1,33 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page plano-page" id="plano-page">
+    <header class="crud-header">
+        <div>
+            <h2>Cadastro de Plano</h2>
+        </div>
+        <div class="crud-header-actions">
+            <button class="crud-button crud-button-secondary" id="plano-options" type="button" title="Visualizar planos de todas as empresas">
+                <i class="fa fa-list"></i> Opções
+            </button>
+            <button class="crud-button" id="plano-include" type="button" title="Incluir plano">
+                <i class="fa fa-plus"></i> Incluir
+            </button>
+        </div>
+    </header>
+
+    <div class="crud-toolbar">
+        <div class="crud-field">
+            <label for="plano-busca">Buscar plano</label>
+            <input class="crud-input" type="text" id="plano-busca" placeholder="Nome ou código">
+        </div>
+        <button class="crud-button" id="btn-ok" type="button">
+            <i class="fa fa-search"></i> Buscar
+        </button>
+    </div>
+
+    <div class="crud-list plano-list" id="plano-result" aria-live="polite"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/plano.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/navigation.js"></script>
