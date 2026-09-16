@@ -1086,7 +1086,11 @@
 
 .historico-close:hover { background: #dce7f7; }
 
-.exame-dialog { width: min(980px, 100%); }
+.exame-dialog {
+    width: min(980px, 100%);
+    display: flex;
+    flex-direction: column;
+}
 .exame-form {
     display: grid;
     grid-template-columns: minmax(220px, 1.5fr) minmax(130px, 0.65fr) minmax(130px, 0.65fr) minmax(160px, 0.8fr);
@@ -1095,6 +1099,8 @@
     padding: 18px 20px;
     border-bottom: 1px solid #e1e8f2;
     background: #f7f9fc;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 .exame-form[hidden] { display: none; }
 .exame-name { grid-column: span 3; }
@@ -1103,6 +1109,7 @@
 .exame-observation textarea { min-height: 90px; resize: vertical; }
 .exame-image-preview-wrap {
     min-height: 120px;
+    max-height: min(42vh, 340px);
     margin-top: 8px;
     border: 1px dashed #b9c8dc;
     border-radius: 9px;
@@ -1115,7 +1122,7 @@
 .exame-image-preview {
     display: block;
     width: 100%;
-    max-height: 300px;
+    max-height: min(40vh, 320px);
     object-fit: contain;
 }
 .exame-image-preview[hidden] { display: none; }
@@ -1129,9 +1136,19 @@
     font-size: 0.88rem;
 }
 .exame-list {
+    flex: 1;
     min-height: 150px;
     overflow: auto;
     padding: 16px 20px 20px;
+}
+
+.exame-dialog:has(.exame-form:not([hidden])) .exame-form {
+    flex: 1;
+    min-height: 0;
+}
+
+.exame-dialog:has(.exame-form:not([hidden])) .exame-list {
+    display: none;
 }
 .exame-card {
     display: grid;
@@ -1292,6 +1309,7 @@
 .receita-dialog {
     width: min(760px, 100%);
     height: min(920px, calc(100vh - 30px));
+    height: min(920px, calc(100dvh - 30px));
     overflow: hidden;
     border-radius: 8px;
     background: #fff;
@@ -1390,15 +1408,37 @@
 .receita-memo {
     flex: 1;
     min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .receita-memo textarea {
     width: 100%;
-    height: 100%;
-    min-height: 560px;
+    flex: 1;
+    min-height: 220px;
     resize: none;
     font-size: 1rem;
     line-height: 1.55;
+}
+
+@media (max-height: 760px) {
+    .receita-dialog {
+        height: calc(100vh - 16px);
+        height: calc(100dvh - 16px);
+    }
+
+    .receita-header {
+        padding-block: 10px;
+    }
+
+    .receita-paper {
+        gap: 10px;
+        padding: 14px 20px 18px;
+    }
+
+    .receita-memo textarea {
+        min-height: 160px;
+    }
 }
 
 .historico-table-wrap {
@@ -1588,6 +1628,8 @@
     .exame-form { grid-template-columns: 1fr; padding: 14px; }
     .exame-name { grid-column: auto; }
     .exame-image-field { grid-column: auto; }
+    .exame-image-preview-wrap { max-height: 34vh; }
+    .exame-image-preview { max-height: 32vh; }
     .exame-card { grid-template-columns: 72px minmax(0, 1fr); }
     .exame-thumbnail-link, .exame-no-image { width: 72px; height: 62px; }
     .exame-card .crud-actions { grid-column: 1 / -1; }
@@ -1595,14 +1637,17 @@
     .historico-form-memo,
     .historico-form-actions { grid-column: auto; }
     .receita-modal { padding: 8px; }
-    .receita-dialog { height: calc(100vh - 16px); }
+    .receita-dialog {
+        height: calc(100vh - 16px);
+        height: calc(100dvh - 16px);
+    }
     .receita-header { padding: 12px; }
     .receita-header h3 { font-size: 1rem; }
     .receita-header-actions { gap: 6px; }
     .receita-header-actions .receita-history span { display: none; }
     .receita-paper { padding: 16px; }
     .receita-padrao-tools { grid-template-columns: 1fr; }
-    .receita-memo textarea { min-height: 420px; }
+    .receita-memo textarea { min-height: 180px; }
     .historico-table-wrap { padding: 0 14px 14px; }
     .mensagens-table-wrap { border: 0; background: transparent; overflow: visible; }
     .mensagens-table,

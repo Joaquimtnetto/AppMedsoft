@@ -1,15 +1,14 @@
+
 from datetime import date
 import re
 import unicodedata
 
 from flask import Blueprint, request, jsonify, session, current_app
 import config
-from medsoft_diagnostics import log_event, log_exception
 from medsoft_core import get_db_connection, DBConnectionError
 from tenant_context import current_company_id
 
 consultas_bp = Blueprint('consultas', __name__)
-log_event('BOOT', 'consultas_routes carregado', file=__file__)
 
 
 def _database_path():
@@ -295,13 +294,13 @@ def consultas_paciente():
     except DBConnectionError as e:
         return jsonify({'success': False, 'message': str(e), 'consultas': []}), 503
     except Exception as e:
-        log_exception('HISTORICO', 'falha ao listar históricos', e)
-        return jsonify({'success': False, 'message': f'ERRO_LISTA_HISTORICO_DIAG: {e}', 'consultas': []}), 500
+        return jsonify({'success': False, 'message': 'Erro interno no servidor.', 'consultas': []}), 500
 
 
 @consultas_bp.route('/api/consultas-paciente/itens', methods=['POST'])
 def incluir_consulta_paciente():
-    log_event('HISTORICO', 'entrou no endpoint de inclusão')
+    with open('C:/Medsoft/python/pMobile/historico_trace.log', 'a', encoding='utf-8') as handle:
+        handle.write('ENTROU no endpoint POST /api/consultas-paciente/itens\n')
     data = request.get_json(silent=True) or {}
     codpac = data.get('codpac')
     historico = str(data.get('historico') or '').strip()
@@ -381,101 +380,16 @@ def incluir_consulta_paciente():
     except DBConnectionError as e:
         return jsonify({'success': False, 'message': str(e)}), 503
     except Exception as exc:
-        log_exception('HISTORICO', 'falha ao incluir histórico', exc)
+        import traceback
+        error_log = 'C:/Medsoft/python/pMobile/historico_error.log'
+        with open(error_log, 'a', encoding='utf-8') as handle:
+            handle.write('\n--- Falha ao incluir historico ---\n')
+            handle.write(traceback.format_exc())
+            handle.write('\n')
         current_app.logger.exception('Falha ao incluir historico do paciente')
         if con:
             con.rollback()
         return jsonify({'success': False, 'message': f'ERRO_HISTORICO_DIAG: {exc}'}), 500
-    finally:
-        if con:
-            con.close()
-
-
-@consultas_bp.route('/api/consultas-paciente/itens/<int:consulta_cod>', methods=['PUT'])
-def alterar_consulta_paciente(consulta_cod):
-    data = request.get_json(silent=True) or {}
-    codpac = data.get('codpac')
-    historico = str(data.get('historico') or '').strip()
-
-    try:
-        codpac = int(codpac)
-        if codpac <= 0 or consulta_cod <= 0:
-            raise ValueError
-    except (TypeError, ValueError):
-        return jsonify({'success': False, 'message': 'Código da consulta ou do paciente inválido.'}), 400
-
-    try:
-        dtvisita = date.fromisoformat(str(data.get('dtvisita') or ''))
-    except ValueError:
-        return jsonify({'success': False, 'message': 'Data da visita inválida.'}), 400
-
-    if not historico:
-        return jsonify({'success': False, 'message': 'Informe o histórico da consulta.'}), 400
-
-    con = None
-    try:
-        con = get_db_connection(_database_path())
-        cur = con.cursor()
-        company_id = current_company_id()
-        user_row = _logged_professional_info(company_id)
-        logged_professional_id = user_row[0] if user_row else None
-        logged_profile = str(user_row[1] or '').strip().upper() if user_row else ''
-        if logged_profile in ('PROFSAÚDE', 'PROFSAUDE', 'PROF. SAÚDE', 'PROF. SAUDE') and not logged_professional_id:
-            return jsonify({
-                'success': False,
-                'message': 'O usuário Prof. Saúde não possui profissional relacionado.',
-            }), 400
-
-        cur.execute(
-            '''
-            UPDATE public.consulta
-               SET dtvisita = %s,
-                   historico = %s,
-                   datatualiza = CURRENT_TIMESTAMP,
-                   codmed = %s
-             WHERE cod = %s
-               AND codpac = %s
-               AND codclin = %s
-             RETURNING cod
-            ''',
-            (dtvisita, historico.encode('utf-8'), logged_professional_id, consulta_cod, codpac, company_id),
-        )
-        if not cur.fetchone():
-            return jsonify({'success': False, 'message': 'Histórico não encontrado para alteração.'}), 404
-
-        cur.execute(
-            '''
-            UPDATE public.pacient
-               SET datult_ = %s
-             WHERE codcli = %s
-               AND codclin = %s
-            RETURNING datult_
-            ''',
-            (dtvisita, codpac, company_id),
-        )
-        if not cur.fetchone():
-            raise ValueError('Não foi possível atualizar a data da última consulta do paciente.')
-
-        con.commit()
-        return jsonify({
-            'success': True,
-            'message': 'Histórico alterado com sucesso.',
-            'consulta': {
-                'cod': consulta_cod,
-                'codpac': codpac,
-                'dtvisita': dtvisita.strftime('%d/%m/%Y'),
-                'historico': historico,
-                'codmed': logged_professional_id,
-            },
-        })
-    except DBConnectionError as e:
-        return jsonify({'success': False, 'message': str(e)}), 503
-    except Exception as exc:
-        log_exception('HISTORICO', 'falha ao alterar histórico', exc)
-        current_app.logger.exception('Falha ao alterar historico do paciente')
-        if con:
-            con.rollback()
-        return jsonify({'success': False, 'message': f'ERRO_HISTORICO_ALTERACAO_DIAG: {exc}'}), 500
     finally:
         if con:
             con.close()

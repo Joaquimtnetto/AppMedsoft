@@ -1,4 +1,4 @@
-import datetime
+﻿import datetime
 import html as html_lib
 import json
 import re
@@ -694,15 +694,11 @@ def _send_confirmation_whatsapp(
     return False, error
 
 
-
-def _limit_legacy_text(value, max_length=30):
-    text = str(value or '').strip()
-    return text[:max_length]
 def _appointment_data(data):
-    patient = _limit_legacy_text(data.get('paciente'))
+    patient = (data.get('paciente') or '').strip()
     if not patient:
         raise ValueError('Informe o nome do paciente.')
-    professional = _limit_legacy_text(data.get('profissional'), 40)
+    professional = (data.get('profissional') or '').strip()
     if not professional:
         raise ValueError('Informe o Prof. Saude.')
     status = (data.get('status') or 'AG').strip().upper()
@@ -721,8 +717,8 @@ def _appointment_data(data):
         'nomed': professional,
         'telefone': _format_phone(data.get('telefone')),
         'email': email,
-        'nomeplano': _limit_legacy_text(data.get('plano'), 25),
-        'proced': _limit_legacy_text(data.get('procedimento')),
+        'nomeplano': (data.get('plano') or '').strip(),
+        'proced': (data.get('procedimento') or '').strip(),
         'observacao': observation,
         'atend': status,
     }
@@ -821,8 +817,8 @@ agenda_repository = CrudRepository(
 def api_agenda():
     data = request.get_json(silent=True) or {}
     data_str = data.get('data') if data else None
-    professional = _limit_legacy_text(data.get('profissional'), 40)
-    patient = _limit_legacy_text(data.get('paciente'))
+    professional = (data.get('profissional') or '').strip()
+    patient = (data.get('paciente') or '').strip()
     if not data_str and not patient:
         return jsonify({'success': False, 'message': 'Informe uma data ou um paciente.'}), 400
     try:
@@ -878,7 +874,7 @@ def report_agenda():
         end_date = _parse_date(data.get('data_fim'))
         if end_date < start_date:
             raise ValueError('A Data Fim deve ser igual ou posterior a Data Inicio.')
-        professional = _limit_legacy_text(data.get('profissional'), 40)
+        professional = (data.get('profissional') or '').strip()
         plan = (data.get('plano') or '').strip()
         with _connection() as connection:
             with connection.cursor() as cursor:
@@ -925,7 +921,7 @@ def report_agenda():
 def availability():
     data = request.get_json(silent=True) or {}
     data_str = data.get('data') if data else None
-    professional = _limit_legacy_text(data.get('profissional'), 40)
+    professional = (data.get('profissional') or '').strip()
     if not data_str:
         return jsonify({'success': False, 'message': 'Data não informada.'}), 400
     if not professional:
@@ -1335,9 +1331,6 @@ def list_confirmation_patterns():
                     {'value': str(row[0]), 'label': '{} - {}'.format(row[0], row[1] or '')}
                     for row in cursor.fetchall()
                 ]
-        if not patterns:
-            channel = 'E-mail' if pattern_type == 'E' else 'WhatsApp'
-            patterns = [{'value': '__default__', 'label': 'Mensagem padrão MedSoft ({})'.format(channel)}]
         return jsonify({'success': True, 'textos': patterns})
     except Exception as exc:
         return _error_response(exc)
@@ -1348,8 +1341,6 @@ def request_email_confirmation(appointment_id):
     try:
         data = request.get_json(silent=True) or {}
         selected_code = data.get('codigo_texto')
-        if selected_code == '__default__':
-            selected_code = None
         appointment, email, _phone = _confirmation_context(appointment_id)
         if not appointment:
             return jsonify({'success': False, 'message': 'Agendamento não encontrado.'}), 404
@@ -1386,8 +1377,6 @@ def request_whatsapp_confirmation(appointment_id):
     try:
         data = request.get_json(silent=True) or {}
         selected_code = data.get('codigo_texto')
-        if selected_code == '__default__':
-            selected_code = None
         appointment, _email, phone = _confirmation_context(appointment_id)
         if not appointment:
             return jsonify({'success': False, 'message': 'Agendamento não encontrado.'}), 404

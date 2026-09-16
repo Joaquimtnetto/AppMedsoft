@@ -286,10 +286,6 @@ def appointment_whatsapp_messages(appointment_id):
         with _connection() as connection:
             with connection.cursor() as cursor:
                 cursor.execute('''
-                    ALTER TABLE public.medsoft_logmsgem
-                    ADD COLUMN IF NOT EXISTS conteudo TEXT NULL
-                ''')
-                cursor.execute('''
                     SELECT l.codigo, l.datahoraenvio, l.destino,
                            COALESCE(NULLIF(l.conteudo, ''), ''),
                            COALESCE(t.nome, ''), COALESCE(l.enviado, 'Sim'),

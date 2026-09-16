@@ -1194,15 +1194,8 @@
                 });
                 var visitDate = String(values.get('dtvisita') || '');
                 if (patient) patient.datult = visitDate;
-                var updatedPatient = patient;
-                if (controller) {
-                    try {
-                        await controller.reload();
-                        updatedPatient = controller.find(codcli) || patient;
-                    } catch (reloadError) {
-                        console.warn('HistÃ³rico salvo, mas a lista de pacientes nÃ£o foi recarregada.', reloadError);
-                    }
-                }
+                if (controller) await controller.reload();
+                var updatedPatient = controller && controller.find(codcli);
                 CrudUI.notify(result.message || (editingConsultation ? 'Histórico alterado com sucesso.' : 'Histórico incluído com sucesso.'));
                 closeHistoricoModal();
                 window.abrirHistoricoPaciente(codcli, nomecli, updatedPatient || patient);
@@ -1292,7 +1285,6 @@
             form.reset();
             form.querySelector('[name="idexame"]').value = '';
             form.querySelector('[name="data"]').value = localToday();
-            imagePreview.onerror = null;
             imagePreview.hidden = true;
             imagePreview.removeAttribute('src');
             imageEmpty.textContent = 'Nenhum documento selecionado';
@@ -1308,17 +1300,7 @@
                 form.querySelector('[name="nome"]').value = exam.nome || '';
                 form.querySelector('[name="data"]').value = exam.data || localToday();
                 form.querySelector('[name="observacao"]').value = exam.observacao || '';
-                if (exam.tem_imagem) {
-                    imageEmpty.textContent = 'Documento atual anexado';
-                    imagePreview.onerror = function () {
-                        imagePreview.hidden = true;
-                        imagePreview.removeAttribute('src');
-                        imageEmpty.hidden = false;
-                    };
-                    imagePreview.src = imageUrl(exam.id);
-                    imagePreview.hidden = false;
-                    imageEmpty.hidden = true;
-                }
+                if (exam.tem_imagem) imageEmpty.textContent = 'Documento atual anexado';
             }
             form.querySelector('[name="nome"]').focus();
         }

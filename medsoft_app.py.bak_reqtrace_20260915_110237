@@ -1,3 +1,12 @@
+# MEDSOFT_RUN_TRACE_APP
+try:
+    import datetime as _medsoft_trace_datetime
+    with open('C:/Medsoft/python/pMobile/app_boot_trace.log', 'a', encoding='utf-8') as _medsoft_trace_file:
+        _medsoft_trace_file.write(
+            f"{_medsoft_trace_datetime.datetime.now().isoformat()} medsoft_app carregado de {__file__}\n"
+        )
+except Exception:
+    pass
 
 from medsoft_core import get_db_connection
 from build_info import BUILD_DATETIME, BUILD_VERSION

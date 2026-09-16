@@ -1,7 +1,7 @@
-
 from medsoft_core import get_db_connection
 from build_info import BUILD_DATETIME, BUILD_VERSION
 import config
+from medsoft_diagnostics import log_event, log_exception
 from message_log import log_sent_message
 from config import SECRET_KEY
 # Importa o Blueprint de consulta_paciente
@@ -29,9 +29,9 @@ usuario_global = None
 empresa_global = None
 
 def get_user_empresa_db(login, senha):
-    # A tabela atual é `ic_usuario_geral` e os campos de autenticação são `login` e `senha`.
-    # Muitos esquemas não possuem a coluna `nome_medico`; para evitar erro, retornamos
-    # um valor nulo para `nome_medico` quando a coluna não existir.
+    # A tabela atual Ã© `ic_usuario_geral` e os campos de autenticaÃ§Ã£o sÃ£o `login` e `senha`.
+    # Muitos esquemas nÃ£o possuem a coluna `nome_medico`; para evitar erro, retornamos
+    # um valor nulo para `nome_medico` quando a coluna nÃ£o existir.
     con = get_db_connection()
     cur = con.cursor()
     cur.execute("""
@@ -126,22 +126,22 @@ import datetime
 configured_build_datetime = os.environ.get('MEDSOFT_BUILD_DATETIME', '').strip()
 
 if configured_build_datetime:
-    # Em produção, a publicação informa uma data/hora fixa. Reiniciar o
-    # serviço não altera a identificação da versão instalada.
+    # Em produÃ§Ã£o, a publicaÃ§Ã£o informa uma data/hora fixa. Reiniciar o
+    # serviÃ§o nÃ£o altera a identificaÃ§Ã£o da versÃ£o instalada.
     published_at = datetime.datetime.strptime(configured_build_datetime, '%d/%m/%Y %H:%M')
     BUILD_DATETIME = published_at.strftime('%d/%m/%Y %H:%M')
     BUILD_VERSION = published_at.strftime('%Y%m%d%H%M%S')
-    BUILD_ENVIRONMENT = 'Produção'
+    BUILD_ENVIRONMENT = 'ProduÃ§Ã£o'
 elif getattr(sys, 'frozen', False):
-    # No executável, a versão corresponde à data real de geração do arquivo.
+    # No executÃ¡vel, a versÃ£o corresponde Ã  data real de geraÃ§Ã£o do arquivo.
     executable_time = datetime.datetime.fromtimestamp(
         os.path.getmtime(sys.executable)
     ).astimezone()
     BUILD_DATETIME = executable_time.strftime('%d/%m/%Y %H:%M')
     BUILD_VERSION = executable_time.strftime('%Y%m%d%H%M%S')
-    BUILD_ENVIRONMENT = 'Produção'
+    BUILD_ENVIRONMENT = 'ProduÃ§Ã£o'
 else:
-    # Sem uma versão de publicação configurada, trata a execução como local.
+    # Sem uma versÃ£o de publicaÃ§Ã£o configurada, trata a execuÃ§Ã£o como local.
     startup_time = datetime.datetime.now().astimezone()
     BUILD_DATETIME = startup_time.strftime('%d/%m/%Y %H:%M')
     BUILD_VERSION = startup_time.strftime('%Y%m%d%H%M%S')
@@ -149,7 +149,7 @@ else:
 
 
 def current_build_metadata():
-    """Em desenvolvimento, reflete a última alteração real dos fontes."""
+    """Em desenvolvimento, reflete a Ãºltima alteraÃ§Ã£o real dos fontes."""
     if BUILD_ENVIRONMENT != 'Desenvolvimento':
         return BUILD_DATETIME, BUILD_VERSION, BUILD_ENVIRONMENT
     project_root = Path(__file__).resolve().parent.parent
@@ -177,17 +177,21 @@ def current_build_metadata():
 
 
 
-# Função para obter o caminho dos recursos (templates/static) para PyInstaller
+# FunÃ§Ã£o para obter o caminho dos recursos (templates/static) para PyInstaller
 def resource_path(relative_path):
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
-    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    local_root = os.path.abspath(os.path.dirname(__file__))
+    local_candidate = os.path.join(local_root, relative_path)
+    if os.path.exists(local_candidate):
+        return local_candidate
+    project_root = os.path.abspath(os.path.join(local_root, '..'))
     return os.path.join(project_root, relative_path)
 
 from flask import send_from_directory
 
 
-# No executável, os recursos são extraídos pelo PyInstaller em sys._MEIPASS.
+# No executÃ¡vel, os recursos sÃ£o extraÃ­dos pelo PyInstaller em sys._MEIPASS.
 template_folder = resource_path('templates')
 static_folder = resource_path('static')
 
@@ -207,6 +211,32 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.jinja_env.auto_reload = True
 
+log_event('BOOT', 'medsoft_app carregado', file=__file__)
+
+
+@app.before_request
+def medsoft_diagnostic_request_start():
+    log_event(
+        'REQUEST_START', 'inicio',
+        path=request.path, method=request.method, endpoint=request.endpoint,
+        usuario=session.get('usuario'), idusuario=session.get('idusuario'),
+        idempresa=session.get('idempresa'),
+        db_path=session.get('db_path'),
+    )
+
+
+@app.after_request
+def medsoft_diagnostic_request_end(response):
+    body = ''
+    if response.status_code >= 400 or request.path.startswith('/api/consultas-paciente'):
+        body = response.get_data(as_text=True)[:1200]
+    log_event(
+        'REQUEST_END', 'fim',
+        path=request.path, method=request.method, endpoint=request.endpoint,
+        status=response.status_code, body=body,
+    )
+    return response
+
 
 @app.after_request
 def enforce_utf8_response(response):
@@ -219,7 +249,14 @@ def enforce_utf8_response(response):
 def handle_unexpected_error(error):
     if isinstance(error, HTTPException):
         return error
-    logging.exception('Erro inesperado na aplicação Flask:', exc_info=error)
+    log_exception(
+        'ERROR', 'erro inesperado na aplicação',
+        error, path=request.path, method=request.method, endpoint=request.endpoint,
+        usuario=session.get('usuario'), idusuario=session.get('idusuario'),
+        idempresa=session.get('idempresa'),
+        db_path=session.get('db_path'),
+    )
+    logging.exception('Erro inesperado na aplicacao Flask:', exc_info=error)
     return 'Internal Server Error', 500
 
 PUBLIC_ENDPOINTS = {
@@ -281,13 +318,14 @@ def require_authentication():
         return None
     session.clear()
     if request.path.startswith('/api/'):
-        return jsonify({'success': False, 'message': 'Sessão expirada. Faça login novamente.'}), 401
+        return jsonify({'success': False, 'message': 'SessÃ£o expirada. FaÃ§a login novamente.'}), 401
     return redirect(url_for('index'))
 
 
 EDIT_ENDPOINT_MENU = {
     'paciente_api.create_patient': 1, 'paciente_api.update_patient': 1, 'paciente_api.delete_patient': 1,
-    'consultas.incluir_consulta_paciente': 1, 'consultas.organizar_consulta_local': 1,
+    'consultas.incluir_consulta_paciente': 1, 'consultas.alterar_consulta_paciente': 1,
+    'consultas.organizar_consulta_local': 1,
     'exame_api.create_exam': 1,
     'exame_api.update_exam': 1, 'exame_api.delete_exam': 1,
     'agenda_api.create_appointment': 2, 'agenda_api.update_appointment': 2,
@@ -332,6 +370,7 @@ def _ensure_core_menu_permissions(permissions):
 PROFILE_VIEW_ENDPOINTS = {
     'consultas.consultas_paciente': 'verhist',
     'consultas.incluir_consulta_paciente': 'verhist',
+    'consultas.alterar_consulta_paciente': 'verhist',
     'consultas.organizar_consulta_local': 'verhist',
     'exame_api.list_exams': 'verexame',
     'exame_api.create_exam': 'verexame',
@@ -376,8 +415,6 @@ def _load_plan_capabilities(company_id, force=False):
             connection.close()
     session.update(capabilities)
     return capabilities
-
-
 @app.before_request
 def require_plan_feature_permission():
     if not _has_valid_session():
@@ -388,11 +425,11 @@ def require_plan_feature_permission():
     try:
         capabilities = _load_plan_capabilities(session.get('idempresa'))
     except Exception:
-        logging.exception('Não foi possível validar os recursos do plano.')
+        logging.exception('NÃ£o foi possÃ­vel validar os recursos do plano.')
         capabilities = {'plan_financeiro': False}
     if capabilities.get('plan_financeiro'):
         return None
-    message = 'O plano da empresa não permite acesso ao Financeiro.'
+    message = 'O plano da empresa nÃ£o permite acesso ao Financeiro.'
     if request.path.startswith('/api/'):
         return jsonify({'success': False, 'message': message}), 403
     return message, 403
@@ -400,7 +437,7 @@ def require_plan_feature_permission():
 
 def _profile_view_allowed(field_name):
     cache_key = 'profile_' + field_name
-    connection = get_db_connection(session.get('db_path') or None)
+    connection = get_db_connection()
     try:
         with connection.cursor() as cursor:
             cursor.execute('''
@@ -426,14 +463,14 @@ def require_profile_view_permission():
     try:
         allowed = _profile_view_allowed(field_name)
     except Exception:
-        logging.exception('Não foi possível validar a permissão de visualização do perfil.')
+        logging.exception('NÃ£o foi possÃ­vel validar a permissÃ£o de visualizaÃ§Ã£o do perfil.')
         allowed = False
     if allowed:
         return None
-    resource = 'histórico clínico' if field_name == 'verhist' else 'histórico de exames'
+    resource = 'histÃ³rico clÃ­nico' if field_name == 'verhist' else 'histÃ³rico de exames'
     return jsonify({
         'success': False,
-        'message': 'Seu perfil não permite visualizar o {}.'.format(resource),
+        'message': 'Seu perfil nÃ£o permite visualizar o {}.'.format(resource),
     }), 403
 
 
@@ -446,7 +483,7 @@ def require_menu_edit_permission():
         return None
     profile_name = (session.get('perfil') or '').strip().upper()
     is_health_professional = profile_name in (
-        'PROFSAÚDE', 'PROFSAUDE', 'PROF. SAÚDE', 'PROF. SAUDE'
+        'PROFSAÃšDE', 'PROFSAUDE', 'PROF. SAÃšDE', 'PROF. SAUDE'
     )
     if request.endpoint == 'consultas.incluir_consulta_paciente' and is_health_professional:
         return None
@@ -456,16 +493,16 @@ def require_menu_edit_permission():
         if len(parts) == 3 and parts[0] == str(menu_id) and parts[2] == 'NET':
             return jsonify({
                 'success': False,
-                'message': 'Seu perfil possui acesso somente para visualização neste menu.',
+                'message': 'Seu perfil possui acesso somente para visualizaÃ§Ã£o neste menu.',
             }), 403
     return None
 
-# Validar configuração inicial e falhar com mensagem clara se estiver incorreta
+# Validar configuraÃ§Ã£o inicial e falhar com mensagem clara se estiver incorreta
 validation_errors = config.validate_config()
 if validation_errors:
     for err in validation_errors:
         print('Configuration error:', err)
-    print('Corrija as variáveis de ambiente conforme mensagens acima e reinicie a aplicação.')
+    print('Corrija as variÃ¡veis de ambiente conforme mensagens acima e reinicie a aplicaÃ§Ã£o.')
     sys.exit(1)
 app.register_blueprint(consultas_bp)
 app.register_blueprint(consulta_paciente_bp)
@@ -486,17 +523,17 @@ app.register_blueprint(faturamento_api_bp)
 app.register_blueprint(mensagens_api_bp)
 app.register_blueprint(internal_chat_api_bp)
 
-# Serializer para tokens de redefinição de senha
+# Serializer para tokens de redefiniÃ§Ã£o de senha
 serializer = URLSafeTimedSerializer(app.secret_key)
 
 
 def send_email(to_address, subject, body, html_body=None):
-    """Envia um e-mail usando as configurações em `config`.
-    Retorna True se enviado com sucesso, False caso contrário.
+    """Envia um e-mail usando as configuraÃ§Ãµes em `config`.
+    Retorna True se enviado com sucesso, False caso contrÃ¡rio.
     """
-    # Se SMTP não estiver configurado, não tenta enviar
+    # Se SMTP nÃ£o estiver configurado, nÃ£o tenta enviar
     if not getattr(config, 'SMTP_HOST', ''):
-        logging.info('SMTP não configurado; pulando envio de e-mail.')
+        logging.info('SMTP nÃ£o configurado; pulando envio de e-mail.')
         return False
     try:
         msg = EmailMessage()
@@ -540,13 +577,13 @@ def login():
     login = data.get('nome')
     senha = data.get('senha')
     if not login or not senha:
-        return jsonify({'success': False, 'message': 'Nome e senha obrigatórios.'}), 400
+        return jsonify({'success': False, 'message': 'Nome e senha obrigatÃ³rios.'}), 400
     try:
         global db_path_global, usuario_global, empresa_global
         idusuario, idempresa, nome, db_path, empresa_nome, nome_medico, perfil = get_user_empresa_db(login, senha)
         if not idusuario or not db_path:
-            return jsonify({'success': False, 'message': 'Nome ou senha inválidos ou empresa inativa.'}), 401
-        # Define variáveis globais
+            return jsonify({'success': False, 'message': 'Nome ou senha invÃ¡lidos ou empresa inativa.'}), 401
+        # Define variÃ¡veis globais
         if (perfil or '').strip().upper() != 'MASTER':
             usage_allowed, limit_date = get_company_usage_limit(idempresa)
             if not usage_allowed:
@@ -560,7 +597,7 @@ def login():
         db_path_global = db_path
         usuario_global = nome
         empresa_global = empresa_nome
-        # Testa conexão com banco do usuário
+        # Testa conexÃ£o com banco do usuÃ¡rio
         try:
             con_user = get_db_connection(db_path)
             con_user.close()
@@ -571,7 +608,7 @@ def login():
         session['db_path'] = db_path
         session['idusuario'] = idusuario
         session['idempresa'] = idempresa
-        # Alias mantido para os pontos legados que já procuram codclin.
+        # Alias mantido para os pontos legados que jÃ¡ procuram codclin.
         session['codclin'] = idempresa
         session['empresa_nome'] = empresa_nome
         session['nome_medico'] = nome_medico
@@ -602,7 +639,7 @@ def logout():
 
 
 def _windows_desktop_path():
-    """Obtém a Área de Trabalho real, inclusive quando redirecionada ao OneDrive."""
+    """ObtÃ©m a Ãrea de Trabalho real, inclusive quando redirecionada ao OneDrive."""
     if sys.platform == 'win32':
         try:
             import winreg
@@ -613,12 +650,12 @@ def _windows_desktop_path():
             if resolved.is_dir():
                 return resolved
         except (OSError, ImportError):
-            logging.exception('Não foi possível localizar a Área de Trabalho pelo Windows.')
+            logging.exception('NÃ£o foi possÃ­vel localizar a Ãrea de Trabalho pelo Windows.')
     return Path.home() / 'Desktop'
 
 
 def _install_medsoft_shortcut_icon():
-    """Copia o ícone para uma pasta permanente do perfil do usuário."""
+    """Copia o Ã­cone para uma pasta permanente do perfil do usuÃ¡rio."""
     local_app_data = Path(os.environ.get('LOCALAPPDATA') or (Path.home() / 'AppData' / 'Local'))
     icon_directory = local_app_data / 'MedSoft'
     icon_directory.mkdir(parents=True, exist_ok=True)
@@ -647,17 +684,17 @@ def criar_atalho_medsoft():
                 import ctypes
                 ctypes.windll.shell32.SHChangeNotify(0x00002000, 0x0005, str(shortcut), None)
             except (AttributeError, OSError):
-                logging.exception('Não foi possível atualizar o ícone do atalho no Explorer.')
+                logging.exception('NÃ£o foi possÃ­vel atualizar o Ã­cone do atalho no Explorer.')
         return jsonify({
             'success': True,
-            'message': 'Atalho MedSoft criado na Área de Trabalho.',
+            'message': 'Atalho MedSoft criado na Ãrea de Trabalho.',
             'path': str(shortcut),
         })
     except OSError:
-        logging.exception('Não foi possível criar o atalho MedSoft.')
+        logging.exception('NÃ£o foi possÃ­vel criar o atalho MedSoft.')
         return jsonify({
             'success': False,
-            'message': 'Não foi possível criar o atalho. Verifique a permissão da Área de Trabalho.',
+            'message': 'NÃ£o foi possÃ­vel criar o atalho. Verifique a permissÃ£o da Ãrea de Trabalho.',
         }), 500
 
 
@@ -668,17 +705,17 @@ def change_password():
     senha_atual = data.get('senhaAtual')
     nova_senha = data.get('novaSenha')
     if not nome or not senha_atual or not nova_senha:
-        return jsonify({'success': False, 'message': 'Usuário, senha atual e nova senha obrigatórios.'}), 400
+        return jsonify({'success': False, 'message': 'UsuÃ¡rio, senha atual e nova senha obrigatÃ³rios.'}), 400
     try:
         con = get_db_connection()
         cur = con.cursor()
-        # Verifica se a senha atual está correta na tabela ic_usuario_geral (campo login/senha)
+        # Verifica se a senha atual estÃ¡ correta na tabela ic_usuario_geral (campo login/senha)
         try:
             cur.execute("SELECT idusuario FROM ic_usuario_geral WHERE login=%s AND senha=%s AND ativo=TRUE", (nome, senha_atual))
             row = cur.fetchone()
         except Exception:
             con.close()
-            return jsonify({'success': False, 'message': 'Erro ao verificar usuário no banco.'}), 500
+            return jsonify({'success': False, 'message': 'Erro ao verificar usuÃ¡rio no banco.'}), 500
         if not row:
             con.close()
             return jsonify({'success': False, 'message': 'Senha atual incorreta.'}), 401
@@ -686,14 +723,14 @@ def change_password():
         # Atualiza a senha no ic_usuario_geral
         cur.execute("UPDATE ic_usuario_geral SET senha=%s WHERE idusuario=%s", (nova_senha, idusuario))
         con.commit()
-        # Independente do rowcount, se não deu erro e passou pela verificação da senha, considera sucesso
+        # Independente do rowcount, se nÃ£o deu erro e passou pela verificaÃ§Ã£o da senha, considera sucesso
         con.close()
         return jsonify({'success': True, 'message': 'Senha alterada com sucesso!'}), 200
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
-# --- Recuperação de senha ---
+# --- RecuperaÃ§Ã£o de senha ---
 @app.route('/esqueci-senha', methods=['GET'])
 def esqueci_senha_form():
     return render_template('esqueci_senha.html')
@@ -704,17 +741,17 @@ def esqueci_senha_post():
     # Aceita form-urlencoded ou JSON
     email = request.form.get('email') if request.form else (request.json and request.json.get('email'))
     if not email:
-        return jsonify({'success': False, 'message': 'E-mail obrigatório.'}), 400
+        return jsonify({'success': False, 'message': 'E-mail obrigatÃ³rio.'}), 400
     try:
         con = get_db_connection()
         cur = con.cursor()
         user = None
-        # Tenta localizar por coluna email; se a consulta falhar (ex.: coluna não existe), faz rollback
+        # Tenta localizar por coluna email; se a consulta falhar (ex.: coluna nÃ£o existe), faz rollback
         try:
             cur.execute("SELECT idusuario, login, nome, email FROM ic_usuario_geral WHERE email=%s AND ativo=TRUE", (email,))
             user = cur.fetchone()
         except Exception as e:
-            # A consulta pode ter deixado a transação em estado abortado; desfaz antes da segunda tentativa
+            # A consulta pode ter deixado a transaÃ§Ã£o em estado abortado; desfaz antes da segunda tentativa
             try:
                 con.rollback()
             except Exception:
@@ -728,22 +765,22 @@ def esqueci_senha_post():
         con.close()
     except Exception as e:
         return jsonify({'success': False, 'message': f'Erro ao acessar o banco: {str(e)}'}), 500
-    # Não revelar se o usuário existe; sempre retornar mensagem positiva
+    # NÃ£o revelar se o usuÃ¡rio existe; sempre retornar mensagem positiva
     if not user:
-        print(f'[Password Reset] nenhum usuário encontrado para: {email}')
-        return jsonify({'success': True, 'message': 'Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha.'})
+        print(f'[Password Reset] nenhum usuÃ¡rio encontrado para: {email}')
+        return jsonify({'success': True, 'message': 'Se o e-mail estiver cadastrado, vocÃª receberÃ¡ instruÃ§Ãµes para redefinir sua senha.'})
     idusuario = user[0]
     token = serializer.dumps({'idusuario': idusuario}, salt='password-reset-salt')
     reset_link = f"{request.url_root.rstrip('/')}/reset-password/{token}"
-    subject = 'MedSoft - Redefinição de senha'
-    body = f"Você solicitou a redefinição de senha. Acesse o link abaixo para criar uma nova senha (válido por 1 hora):\n\n{reset_link}\n\nSe você não solicitou, desconsidere este e-mail."
-    html = f"<p>Você solicitou a redefinição de senha. Clique no link abaixo para criar uma nova senha (válido por 1 hora):</p><p><a href=\"{reset_link}\">Redefinir minha senha</a></p>"
+    subject = 'MedSoft - RedefiniÃ§Ã£o de senha'
+    body = f"VocÃª solicitou a redefiniÃ§Ã£o de senha. Acesse o link abaixo para criar uma nova senha (vÃ¡lido por 1 hora):\n\n{reset_link}\n\nSe vocÃª nÃ£o solicitou, desconsidere este e-mail."
+    html = f"<p>VocÃª solicitou a redefiniÃ§Ã£o de senha. Clique no link abaixo para criar uma nova senha (vÃ¡lido por 1 hora):</p><p><a href=\"{reset_link}\">Redefinir minha senha</a></p>"
     sent = send_email(email, subject, body, html_body=html)
     if not sent:
         # fallback: mostra link no console e retorna debug_link durante desenvolvimento
         print(f'[Password Reset] Link para {email}: {reset_link}')
-        return jsonify({'success': True, 'message': 'Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha.', 'debug_link': reset_link})
-    return jsonify({'success': True, 'message': 'Se o e-mail estiver cadastrado, você receberá instruções para redefinir sua senha.'})
+        return jsonify({'success': True, 'message': 'Se o e-mail estiver cadastrado, vocÃª receberÃ¡ instruÃ§Ãµes para redefinir sua senha.', 'debug_link': reset_link})
+    return jsonify({'success': True, 'message': 'Se o e-mail estiver cadastrado, vocÃª receberÃ¡ instruÃ§Ãµes para redefinir sua senha.'})
 
 
 @app.route('/reset-password/<token>', methods=['GET'])
@@ -756,14 +793,14 @@ def reset_password_post():
     token = request.form.get('token') if request.form else (request.json and request.json.get('token'))
     nova_senha = request.form.get('nova_senha') if request.form else (request.json and request.json.get('nova_senha'))
     if not token or not nova_senha:
-        return jsonify({'success': False, 'message': 'Token e nova senha obrigatórios.'}), 400
+        return jsonify({'success': False, 'message': 'Token e nova senha obrigatÃ³rios.'}), 400
     try:
         data = serializer.loads(token, salt='password-reset-salt', max_age=3600)
         idusuario = data.get('idusuario')
     except SignatureExpired:
         return jsonify({'success': False, 'message': 'Token expirado.'}), 400
     except BadSignature:
-        return jsonify({'success': False, 'message': 'Token inválido.'}), 400
+        return jsonify({'success': False, 'message': 'Token invÃ¡lido.'}), 400
     try:
         con = get_db_connection()
         cur = con.cursor()
@@ -778,7 +815,7 @@ def reset_password_post():
 
 
 
-# Rota para servir o login.html como página inicial
+# Rota para servir o login.html como pÃ¡gina inicial
 @app.route('/')
 def index():
     build_datetime, build_version, build_environment = current_build_metadata()
@@ -836,7 +873,7 @@ def menu():
         menu_permissions = _ensure_core_menu_permissions(menu_permissions)
         session['menu_permissions'] = menu_permissions
     except Exception:
-        logging.exception('Não foi possível carregar as permissões de menu do perfil.')
+        logging.exception('NÃ£o foi possÃ­vel carregar as permissÃµes de menu do perfil.')
     if show_clinic_header and company_id > 0:
         try:
             connection = get_db_connection()
@@ -852,7 +889,7 @@ def menu():
             company_plan_name = (plan_row[0] if plan_row else '') or ''
             connection.close()
         except Exception:
-            logging.exception('Não foi possível carregar o plano da empresa.')
+            logging.exception('NÃ£o foi possÃ­vel carregar o plano da empresa.')
     return render_template(
         'menu.html',
         db_path=db_path,
@@ -929,14 +966,14 @@ def help_html():
         return render_template('help.html', build_version=BUILD_VERSION)
     except TemplateNotFound:
         current_app.logger.error(
-            'Template help.html não encontrado. Pastas pesquisadas pelo Flask: %s',
+            'Template help.html nÃ£o encontrado. Pastas pesquisadas pelo Flask: %s',
             getattr(app.jinja_loader, 'searchpath', []),
         )
         return (
             '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">'
             '<style>body{font-family:Segoe UI,Arial,sans-serif;margin:16px;color:#18304f;line-height:1.45}'
             'h1{font-size:20px;color:#357ae8}</style></head><body>'
-            '<h1>Ajuda</h1><p>Arquivo help.html não encontrado pelo carregador do aplicativo.</p>'
+            '<h1>Ajuda</h1><p>Arquivo help.html nÃ£o encontrado pelo carregador do aplicativo.</p>'
             '<p>Verifique o registro do servidor para consultar a pasta pesquisada.</p>'
             '</body></html>'
         ), 404
@@ -1009,3 +1046,5 @@ if __name__ == '__main__':
     start_bounce_robot(app)
     threading.Timer(1.0, lambda: webbrowser.open('http://localhost:8072')).start()
     app.run(host='0.0.0.0', port=8072, debug=False, use_reloader=False)
+
+

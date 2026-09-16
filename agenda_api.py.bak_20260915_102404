@@ -1335,9 +1335,6 @@ def list_confirmation_patterns():
                     {'value': str(row[0]), 'label': '{} - {}'.format(row[0], row[1] or '')}
                     for row in cursor.fetchall()
                 ]
-        if not patterns:
-            channel = 'E-mail' if pattern_type == 'E' else 'WhatsApp'
-            patterns = [{'value': '__default__', 'label': 'Mensagem padrão MedSoft ({})'.format(channel)}]
         return jsonify({'success': True, 'textos': patterns})
     except Exception as exc:
         return _error_response(exc)
@@ -1348,8 +1345,6 @@ def request_email_confirmation(appointment_id):
     try:
         data = request.get_json(silent=True) or {}
         selected_code = data.get('codigo_texto')
-        if selected_code == '__default__':
-            selected_code = None
         appointment, email, _phone = _confirmation_context(appointment_id)
         if not appointment:
             return jsonify({'success': False, 'message': 'Agendamento não encontrado.'}), 404
@@ -1386,8 +1381,6 @@ def request_whatsapp_confirmation(appointment_id):
     try:
         data = request.get_json(silent=True) or {}
         selected_code = data.get('codigo_texto')
-        if selected_code == '__default__':
-            selected_code = None
         appointment, _email, phone = _confirmation_context(appointment_id)
         if not appointment:
             return jsonify({'success': False, 'message': 'Agendamento não encontrado.'}), 404

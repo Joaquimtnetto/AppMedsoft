@@ -1211,14 +1211,26 @@ class AgendaCrudApiTest(unittest.TestCase):
 class FakeConsultaCursor:
     def __init__(self):
         self.executions = []
-        self.results = [(1,), (3, 'ProfSaúde'), (175511,)]
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, traceback):
+        return False
 
     def execute(self, statement, parameters=None):
         self.executions.append((statement, parameters))
 
     def fetchone(self):
-        if self.results:
-            return self.results.pop(0)
+        statement = self.executions[-1][0] if self.executions else ''
+        if 'SELECT 1 FROM public.pacient' in statement:
+            return (1,)
+        if 'SELECT usuario.idcodmed' in statement:
+            return (3, 'ProfSaúde')
+        if 'SELECT COALESCE(MAX(cod), 0) + 1' in statement:
+            return (175511,)
+        if 'UPDATE public.consulta' in statement:
+            return (175511,)
         return (__import__('datetime').date(2026, 6, 30),)
 
 
@@ -1276,6 +1288,22 @@ class ConsultaHistoryApiTest(unittest.TestCase):
         patient_update = self.connection.cursor_instance.executions[-1]
         self.assertIn('UPDATE public.pacient', patient_update[0])
         self.assertEqual(patient_update[1][1:], (42, 8))
+
+    def test_updates_existing_history_for_patient(self):
+        response = self.client.put('/api/consultas-paciente/itens/175511', json={
+            'codpac': 42,
+            'dtvisita': '2026-06-30',
+            'historico': 'Paciente retornou sem queixas.',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(self.connection.committed)
+        update = next(
+            execution for execution in self.connection.cursor_instance.executions
+            if 'UPDATE public.consulta' in execution[0]
+        )
+        self.assertIn('UPDATE public.consulta', update[0])
+        self.assertEqual(update[1][1], b'Paciente retornou sem queixas.')
+        self.assertEqual(update[1][3:], (175511, 42, 8))
 
     def test_requires_date_and_history(self):
         invalid_date = self.client.post('/api/consultas-paciente/itens', json={

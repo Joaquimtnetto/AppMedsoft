@@ -1,3 +1,12 @@
+# MEDSOFT_RUN_TRACE_APP
+try:
+    import datetime as _medsoft_trace_datetime
+    with open('C:/Medsoft/python/pMobile/app_boot_trace.log', 'a', encoding='utf-8') as _medsoft_trace_file:
+        _medsoft_trace_file.write(
+            f"{_medsoft_trace_datetime.datetime.now().isoformat()} medsoft_app carregado de {__file__}\n"
+        )
+except Exception:
+    pass
 
 from medsoft_core import get_db_connection
 from build_info import BUILD_DATETIME, BUILD_VERSION
@@ -377,6 +386,36 @@ def _load_plan_capabilities(company_id, force=False):
     session.update(capabilities)
     return capabilities
 
+
+
+# MEDSOFT_REQUEST_TRACE_HISTORICO
+@app.before_request
+def trace_historico_request_start():
+    try:
+        if request.path.startswith('/api/consultas-paciente'):
+            with open('C:/Medsoft/python/pMobile/historico_request_trace.log', 'a', encoding='utf-8') as handle:
+                handle.write(
+                    f"START path={request.path} method={request.method} endpoint={request.endpoint} "
+                    f"idusuario={session.get('idusuario')} idempresa={session.get('idempresa')} "
+                    f"db_path={session.get('db_path')}\n"
+                )
+    except Exception:
+        pass
+
+
+@app.after_request
+def trace_historico_request_end(response):
+    try:
+        if request.path.startswith('/api/consultas-paciente'):
+            body = response.get_data(as_text=True)[:500]
+            with open('C:/Medsoft/python/pMobile/historico_request_trace.log', 'a', encoding='utf-8') as handle:
+                handle.write(
+                    f"END path={request.path} method={request.method} endpoint={request.endpoint} "
+                    f"status={response.status_code} body={body}\n"
+                )
+    except Exception:
+        pass
+    return response
 
 @app.before_request
 def require_plan_feature_permission():

@@ -1,3 +1,12 @@
+﻿# MEDSOFT_RUN_TRACE_APP
+try:
+    import datetime as _medsoft_trace_datetime
+    with open('C:/Medsoft/python/pMobile/app_boot_trace.log', 'a', encoding='utf-8') as _medsoft_trace_file:
+        _medsoft_trace_file.write(
+            f"{_medsoft_trace_datetime.datetime.now().isoformat()} medsoft_app carregado de {__file__}\n"
+        )
+except Exception:
+    pass
 
 from medsoft_core import get_db_connection
 from build_info import BUILD_DATETIME, BUILD_VERSION
@@ -206,6 +215,36 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.jinja_env.auto_reload = True
+# MEDSOFT_EARLY_TRACE_APP
+@app.before_request
+def medsoft_early_trace_request():
+    try:
+        import datetime as _medsoft_trace_datetime
+        with open(r'C:\Medsoft\python\pMobile\early_request_trace.log', 'a', encoding='utf-8') as handle:
+            handle.write(
+                f"{_medsoft_trace_datetime.datetime.now().isoformat()} START "
+                f"path={request.path} method={request.method} endpoint={request.endpoint} "
+                f"idusuario={session.get('idusuario')} idempresa={session.get('idempresa')} "
+                f"db_path={session.get('db_path')}\n"
+            )
+    except Exception:
+        pass
+
+
+@app.after_request
+def medsoft_early_trace_response(response):
+    try:
+        import datetime as _medsoft_trace_datetime
+        body = response.get_data(as_text=True)[:1200]
+        with open(r'C:\Medsoft\python\pMobile\early_request_trace.log', 'a', encoding='utf-8') as handle:
+            handle.write(
+                f"{_medsoft_trace_datetime.datetime.now().isoformat()} END "
+                f"path={request.path} method={request.method} endpoint={request.endpoint} "
+                f"status={response.status_code} body={body}\n"
+            )
+    except Exception:
+        pass
+    return response
 
 
 @app.after_request
@@ -219,7 +258,21 @@ def enforce_utf8_response(response):
 def handle_unexpected_error(error):
     if isinstance(error, HTTPException):
         return error
-    logging.exception('Erro inesperado na aplicaÃ§Ã£o Flask:', exc_info=error)
+    try:
+        import datetime as _medsoft_error_datetime
+        import traceback as _medsoft_error_traceback
+        with open(r'C:\Medsoft\python\pMobile\server_error_trace.log', 'a', encoding='utf-8') as handle:
+            handle.write(
+                f"{_medsoft_error_datetime.datetime.now().isoformat()} "
+                f"path={request.path} method={request.method} endpoint={request.endpoint} "
+                f"idusuario={session.get('idusuario')} idempresa={session.get('idempresa')} "
+                f"db_path={session.get('db_path')}\n"
+            )
+            handle.write(''.join(_medsoft_error_traceback.format_exception(type(error), error, error.__traceback__)))
+            handle.write("\n---\n")
+    except Exception:
+        pass
+    logging.exception('Erro inesperado na aplicacao Flask:', exc_info=error)
     return 'Internal Server Error', 500
 
 PUBLIC_ENDPOINTS = {
@@ -377,6 +430,94 @@ def _load_plan_capabilities(company_id, force=False):
     session.update(capabilities)
     return capabilities
 
+
+
+# MEDSOFT_REQUEST_TRACE_HISTORICO
+@app.before_request
+def trace_historico_request_start():
+    try:
+        if request.path.startswith('/api/consultas-paciente'):
+            with open('C:/Medsoft/python/pMobile/historico_request_trace.log', 'a', encoding='utf-8') as handle:
+                handle.write(
+                    f"START path={request.path} method={request.method} endpoint={request.endpoint} "
+                    f"idusuario={session.get('idusuario')} idempresa={session.get('idempresa')} "
+                    f"db_path={session.get('db_path')}\n"
+                )
+    except Exception:
+        pass
+
+
+@app.after_request
+def trace_historico_request_end(response):
+    try:
+        if request.path.startswith('/api/consultas-paciente'):
+            body = response.get_data(as_text=True)[:500]
+            with open('C:/Medsoft/python/pMobile/historico_request_trace.log', 'a', encoding='utf-8') as handle:
+                handle.write(
+                    f"END path={request.path} method={request.method} endpoint={request.endpoint} "
+                    f"status={response.status_code} body={body}\n"
+                )
+    except Exception:
+        pass
+    return response
+
+
+# MEDSOFT_REQUEST_TRACE_ALL_API
+@app.before_request
+def trace_all_api_request_start():
+    try:
+        if request.path.startswith('/api/'):
+            with open('C:/Medsoft/python/pMobile/api_request_trace.log', 'a', encoding='utf-8') as handle:
+                handle.write(
+                    f"START path={request.path} method={request.method} endpoint={request.endpoint} "
+                    f"idusuario={session.get('idusuario')} idempresa={session.get('idempresa')} "
+                    f"db_path={session.get('db_path')}\n"
+                )
+    except Exception:
+        pass
+
+
+@app.after_request
+def trace_all_api_request_end(response):
+    try:
+        if request.path.startswith('/api/'):
+            body = response.get_data(as_text=True)[:1000]
+            with open('C:/Medsoft/python/pMobile/api_request_trace.log', 'a', encoding='utf-8') as handle:
+                handle.write(
+                    f"END path={request.path} method={request.method} endpoint={request.endpoint} "
+                    f"status={response.status_code} body={body}\n"
+                )
+    except Exception:
+        pass
+    return response
+
+
+# MEDSOFT_REQUEST_TRACE_EVERYTHING
+@app.before_request
+def trace_every_request_start():
+    try:
+        with open('C:/Medsoft/python/pMobile/all_request_trace.log', 'a', encoding='utf-8') as handle:
+            handle.write(
+                f"START path={request.path} method={request.method} endpoint={request.endpoint} "
+                f"idusuario={session.get('idusuario')} idempresa={session.get('idempresa')} "
+                f"db_path={session.get('db_path')}\n"
+            )
+    except Exception:
+        pass
+
+
+@app.after_request
+def trace_every_request_end(response):
+    try:
+        body = response.get_data(as_text=True)[:1000]
+        with open('C:/Medsoft/python/pMobile/all_request_trace.log', 'a', encoding='utf-8') as handle:
+            handle.write(
+                f"END path={request.path} method={request.method} endpoint={request.endpoint} "
+                f"status={response.status_code} body={body}\n"
+            )
+    except Exception:
+        pass
+    return response
 
 @app.before_request
 def require_plan_feature_permission():
@@ -1009,3 +1150,4 @@ if __name__ == '__main__':
     start_bounce_robot(app)
     threading.Timer(1.0, lambda: webbrowser.open('http://localhost:8072')).start()
     app.run(host='0.0.0.0', port=8072, debug=False, use_reloader=False)
+
