@@ -75,8 +75,8 @@
                 ? 'Token já cadastrado — deixe vazio para manter' : 'Informe o token';
         }
         if (form.elements.whatsapp_modo) {
-            form.elements.whatsapp_modo.value = 'simplificado';
-            values.whatzapsimplificado = true;
+            form.elements.whatsapp_modo.value = values.whatzapsimplificado
+                ? 'simplificado' : 'business';
         }
         updateWhatsappMode(form);
     }

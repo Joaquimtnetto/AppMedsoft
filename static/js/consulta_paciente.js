@@ -1200,7 +1200,7 @@
                         await controller.reload();
                         updatedPatient = controller.find(codcli) || patient;
                     } catch (reloadError) {
-                        console.warn('HistÃ³rico salvo, mas a lista de pacientes nÃ£o foi recarregada.', reloadError);
+                        console.warn('Histórico salvo, mas a lista de pacientes não foi recarregada.', reloadError);
                     }
                 }
                 CrudUI.notify(result.message || (editingConsultation ? 'Histórico alterado com sucesso.' : 'Histórico incluído com sucesso.'));

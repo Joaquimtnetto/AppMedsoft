@@ -51,3 +51,18 @@ instance/
 # Serviço WhatsApp/Baileys
 whatsapp-baileys/node_modules/
 whatsapp-baileys/sessions/
+
+# Ferramentas temporarias e dependencias locais
+.codex_tmp/
+node_modules/
+
+# Repositorio local antigo dentro da pasta de trabalho
+/pMobile/
+
+# Configuracoes privadas e dados de conversas
+.env.*
+!.env.example
+whatsapp-baileys/message-history/
+
+# Artefatos gerados fora da aplicacao
+/output/

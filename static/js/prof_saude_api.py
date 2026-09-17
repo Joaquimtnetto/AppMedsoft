@@ -667,7 +667,7 @@ def _insert_profissional(cursor, layout, item):
 
 def _create_profissional(layout, item):
     if not layout.get('tenant_column'):
-        raise ValueError('Campo CODCLIN nÃ£o encontrado na tabela public.NOMED.')
+        raise ValueError('Campo CODCLIN não encontrado na tabela public.NOMED.')
     if not layout.get('generate_legacy_id') or layout.get('generate_integer_id'):
         return _repository(layout).create(item)
     with _connection() as connection:

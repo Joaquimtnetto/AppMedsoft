@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual detalhado do MedSoft</title>
+  <style>
+    :root{--primary:#0b5ea8;--dark:#083e70;--light:#edf5ff;--bg:#f4f7fb;--text:#263238;--muted:#667085;--border:#d7e2ef;--ok:#198754;--warn:#b76e00;--danger:#b42318}
+    *{box-sizing:border-box;scroll-behavior:smooth}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+    header{background:linear-gradient(135deg,var(--primary),var(--dark));color:#fff;padding:28px 34px}
+    header h1{font-size:30px;margin:0 0 6px} header p{margin:0;opacity:.95}
+    .top-actions{display:flex;gap:8px;margin-top:16px}
+    .top-actions button{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.12);color:#fff;padding:9px 13px;border-radius:8px;cursor:pointer;font-weight:700}
+    .layout{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:calc(100vh - 130px)}
+    aside{background:#fff;border-right:1px solid var(--border);padding:20px;position:sticky;top:0;height:100vh;overflow:auto}
+    .brand{font-weight:800;color:var(--dark);font-size:18px;margin-bottom:14px}
+    .search{width:100%;padding:11px;border:1px solid var(--border);border-radius:8px;margin-bottom:14px}
+    nav a{display:block;text-decoration:none;color:var(--text);font-size:14px;padding:7px 9px;border-radius:7px;margin:2px 0}
+    nav a:hover,nav a.active{background:var(--light);color:var(--primary);font-weight:700}
+    main{padding:26px 32px 60px;max-width:1220px}
+    .intro,section{background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:20px;box-shadow:0 2px 10px rgba(0,0,0,.035)}
+    .intro{background:linear-gradient(120deg,#fff,#f5faff)}
+    h2{color:var(--dark);margin:0 0 14px;font-size:23px}
+    h3{color:var(--primary);margin:22px 0 8px;font-size:18px}
+    h4{color:var(--dark);margin:16px 0 6px}
+    .subtitle{color:var(--muted);margin-top:-8px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+    .card{border:1px solid var(--border);border-radius:10px;padding:14px;background:#fbfdff}
+    .card strong{color:var(--dark)}
+    .steps{counter-reset:item;padding:0}
+    .steps li{list-style:none;position:relative;padding-left:36px;margin:10px 0}
+    .steps li:before{counter-increment:item;content:counter(item);position:absolute;left:0;top:0;width:25px;height:25px;border-radius:50%;background:var(--primary);color:#fff;text-align:center;line-height:25px;font-size:13px;font-weight:700}
+    .note{border-left:5px solid var(--primary);background:#f7fbff;padding:12px 14px;border-radius:8px;margin:14px 0}
+    .note.ok{border-left-color:var(--ok);background:#f3fbf7}
+    .note.warn{border-left-color:var(--warn);background:#fff9ed}
+    .note.danger{border-left-color:var(--danger);background:#fff4f2}
+    .tags span{display:inline-block;background:var(--light);color:var(--dark);border:1px solid #c7def8;border-radius:20px;padding:4px 10px;font-size:12px;margin:3px}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+    th,td{border:1px solid var(--border);padding:10px;text-align:left;vertical-align:top}
+    th{background:#eff6ff;color:var(--dark)}
+    .field-list{columns:2;column-gap:35px}.field-list li{break-inside:avoid;margin:5px 0}
+    .hidden{display:none!important}
+    footer{color:var(--muted);font-size:13px;text-align:center;padding-top:10px}
+    @media(max-width:900px){.layout{display:block}aside{position:relative;height:auto;border-right:0;border-bottom:1px solid var(--border)}main{padding:18px}.grid{grid-template-columns:1fr}.field-list{columns:1}}
+    @media print{aside,.top-actions{display:none}.layout{display:block}main{max-width:none;padding:0}header{background:#fff;color:#000;border-bottom:2px solid #000;padding:12px 0}section,.intro{box-shadow:none;page-break-inside:avoid;border-color:#aaa}body{background:#fff}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Manual detalhado do MedSoft</h1>
+  <p>Guia completo das principais telas, botões e rotinas do sistema.</p>
+  <div class="top-actions">
+    <button type="button" onclick="window.print()">Imprimir ajuda</button>
+    <button type="button" onclick="location.href='#inicio'">Voltar ao início</button>
+  </div>
+</header>
+<div class="layout">
+<aside>
+  <div class="brand">MedSoft • Ajuda detalhada</div>
+  <input id="search" class="search" type="search" placeholder="Pesquisar no manual..." aria-label="Pesquisar no manual">
+  <nav>
+    <a href="#inicio">Visão geral</a>
+    <a href="#login">Login e senha</a>
+    <a href="#menu">Menu principal</a>
+    <a href="#pacientes">Pacientes</a>
+    <a href="#historico">Histórico Clínico</a>
+    <a href="#receita">Receita</a>
+    <a href="#exames">Exames</a>
+    <a href="#agenda">Agenda</a>
+    <a href="#padroes">Padrões</a>
+    <a href="#profissionais">Prof. Saúde</a>
+    <a href="#clinicas">Clínicas</a>
+    <a href="#planos">Planos</a>
+    <a href="#procedimentos">Procedimentos</a>
+    <a href="#financeiro">Financeiro</a>
+    <a href="#relatorios">Relatórios</a>
+    <a href="#usuarios">Usuários e perfis</a>
+    <a href="#empresa">Empresa</a>
+    <a href="#email">Configuração de e-mail</a>
+    <a href="#whatsapp">Configuração de WhatsApp</a>
+    <a href="#mensagens">Mensagens enviadas</a>
+    <a href="#celular">Uso pelo celular</a>
+    <a href="#boas-praticas">Boas práticas</a>
+  </nav>
+</aside>
+<main>
+<div class="intro" id="inicio">
+  <h2>Visão geral</h2>
+  <p>O MedSoft reúne cadastro de pacientes, agenda, prontuário clínico, receitas, exames, profissionais, planos, procedimentos, faturamento, relatórios e comunicação com pacientes.</p>
+  <div class="tags"><span>Pacientes</span><span>Histórico Clínico</span><span>Receitas</span><span>Exames</span><span>Agenda</span><span>Financeiro</span><span>E-mail</span><span>WhatsApp</span></div>
+  <div class="note ok"><strong>Sequência sugerida para começar:</strong> cadastre empresa, perfis, usuários, clínica, profissionais, planos e procedimentos. Depois cadastre pacientes e utilize agenda, histórico clínico, financeiro e relatórios.</div>
+</div>
+
+<section id="login">
+  <h2>1. Login e recuperação de senha</h2>
+  <p class="subtitle">Acesso individual e protegido ao sistema.</p>
+  <ol class="steps"><li>Informe o usuário ou e-mail cadastrado.</li><li>Digite a senha.</li><li>Clique em <strong>Entrar</strong>.</li><li>Após a autenticação, confira a empresa ativa exibida no topo.</li></ol>
+  <h3>Esqueci minha senha</h3>
+  <p>Use a opção de recuperação na tela de login, informe o e-mail cadastrado e siga o link recebido. Se a mensagem não aparecer, verifique spam, lixo eletrônico e o cadastro do usuário.</p>
+  <div class="note warn"><strong>Segurança:</strong> cada pessoa deve utilizar seu próprio usuário. Não compartilhe senhas nem mantenha sessões abertas em aparelhos de terceiros.</div>
+</section>
+
+<section id="menu">
+  <h2>2. Menu principal e navegação</h2>
+  <p>O menu lateral apresenta somente os módulos liberados para o perfil conectado. Em telas menores, toque no botão de três linhas para abrir ou fechar o menu.</p>
+  <div class="grid"><div class="card"><strong>Voltar</strong><br>Retorna à tela anterior dentro do sistema.</div><div class="card"><strong>Ajuda (?)</strong><br>Abre este manual sem sair da tela atual.</div><div class="card"><strong>Empresa ativa</strong><br>Mostra o código, nome e plano da empresa em uso.</div><div class="card"><strong>Sair</strong><br>Encerra a sessão e retorna ao login.</div></div>
+  <div class="note"><strong>Permissões:</strong> se um menu ou botão não aparecer, confirme se o perfil possui autorização para abrir ou editar aquele módulo.</div>
+</section>
+
+<section id="pacientes">
+  <h2>3. Pacientes</h2>
+  <p>A tela de Pacientes concentra pesquisa, cadastro, dados pessoais e acesso às informações clínicas.</p>
+  <h3>Pesquisar um paciente</h3>
+  <ol class="steps"><li>Acesse <strong>Paciente</strong>.</li><li>Digite nome, código ou outro termo disponível.</li><li>Clique em <strong>Buscar</strong>.</li><li>Localize o cartão correto e escolha a ação desejada.</li></ol>
+  <h3>Incluir ou alterar</h3>
+  <p>Clique em <strong>Incluir</strong> para um novo cadastro ou em <strong>Alterar</strong> no cartão existente. Preencha os dados de identificação, nascimento, plano, contatos, endereço e demais informações apresentadas.</p>
+  <ul class="field-list"><li>Nome e código do paciente</li><li>Data de nascimento e idade</li><li>Plano</li><li>Telefone residencial/comercial</li><li>E-mail</li><li>Endereço</li><li>Observações cadastrais</li><li>Profissional relacionado, quando aplicável</li></ul>
+  <h3>Ações clínicas do cartão</h3>
+  <table><tr><th>Ação</th><th>Finalidade</th></tr><tr><td>Histórico</td><td>Consulta atendimentos anteriores e inclui uma nova evolução clínica.</td></tr><tr><td>Receita</td><td>Elabora uma prescrição usando dados do paciente, profissional e clínica.</td></tr><tr><td>Exames</td><td>Registra exames, observações e anexos vinculados ao paciente.</td></tr><tr><td>Alterar</td><td>Atualiza o cadastro do paciente.</td></tr><tr><td>Excluir</td><td>Remove o registro quando permitido. Confirme cuidadosamente antes de continuar.</td></tr></table>
+  <div class="note warn"><strong>Evite duplicidade:</strong> sempre pesquise pelo nome antes de incluir um novo paciente.</div>
+</section>
+
+<section id="historico">
+  <h2>4. Histórico Clínico</h2>
+  <p>O Histórico Clínico registra a evolução dos atendimentos do paciente e permite consultar registros anteriores em ordem de data.</p>
+  <h3>Consultar registros anteriores</h3>
+  <ol class="steps"><li>Localize o paciente.</li><li>Abra a opção <strong>Histórico</strong>.</li><li>Confira o paciente, idade e plano no cabeçalho.</li><li>Consulte data, profissional e texto dos atendimentos registrados.</li></ol>
+  <h3>Incluir um novo histórico</h3>
+  <ol class="steps"><li>Clique no botão <strong>Incluir (+)</strong>.</li><li>Confirme a <strong>Data</strong> do atendimento.</li><li>Escolha o <strong>Tipo</strong> de padrão: receita, exame, procedimento ou anamnese.</li><li>Opcionalmente, pesquise um texto no campo <strong>Padrão</strong> e clique em <strong>Incluir padrão</strong>.</li><li>Digite ou dite o conteúdo no campo <strong>Histórico</strong>.</li><li>Clique em <strong>Salvar</strong>. Para abandonar a inclusão, use <strong>Cancelar</strong>.</li></ol>
+  <h3>Ditado por voz</h3>
+  <p>O botão <strong>Ditado por voz</strong> transforma a fala em texto no campo Histórico. Ao tocar, permita o uso do microfone e fale próximo ao aparelho. Toque em <strong>Parar</strong> para encerrar.</p>
+  <div class="note warn"><strong>Requisitos do ditado:</strong> no celular, abra o sistema por HTTPS com certificado válido e permita o microfone. No Android, prefira Chrome ou Edge. Se o navegador não oferecer reconhecimento de voz, use o microfone do teclado do aparelho.</div>
+  <h3>Teleconsulta</h3>
+  <p>Quando disponível no plano, o botão <strong>Teleconsulta</strong> permite informar e abrir um link do Google Meet. Confira o endereço antes de iniciar a reunião.</p>
+  <div class="note danger"><strong>Prontuário:</strong> revise o texto antes de salvar. O histórico contém informação clínica sensível e deve ser objetivo, legível e relacionado ao atendimento.</div>
+</section>
+
+<section id="receita">
+  <h2>5. Receita</h2>
+  <p>A rotina de Receita prepara a prescrição com os dados do paciente e as informações configuradas da clínica e do profissional.</p>
+  <h3>Criar uma receita</h3>
+  <ol class="steps"><li>Abra o paciente e acesse <strong>Histórico</strong>.</li><li>Clique no botão <strong>Receita</strong> no cabeçalho.</li><li>Pesquise um padrão de receita, se desejar.</li><li>Selecione o padrão e clique em <strong>Incluir padrão</strong> para acrescentar o texto.</li><li>Edite a prescrição no campo principal.</li><li>Use <strong>Ditado por voz</strong> se o navegador e o plano permitirem.</li><li>Revise paciente, conteúdo, data e identificação profissional.</li></ol>
+  <h3>Botões da receita</h3>
+  <table><tr><th>Botão</th><th>O que faz</th></tr><tr><td>Imprimir</td><td>Abre a receita em formato preparado para impressão.</td></tr><tr><td>Atualizar histórico</td><td>Registra o conteúdo da receita no histórico do paciente.</td></tr><tr><td>Incluir padrão</td><td>Acrescenta ao texto o modelo selecionado.</td></tr><tr><td>Fechar</td><td>Fecha a receita. Confirme se o conteúdo necessário já foi registrado.</td></tr></table>
+  <div class="note"><strong>Configuração:</strong> cabeçalho, títulos, rodapés e identificação da clínica dependem dos dados cadastrados em Clínica e Prof. Saúde.</div>
+</section>
+
+<section id="exames">
+  <h2>6. Exames do paciente</h2>
+  <p>Esta área mantém exames e documentos relacionados ao paciente.</p>
+  <ol class="steps"><li>Localize o paciente e abra <strong>Exames</strong>.</li><li>Clique em <strong>Incluir exame</strong>.</li><li>Informe nome, data e observações.</li><li>Selecione o arquivo ou imagem, quando necessário.</li><li>Confira a prévia e clique em <strong>Salvar</strong>.</li></ol>
+  <p>Nos registros existentes, use <strong>Alterar</strong> para corrigir informações ou <strong>Excluir</strong> quando permitido.</p>
+  <div class="note warn"><strong>Anexos:</strong> utilize arquivos compatíveis e confira se pertencem ao paciente correto antes de salvar.</div>
+</section>
+
+<section id="agenda">
+  <h2>7. Agenda</h2>
+  <p>A Agenda organiza horários, pacientes, profissionais, procedimentos, planos e situação do atendimento.</p>
+  <h3>Filtros e visualizações</h3>
+  <ul class="field-list"><li>Data da agenda</li><li>Prof. Saúde</li><li>Paciente</li><li>Visualização diária</li><li>Visualização semanal</li><li>Visualização mensal</li><li>Visualização anual</li><li>Intervalos de 10 a 60 minutos</li></ul>
+  <h3>Criar um agendamento</h3>
+  <ol class="steps"><li>Selecione data e profissional.</li><li>Clique em <strong>Incluir</strong> ou escolha um horário disponível.</li><li>Selecione um paciente cadastrado. Se necessário, utilize a inclusão rápida de paciente.</li><li>Informe plano e procedimento.</li><li>Revise telefone, e-mail, horário, observação e status.</li><li>Clique em <strong>Salvar</strong>.</li></ol>
+  <h3>Ações do agendamento</h3>
+  <table><tr><th>Ação</th><th>Uso</th></tr><tr><td>Paciente</td><td>Abre o cadastro relacionado.</td></tr><tr><td>Alterar</td><td>Atualiza horário, dados ou situação.</td></tr><tr><td>WhatsApp</td><td>Envia ou prepara a confirmação pelo modo configurado.</td></tr><tr><td>E-mail</td><td>Envia confirmação para o endereço do paciente.</td></tr><tr><td>Excluir</td><td>Remove o agendamento após confirmação.</td></tr></table>
+  <h3>Confirmação</h3>
+  <p>As confirmações podem utilizar textos automáticos e um link para o paciente responder. O status exibido na agenda permite acompanhar agendado, confirmado, atendido, cancelado ou outras situações configuradas.</p>
+</section>
+
+<section id="padroes">
+  <h2>8. Padrões</h2>
+  <p>Padrões são textos reutilizáveis para agilizar histórico, anamnese, receita, exame, procedimento e mensagens.</p>
+  <ol class="steps"><li>Pesquise por nome ou texto.</li><li>Clique em <strong>Incluir</strong>.</li><li>Escolha o tipo adequado.</li><li>Informe um nome curto e identificável.</li><li>Digite o conteúdo completo.</li><li>Quando for modelo de e-mail, configure HTML somente se necessário.</li><li>Salve e teste o padrão no fluxo em que será utilizado.</li></ol>
+  <p>A opção de visualizar padrões pode permitir consulta a modelos disponibilizados para outras empresas, conforme as regras do sistema.</p>
+</section>
+
+<section id="profissionais">
+  <h2>9. Profissionais de Saúde</h2>
+  <p>Cadastre identificação, registro, especialidade, contatos, agenda de trabalho e dados utilizados em receitas.</p>
+  <h3>Cadastro básico</h3>
+  <ol class="steps"><li>Pesquise pelo nome.</li><li>Clique em <strong>Incluir</strong>.</li><li>Preencha nome, registro profissional, especialidade, endereço e contatos.</li><li>Informe os vínculos e campos complementares apresentados.</li><li>Salve o cadastro.</li></ol>
+  <h3>Horários e receituário</h3>
+  <p>Configure os períodos de atendimento por dia da semana e os dados usados no cabeçalho, títulos, assinatura e rodapé das receitas. Esses dados influenciam a disponibilidade da agenda e a impressão de documentos.</p>
+</section>
+
+<section id="clinicas">
+  <h2>10. Clínicas</h2>
+  <p>O cadastro da clínica fornece informações institucionais usadas em telas, comunicações e documentos.</p>
+  <ol class="steps"><li>Pesquise a clínica existente.</li><li>Use <strong>Incluir</strong> ou <strong>Alterar</strong>.</li><li>Preencha nome, endereço, telefone, e-mail e observações.</li><li>Revise os dados usados em receitas e mensagens.</li><li>Salve.</li></ol>
+</section>
+
+<section id="planos">
+  <h2>11. Planos</h2>
+  <p>Os planos são utilizados em pacientes, agenda, procedimentos e financeiro.</p>
+  <h3>Cadastro do plano</h3>
+  <p>Informe nome, prazo de recebimento e demais dados apresentados. O prazo pode ser usado para calcular a data prevista da receita financeira importada da agenda.</p>
+  <h3>Plano Med / Empresa</h3>
+  <p>Administra o plano contratado pela empresa e os recursos liberados, como teleconsulta e ditado por voz.</p>
+</section>
+
+<section id="procedimentos">
+  <h2>12. Procedimentos</h2>
+  <p>Cadastre os serviços usados na agenda e no faturamento.</p>
+  <ol class="steps"><li>Pesquise o procedimento antes de incluir.</li><li>Informe a <strong>Descrição</strong>.</li><li>Selecione o <strong>Plano</strong>.</li><li>Informe o <strong>Valor</strong>.</li><li>Informe <strong>Prof. Saúde (%)</strong>, usando um percentual inteiro de 0 a 100.</li><li>Salve.</li></ol>
+  <div class="note"><strong>Rateio:</strong> o percentual do profissional é usado ao importar atendimentos da agenda para o financeiro.</div>
+</section>
+
+<section id="financeiro">
+  <h2>13. Financeiro</h2>
+  <p>Registra receitas e despesas, permite pesquisa mensal e apresenta totalizações.</p>
+  <h3>Pesquisar</h3>
+  <p>Informe um termo, escolha mês e tipo — Todos, Receita ou Despesa — e clique em <strong>Buscar</strong>.</p>
+  <h3>Incluir manualmente</h3>
+  <p>Use <strong>Incluir</strong> para registrar descrição, cliente, datas prevista e realizada, valores, situação de pagamento e tipo.</p>
+  <h3>Incluir da Agenda</h3>
+  <p>Escolha o mês e clique em <strong>Incluir da Agenda</strong>. Para cada consulta atendida com procedimento e plano cadastrados, o sistema gera:</p>
+  <div class="grid"><div class="card"><strong>Receita</strong><br>Valor do procedimento, data realizada da agenda e data prevista calculada pelo prazo do plano.</div><div class="card"><strong>Despesa de rateio</strong><br>Valor do procedimento × percentual do profissional × 0,01. A descrição identifica profissional, procedimento e paciente.</div></div>
+  <h3>Totalização e ações</h3>
+  <p>Use <strong>Totalização</strong> para consultar receitas, despesas e saldos por período. Os cartões também permitem alterar, excluir e duplicar um lançamento para o próximo mês.</p>
+  <div class="note warn"><strong>Conferência:</strong> antes de importar novamente o mesmo mês, verifique os lançamentos existentes para evitar duplicidade.</div>
+</section>
+
+<section id="relatorios">
+  <h2>14. Relatórios</h2>
+  <p>Selecione o tipo, informe os filtros disponíveis e clique em <strong>Buscar</strong>.</p>
+  <table><tr><th>Relatório</th><th>Principais informações</th></tr><tr><td>Paciente</td><td>Dados cadastrais e vínculos.</td></tr><tr><td>Agenda</td><td>Atendimentos por período, status e profissional, com opções de totalização.</td></tr><tr><td>Plano</td><td>Planos cadastrados e informações relacionadas.</td></tr><tr><td>Prof. Saúde</td><td>Dados dos profissionais.</td></tr><tr><td>Procedimentos</td><td>Descrição, plano, valores e rateio.</td></tr><tr><td>Financeiro</td><td>Receitas, despesas, datas, valores e totais.</td></tr></table>
+  <p>Quando disponíveis, utilize impressão e exportação para Excel. Confira filtros e colunas antes de gerar o arquivo.</p>
+</section>
+
+<section id="usuarios">
+  <h2>15. Usuários e perfis</h2>
+  <div class="grid"><div class="card"><strong>Usuário</strong><br>Cadastre nome, login, e-mail, senha, perfil e vínculos necessários.</div><div class="card"><strong>Perfil</strong><br>Defina quais menus podem ser abertos e em quais módulos o usuário pode editar.</div></div>
+  <ol class="steps"><li>Crie primeiro o perfil com as permissões adequadas.</li><li>Cadastre ou altere o usuário.</li><li>Associe o perfil correto.</li><li>Quando for usuário profissional, confirme o vínculo com o Prof. Saúde.</li><li>Teste o acesso com o novo usuário.</li></ol>
+  <div class="note danger"><strong>Princípio do menor acesso:</strong> libere somente as funções necessárias para o trabalho da pessoa.</div>
+</section>
+
+<section id="empresa">
+  <h2>16. Empresa</h2>
+  <p>Permite consultar e manter empresas que utilizam o sistema.</p>
+  <ol class="steps"><li>Pesquise pelo nome ou código.</li><li>Clique em <strong>Incluir empresa</strong> ou altere a existente.</li><li>Preencha os dados cadastrais.</li><li>Associe o plano correspondente.</li><li>Salve e confira a empresa ativa no topo do sistema.</li></ol>
+</section>
+
+<section id="email">
+  <h2>17. Configuração de e-mail</h2>
+  <p>Define o envio SMTP e os textos usados nas comunicações.</p>
+  <ul class="field-list"><li>Servidor SMTP</li><li>Porta</li><li>Usuário</li><li>Senha</li><li>E-mail remetente</li><li>TLS</li><li>SSL</li><li>Tempos de antecedência</li><li>Textos de agendamento</li><li>Textos de retorno</li><li>Textos de aniversário</li><li>Textos de evento</li></ul>
+  <ol class="steps"><li>Preencha os dados fornecidos pelo provedor.</li><li>Marque TLS ou SSL de acordo com a porta.</li><li>Clique em <strong>Testar conexão</strong>.</li><li>Revise tempos e modelos.</li><li>Clique em <strong>Salvar e-mail</strong>.</li></ol>
+</section>
+
+<section id="whatsapp">
+  <h2>18. Configuração de WhatsApp</h2>
+  <div class="grid"><div class="card"><strong>WhatsApp Business</strong><br>Envio automático pela API oficial, usando credenciais e modelos aprovados.</div><div class="card"><strong>WhatsApp Simplificado</strong><br>Abre o WhatsApp com a mensagem preparada para revisão e envio manual.</div></div>
+  <p>Na API oficial, configure número, Phone Number ID, token, versão, idioma e nome do modelo. Defina também tempos e textos para agendamento, retorno, aniversário e eventos.</p>
+  <div class="note warn"><strong>Modelos:</strong> envios automáticos dependem de modelo aprovado e credenciais válidas.</div>
+</section>
+
+<section id="mensagens">
+  <h2>19. Mensagens enviadas</h2>
+  <p>Apresenta o histórico de e-mails e mensagens de WhatsApp processados pelo sistema.</p>
+  <ol class="steps"><li>Informe data inicial e final.</li><li>Escolha o tipo ou mantenha Todos.</li><li>Opcionalmente, filtre pelo destino.</li><li>Clique em <strong>Pesquisar</strong>.</li><li>Consulte data, tipo, destinatário, motivo e resultado.</li><li>Use <strong>Anterior</strong> e <strong>Próxima</strong> para navegar.</li></ol>
+  <p>Para e-mails, o status de sucesso indica que o servidor aceitou o envio; a entrega final ainda pode gerar retorno posterior.</p>
+</section>
+
+<section id="celular">
+  <h2>20. Uso pelo celular</h2>
+  <ul><li>Use o menu de três linhas para acessar os módulos.</li><li>Role o conteúdo interno das janelas para alcançar todos os campos.</li><li>Os botões Salvar e Cancelar permanecem no rodapé dos formulários compatíveis.</li><li>Para o microfone, utilize HTTPS com certificado válido e conceda permissão ao navegador.</li><li>Se o teclado cobrir um campo, feche o teclado ou role o formulário.</li><li>Evite usar o modo anônimo quando precisar manter permissões do microfone.</li></ul>
+</section>
+
+<section id="boas-praticas">
+  <h2>21. Boas práticas</h2>
+  <div class="grid"><div class="card"><strong>Cadastros</strong><br>Pesquise antes de incluir e mantenha contatos atualizados.</div><div class="card"><strong>Prontuário</strong><br>Revise histórico, receita e anexos antes de salvar.</div><div class="card"><strong>Agenda</strong><br>Confirme paciente, profissional, plano, procedimento, data e hora.</div><div class="card"><strong>Financeiro</strong><br>Confira mês, tipo, valores e importações anteriores.</div><div class="card"><strong>Comunicação</strong><br>Teste e-mail e WhatsApp antes de ativar automações.</div><div class="card"><strong>Segurança</strong><br>Use perfis restritos, senhas individuais e sempre encerre a sessão.</div></div>
+</section>
+<footer>MedSoft — Manual detalhado de utilização</footer>
+</main>
+</div>
+<script>
+  const search=document.getElementById('search');
+  const sections=[...document.querySelectorAll('main section,main .intro')];
+  const links=[...document.querySelectorAll('nav a')];
+  search.addEventListener('input',()=>{
+    const query=search.value.toLocaleLowerCase('pt-BR').trim();
+    sections.forEach(section=>section.classList.toggle('hidden',query&&!section.innerText.toLocaleLowerCase('pt-BR').includes(query)));
+  });
+  window.addEventListener('scroll',()=>{
+    let current='inicio';
+    sections.forEach(section=>{if(section.getBoundingClientRect().top<=140)current=section.id});
+    links.forEach(link=>link.classList.toggle('active',link.getAttribute('href')==='#'+current));
+  });
+</script>
+</body>
+</html>

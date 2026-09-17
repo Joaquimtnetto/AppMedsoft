@@ -1,0 +1,275 @@
+<section class="medsoft-faq">
+  <style>
+    .medsoft-faq {
+      background: linear-gradient(180deg, #eef8ff 0%, #ffffff 100%);
+      padding: 60px 20px;
+      font-family: Arial, sans-serif;
+      color: #1f2937;
+    }
+    .medsoft-faq * { box-sizing: border-box; }
+    .medsoft-faq .wrap { max-width: 980px; margin: 0 auto; }
+    .medsoft-faq .badge {
+      display: inline-block;
+      margin-bottom: 18px;
+      padding: 9px 16px;
+      border-radius: 24px;
+      background: #d9f5ff;
+      color: #007c9c;
+      font-size: 14px;
+      font-weight: bold;
+    }
+    .medsoft-faq h2 {
+      margin: 0 0 16px;
+      color: #073f7a;
+      font-size: 44px;
+      line-height: 1.1;
+    }
+    .medsoft-faq .intro {
+      max-width: 780px;
+      margin: 0 0 34px;
+      color: #526b88;
+      font-size: 19px;
+      line-height: 1.6;
+    }
+    .medsoft-faq .faq-list { display: grid; gap: 14px; }
+    .medsoft-faq details {
+      overflow: hidden;
+      border: 1px solid #d7eaff;
+      border-radius: 12px;
+      background: #ffffff;
+      box-shadow: 0 8px 22px rgba(7, 63, 122, 0.07);
+    }
+    .medsoft-faq summary {
+      position: relative;
+      padding: 20px 58px 20px 22px;
+      color: #073f7a;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 1.35;
+      cursor: pointer;
+      list-style: none;
+    }
+    .medsoft-faq summary::-webkit-details-marker { display: none; }
+    .medsoft-faq summary::after {
+      content: "+";
+      position: absolute;
+      top: 50%;
+      right: 22px;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #e3f8ff;
+      color: #007c9c;
+      font-size: 22px;
+      line-height: 28px;
+      text-align: center;
+      transform: translateY(-50%);
+    }
+    .medsoft-faq details[open] summary::after {
+      content: "-";
+      background: #007c9c;
+      color: #ffffff;
+    }
+    .medsoft-faq .faq-answer {
+      padding: 0 22px 22px;
+      color: #526b88;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    .medsoft-faq .faq-answer p { margin: 0; }
+    .medsoft-faq .faq-answer ul { margin: 8px 0 0; padding-left: 20px; }
+    .medsoft-faq .faq-cta {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 20px;
+      margin-top: 34px;
+      padding: 28px;
+      border-radius: 14px;
+      background: #073f7a;
+      color: #ffffff;
+    }
+    .medsoft-faq .faq-cta h3 {
+      margin: 0 0 8px;
+      color: #ffffff;
+      font-size: 24px;
+    }
+    .medsoft-faq .faq-cta p {
+      margin: 0;
+      color: #d9ecff;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .medsoft-faq .faq-cta a {
+      display: inline-block;
+      padding: 14px 22px;
+      border-radius: 8px;
+      background: #25d366;
+      color: #071b12;
+      text-decoration: none;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    @media (max-width: 700px) {
+      .medsoft-faq { padding: 42px 16px; }
+      .medsoft-faq h2 { font-size: 34px; }
+      .medsoft-faq summary { padding: 18px 52px 18px 18px; font-size: 17px; }
+      .medsoft-faq .faq-cta { grid-template-columns: 1fr; }
+      .medsoft-faq .faq-cta a { text-align: center; white-space: normal; }
+    }
+  </style>
+
+  <div class="wrap">
+    <span class="badge">Perguntas frequentes</span>
+    <h2>Dúvidas frequentes sobre a MedSoft</h2>
+    <p class="intro">
+      Encontre respostas sobre os principais recursos do sistema e veja como a MedSoft
+      pode apoiar a rotina de profissionais de saúde, clínicas e consultórios.
+    </p>
+
+    <div class="faq-list">
+      <details open>
+        <summary>O que é a MedSoft?</summary>
+        <div class="faq-answer">
+          <p>A MedSoft é uma plataforma de gestão para profissionais de saúde, clínicas e consultórios. O sistema reúne cadastro de pacientes, agenda, histórico clínico, receitas, exames, procedimentos, financeiro, relatórios e comunicação em um único ambiente.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Quais profissionais podem utilizar a MedSoft?</summary>
+        <div class="faq-answer">
+          <p>A plataforma pode ser utilizada por médicos, psicólogos, fisioterapeutas, nutricionistas, dentistas, terapeutas e outros profissionais que precisam organizar pacientes, atendimentos, agenda e informações clínicas.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>A MedSoft permite cadastrar e acompanhar pacientes?</summary>
+        <div class="faq-answer">
+          <p>Sim. É possível cadastrar dados pessoais, contatos, endereço e informações importantes para o atendimento. A partir do cadastro, o usuário autorizado também pode acessar histórico clínico, receitas e exames do paciente.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Como funciona a agenda?</summary>
+        <div class="faq-answer">
+          <p>A agenda organiza os atendimentos por data, horário, profissional e paciente. Também permite informar procedimento, observações e situação do agendamento, com visualizações diária, semanal, mensal e anual.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>É possível confirmar agendamentos por e-mail ou WhatsApp?</summary>
+        <div class="faq-answer">
+          <p>Sim. A MedSoft pode enviar ou preparar mensagens de confirmação por e-mail e WhatsApp, conforme a configuração utilizada. O sistema também permite acompanhar o histórico das mensagens processadas.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>O sistema possui Histórico Clínico?</summary>
+        <div class="faq-answer">
+          <p>Sim. O profissional pode consultar registros anteriores e incluir novas evoluções com data e texto do atendimento. Também é possível utilizar padrões cadastrados para agilizar o preenchimento.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>O Histórico Clínico possui ditado por voz?</summary>
+        <div class="faq-answer">
+          <p>Sim. Em navegadores compatíveis, o botão Ditado por voz transforma a fala em texto. No celular, o acesso deve ser feito por conexão HTTPS válida e o usuário precisa permitir o uso do microfone.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>A MedSoft permite realizar teleconsultas?</summary>
+        <div class="faq-answer">
+          <p>O sistema possui recurso para informar e abrir um link de teleconsulta pelo Google Meet. A disponibilidade depende da configuração liberada para a empresa.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>É possível criar e imprimir receitas?</summary>
+        <div class="faq-answer">
+          <p>Sim. A receita utiliza os dados do paciente, da clínica e do profissional. O usuário pode inserir modelos cadastrados, editar o conteúdo, imprimir o documento e registrar a prescrição no histórico do paciente.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>O sistema permite anexar exames e documentos?</summary>
+        <div class="faq-answer">
+          <p>Sim. É possível registrar exames com nome, data e observações, além de anexar imagens ou documentos compatíveis ao cadastro do paciente.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Para que servem os Padrões?</summary>
+        <div class="faq-answer">
+          <p>Os Padrões são textos reutilizáveis para anamnese, histórico, receita, exames, procedimentos e mensagens. Eles reduzem a digitação repetitiva e ajudam a manter os registros organizados.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>A MedSoft possui controle financeiro?</summary>
+        <div class="faq-answer">
+          <p>Sim. O módulo Financeiro permite registrar receitas e despesas, pesquisar por mês e tipo, acompanhar datas e valores, totalizar períodos e duplicar lançamentos recorrentes.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>A agenda pode gerar lançamentos financeiros?</summary>
+        <div class="faq-answer">
+          <p>Sim. Consultas marcadas como atendidas podem gerar a receita do procedimento e a despesa de rateio do profissional. O rateio é calculado com base no valor do procedimento e no percentual cadastrado.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Quais relatórios estão disponíveis?</summary>
+        <div class="faq-answer">
+          <p>O sistema oferece consultas e relatórios de pacientes, agenda, profissionais de saúde, procedimentos e financeiro. Conforme a tela, os dados podem ser impressos ou exportados.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>É possível usar a MedSoft em clínicas com vários profissionais?</summary>
+        <div class="faq-answer">
+          <p>Sim. A plataforma permite cadastrar diferentes profissionais, organizar agendas individuais e utilizar usuários com perfis e permissões adequados para cada função da equipe.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Como funcionam usuários e permissões?</summary>
+        <div class="faq-answer">
+          <p>Cada usuário pode ser associado a um perfil. O perfil define quais menus podem ser abertos e em quais áreas a pessoa pode realizar alterações, ajudando a proteger as informações do sistema.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>A MedSoft funciona pelo celular?</summary>
+        <div class="faq-answer">
+          <p>Sim. As principais telas possuem layout responsivo para celular. O menu lateral, os filtros e os formulários se adaptam a telas menores. Recursos como microfone dependem das permissões e da segurança do navegador.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>A MedSoft realiza migração de dados?</summary>
+        <div class="faq-answer">
+          <p>A possibilidade de migração pode ser avaliada pela equipe técnica conforme o sistema de origem, o formato dos arquivos, o volume e a qualidade das informações existentes.</p>
+        </div>
+      </details>
+
+      <details>
+        <summary>Como solicitar uma demonstração ou tirar dúvidas?</summary>
+        <div class="faq-answer">
+          <p>Entre em contato com a equipe da MedSoft pelo WhatsApp ou pelo formulário do site. A equipe poderá apresentar os recursos e entender as necessidades do profissional ou da clínica.</p>
+        </div>
+      </details>
+    </div>
+
+    <div class="faq-cta">
+      <div>
+        <h3>Ainda tem dúvidas?</h3>
+        <p>Fale com a equipe da MedSoft e conheça melhor os recursos disponíveis para sua rotina profissional ou clínica.</p>
+      </div>
+      <a href="https://wa.me/5521986496127?text=Ol%C3%A1!%20Tenho%20d%C3%BAvidas%20sobre%20a%20MedSoft." target="_blank" rel="noopener">
+        Falar no WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
