@@ -2022,3 +2022,20 @@
         height: min(460px, calc(100vh - 96px));
     }
 }
+
+/* Campos existentes da consulta, abaixo do texto do histórico. */
+.historico-fixed-section { grid-column: 1 / -1; min-width: 0; }
+.historico-fixed-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+.historico-fixed-fields[hidden] { display: none; }
+.historico-fixed-fields .crud-field { min-width: 0; }
+.historico-fixed-fields .crud-input { width: 100%; box-sizing: border-box; }
+@media (max-width: 640px) {
+    .historico-fixed-fields { grid-template-columns: 1fr; }
+}
+
+.prof-saude-form .prof-field-anamnese-instrucao { grid-column: 1 / -1; }

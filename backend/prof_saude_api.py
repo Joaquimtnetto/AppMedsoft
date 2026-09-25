@@ -73,7 +73,10 @@ MAX_LENGTHS = {
 }
 
 
+ANAMNESE_LABEL_FIELDS = tuple(f'param{i}' for i in range(1, 7))
+
 PREFERE_FIELD_CANDIDATES = {
+    **{name: (name,) for name in ANAMNESE_LABEL_FIELDS},
     'tit1': ('nomeclin',),
     'tit2': ('tit2',),
     'tit3': ('tit3',),
@@ -217,6 +220,7 @@ def _prefere_layout(cursor):
             fields[logical_name] = column['name']
     return {
         'table': 'prefere', 'id_column': codmed_column['name'], 'fields': fields,
+        'label_limits': {name: columns[name].get('max_length') for name in ANAMNESE_LABEL_FIELDS if name in columns},
         'tenant_column': (_pick(columns, (TENANT_COLUMN,)) or {}).get('name'),
     }
 
@@ -272,7 +276,22 @@ def _prefere_values(data, layout):
     if not layout:
         return {}
     values = {}
+    for name in ANAMNESE_LABEL_FIELDS:
+        if name in data and name not in layout['fields']:
+            raise ValueError(f'Campo {name} não encontrado na tabela PREFERE.')
     for logical_name, column_name in layout['fields'].items():
+        if logical_name in ANAMNESE_LABEL_FIELDS:
+            if logical_name not in data:
+                continue
+            raw = data[logical_name]
+            if raw is not None and not isinstance(raw, str):
+                raise ValueError('O texto do campo da anamnese deve ser um texto.')
+            value = (raw or '').strip()
+            limit = layout.get('label_limits', {}).get(logical_name)
+            if limit and len(value) > limit:
+                raise ValueError(f'O texto {logical_name} da anamnese excede {limit} caracteres.')
+            values[column_name] = value or None
+            continue
         if logical_name in PREFERE_IMAGE_FIELDS:
             if logical_name in data and data.get(logical_name):
                 values[column_name] = _decode_image(data.get(logical_name))
@@ -391,7 +410,7 @@ def _upsert_prefere(cursor, record_id, data):
             'fonte_rodape', 'tamanho_rodape',
             'linha_cabecalho', 'espessura_linha_cabecalho',
             'linha_rodape', 'espessura_linha_rodape',
-        ) if name in layout['fields']
+        ) + ANAMNESE_LABEL_FIELDS if name in layout['fields']
     ]
     if not verify_logical:
         return {}

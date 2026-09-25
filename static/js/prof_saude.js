@@ -293,10 +293,16 @@
 
     function anamneseFields(item) {
         item = item || {};
-        return [
-            {name: 'anamnese_nome', label: 'Nome', value: item.anamnese_nome || '', maxLength: 30, page: 4, className: 'prof-field-anamnese-nome'},
-            {name: 'anamnese_texto', label: 'Observação', value: item.anamnese_texto || '', type: 'textarea', rows: 5, page: 4, className: 'prof-field-anamnese-texto'}
-        ];
+        var labels = ['Temperatura', 'Peso', 'Pressão', 'Parâmetro 1', 'Parâmetro 2', 'Parâmetro 3'];
+        return [{
+            name: 'anamnese_instrucao', label: '', type: 'static', page: 4,
+            className: 'prof-field-anamnese-instrucao',
+            value: 'Defina os nomes dos campos do histórico para este profissional. Deixe em branco para usar o nome original.'
+        }].concat(labels.map(function (label, index) {
+            var name = 'param' + (index + 1);
+            return {name: name, label: 'Texto do campo ' + label,
+                value: item[name] || '', placeholder: label, page: 4};
+        }));
     }
 
     function fields(item) {
@@ -317,7 +323,7 @@
             {name: 'especialidade', label: 'Especialidade', value: item.especialidade || '', maxLength: 40, page: 1},
             {name: 'subespecialidade', label: 'Sub-Especialidade', value: item.subespecialidade || '', maxLength: 40, page: 1},
             {name: 'observacao', label: 'Observação', value: item.observacao || '', type: 'textarea', rows: 3, maxLength: 400, page: 1, className: 'prof-field-observacao'}
-        ].concat(dayFields(item), receituarioFields(item));
+        ].concat(dayFields(item), receituarioFields(item), anamneseFields(item));
     }
 
     function payload(values) {
@@ -334,6 +340,13 @@
 
         return {
             nome: values.nome,
+            param1: values.param1,
+            param2: values.param2,
+            param3: values.param3,
+            param4: values.param4,
+            param5: values.param5,
+            param6: values.param6,
+
             cep: values.cep,
             uf: values.uf,
             municipio: values.municipio,
@@ -442,9 +455,9 @@
             formClass: 'prof-saude-form',
             emptyMessage: 'Nenhum profissional encontrado.',
             hasComplement: true,
-            pageCount: 3,
-            pageLabels: ['Cadastro', 'Horário', 'Receituário'],
-            pageTitles: ['', '', ''],
+            pageCount: 4,
+            pageLabels: ['Cadastro', 'Horário', 'Receituário', 'Anamnese'],
+            pageTitles: ['', '', '', 'Anamnese'],
             fields: fields,
             renderItem: renderItem,
             onFormReady: setupProfSaudeForm,

@@ -901,7 +901,16 @@
         return parts.join(' ');
     }
 
-    function showHistoricoModal(codcli, nomecli, consultas, patient) {
+    var historicoFixedFields = [
+        ['diag', 'Diagnose', 30], ['teraup', 'Terapêutica', 30],
+        ['exame', 'Exame', 20], ['temp', 'Temperatura', 4],
+        ['peso', 'Peso', 4], ['pressao', 'Pressão', 5],
+        ['param1', 'Parâmetro 1', 5], ['param2', 'Parâmetro 2', 5],
+        ['param3', 'Parâmetro 3', 5]
+    ];
+
+    function showHistoricoModal(codcli, nomecli, consultas, patient, fieldLabels) {
+        fieldLabels = fieldLabels || {};
         closeHistoricoModal();
         consultas = consultas || [];
         if (typeof patient === 'string') patient = {nomed: patient};
@@ -939,6 +948,8 @@
             '<i class="fa fa-plus"></i><span> Incluir</span></button>' +
             '<button type="button" class="crud-button crud-button-secondary historico-alterar" title="Alterar histórico selecionado" disabled>' +
             '<i class="fa fa-pencil"></i><span> Alterar</span></button>' +
+            '<button type="button" class="crud-button crud-button-danger historico-excluir" title="Inativar histórico selecionado" disabled>' +
+            '<i class="fa fa-trash"></i><span> Excluir</span></button>' +
             '<button type="button" class="crud-button crud-button-secondary historico-receita" title="Criar receita">' +
             '<i class="fa fa-file-text-o"></i><span> Receita</span></button>' +
             '<button type="button" class="historico-close" title="Fechar">&times;</button>' +
@@ -968,6 +979,15 @@
             'title="Organizar o texto pelos tópicos do padrão selecionado">' +
             '<i class="fa fa-list-alt"></i><span> Organizar texto</span></button></div></div>' +
             '<textarea id="historico-texto" name="historico" rows="7" required></textarea></div>' +
+            '<div class="historico-fixed-section">' +
+            '<button type="button" class="crud-button crud-button-secondary historico-fixed-toggle" ' +
+            'aria-expanded="false" aria-controls="historico-fixed-fields">' +
+            '<i class="fa fa-plus" aria-hidden="true"></i><span> Campos complementares</span></button>' +
+            '<div id="historico-fixed-fields" class="historico-fixed-fields" hidden>' +
+            historicoFixedFields.map(function (field) {
+                return '<label class="crud-field"><span>' + CrudUI.escapeHtml(fieldLabels[field[0]] || field[1]) + '</span>' +
+                    '<input type="text" class="crud-input" name="' + field[0] + '" maxlength="' + field[2] + '"></label>';
+            }).join('') + '</div></div>' +
             '<div class="historico-organization-review" hidden>Revise cuidadosamente o texto organizado antes de salvar.</div>' +
             '<div class="historico-form-actions">' +
             '<button type="button" class="crud-button historico-form-cancel">Cancelar</button>' +
@@ -979,6 +999,7 @@
         var form = modal.querySelector('.historico-form');
         var includeButton = modal.querySelector('.historico-include');
         var alterButton = modal.querySelector('.historico-alterar');
+        var deleteButton = modal.querySelector('.historico-excluir');
         var receitaButton = modal.querySelector('.historico-receita');
         var cancelButton = modal.querySelector('.historico-form-cancel');
         var submitButton = form.querySelector('[type="submit"]');
@@ -991,6 +1012,24 @@
         var anamneseSearch = form.querySelector('.historico-anamnese-search');
         var anamneseList = form.querySelector('#historico-anamnese-list');
         var anamneseAddButton = form.querySelector('.historico-anamnese-add');
+        var fixedToggle = form.querySelector('.historico-fixed-toggle');
+        var fixedPanel = form.querySelector('.historico-fixed-fields');
+        function setFixedExpanded(expanded) {
+            fixedPanel.hidden = !expanded;
+            fixedToggle.setAttribute('aria-expanded', String(expanded));
+            fixedToggle.querySelector('i').className = expanded ? 'fa fa-minus' : 'fa fa-plus';
+        }
+        fixedToggle.onclick = function () {
+            setFixedExpanded(fixedPanel.hidden);
+        };
+        function loadFixedFields(consultation) {
+            historicoFixedFields.forEach(function (field) {
+                form.elements[field[0]].value = consultation[field[0]] || '';
+            });
+            setFixedExpanded(historicoFixedFields.some(function (field) {
+                return Boolean(consultation[field[0]]);
+            }));
+        }
         var anamneses = [];
         var anamneseSearchTimer;
         var anamneseRequest = 0;
@@ -1008,8 +1047,33 @@
                     if (other !== checkbox) other.checked = false;
                 });
                 alterButton.disabled = !checkbox.checked;
+                deleteButton.disabled = !checkbox.checked;
             };
         });
+
+        deleteButton.onclick = async function () {
+            var checked = modal.querySelector('.historico-item-check:checked');
+            var selected = editingConsultation || (checked && consultas.find(function (item) {
+                return String(item.cod) === checked.dataset.consultaId;
+            }));
+            if (!selected) return;
+            if (!window.confirm('Marcar o histórico de ' + selected.dtvisita + ' como inativo? O registro será preservado no banco.')) return;
+            deleteButton.disabled = true;
+            submitButton.disabled = true;
+            try {
+                var result = await api('/api/consultas-paciente/itens/' + encodeURIComponent(selected.cod), 'DELETE', {codpac: codcli});
+                CrudUI.notify(result.message);
+                closeHistoricoModal();
+                if (controller) {
+                    try { await controller.reload(); } catch (error) { console.warn('Histórico inativado; atualize a lista de pacientes.', error); }
+                }
+                window.abrirHistoricoPaciente(codcli, nomecli, patient);
+            } catch (error) {
+                CrudUI.notify(error.message || 'Não foi possível inativar o histórico.', 'error');
+                deleteButton.disabled = false;
+                submitButton.disabled = false;
+            }
+        };
 
         alterButton.onclick = function () {
             var checked = modal.querySelector('.historico-item-check:checked');
@@ -1022,6 +1086,7 @@
             alterButton.disabled = true;
             form.querySelector('[name="dtvisita"]').value = isoVisitDate(editingConsultation.dtvisita);
             historicoMemo.value = editingConsultation.historico || '';
+            loadFixedFields(editingConsultation);
             submitButton.querySelector('span').textContent = ' Salvar alteração';
             historicoMemo.focus();
         };
@@ -1086,6 +1151,8 @@
             includeButton.disabled = true;
             alterButton.disabled = true;
             editingConsultation = null;
+            deleteButton.disabled = true;
+            loadFixedFields({});
             submitButton.querySelector('span').textContent = ' Salvar';
             loadAnamneses('');
             historicoMemo.focus();
@@ -1176,8 +1243,11 @@
             dialog.classList.remove('historico-editing');
             includeButton.disabled = false;
             editingConsultation = null;
+            deleteButton.disabled = true;
+            loadFixedFields({});
             submitButton.querySelector('span').textContent = ' Salvar';
             alterButton.disabled = !modal.querySelector('.historico-item-check:checked');
+            deleteButton.disabled = alterButton.disabled;
         };
         form.onsubmit = async function (event) {
             event.preventDefault();
@@ -1187,11 +1257,15 @@
                 var targetUrl = editingConsultation
                     ? '/api/consultas-paciente/itens/' + encodeURIComponent(editingConsultation.cod)
                     : '/api/consultas-paciente/itens';
-                var result = await api(targetUrl, editingConsultation ? 'PUT' : 'POST', {
+                var payload = {
                     codpac: codcli,
                     dtvisita: values.get('dtvisita'),
                     historico: values.get('historico')
+                };
+                historicoFixedFields.forEach(function (field) {
+                    payload[field[0]] = values.get(field[0]);
                 });
+                var result = await api(targetUrl, editingConsultation ? 'PUT' : 'POST', payload);
                 var visitDate = String(values.get('dtvisita') || '');
                 if (patient) patient.datult = visitDate;
                 var updatedPatient = patient;
@@ -1619,7 +1693,7 @@
         .then(resp => resp.json())
         .then(data => {
             if (!data.success) throw new Error(data.message || 'Erro ao buscar historico.');
-            showHistoricoModal(codcli, nomecli, data.consultas || [], patient);
+            showHistoricoModal(codcli, nomecli, data.consultas || [], patient, data.field_labels);
         })
         .catch(err => CrudUI.notify('Erro ao buscar histórico: ' + err.message, 'error'));
     };

@@ -12,6 +12,29 @@ consultas_bp = Blueprint('consultas', __name__)
 log_event('BOOT', 'consultas_routes carregado', file=__file__)
 
 
+def _consulta_active_type(connection):
+    """Consulta o tipo sem alterar a estrutura ou exigir propriedade da tabela."""
+    cursor = connection.cursor()
+    try:
+        cursor.execute("""
+            SELECT data_type FROM information_schema.columns
+            WHERE table_schema = 'public' AND table_name = 'consulta'
+              AND column_name = 'ativo'
+        """)
+        row = cursor.fetchone()
+        return row[0] if row else None
+    finally:
+        cursor.close()
+
+
+def _consulta_active_value(column_type, active):
+    if column_type == 'boolean':
+        return bool(active)
+    if column_type in ('smallint', 'integer', 'bigint', 'numeric'):
+        return 1 if active else 0
+    return 'S' if active else 'N'
+
+
 def _database_path():
     return session.get('db_path') or None
 
@@ -223,6 +246,69 @@ def organizar_consulta_local():
     except ValueError as error:
         return jsonify({'success': False, 'message': str(error)}), 400
 
+# Limites das colunas existentes da tabela consulta.
+_CONSULTA_FIELDS = {
+    'diag': ('Diagnose', 30),
+    'teraup': ('Terapêutica', 30),
+    'exame': ('Exame', 20),
+    'temp': ('Temperatura', 4),
+    'peso': ('Peso', 4),
+    'pressao': ('Pressão', 5),
+    'param1': ('Parâmetro 1', 5),
+    'param2': ('Parâmetro 2', 5),
+    'param3': ('Parâmetro 3', 5),
+}
+
+
+def _consulta_fields(data):
+    values = {}
+    for key, (label, limit) in _CONSULTA_FIELDS.items():
+        if key not in data:
+            continue
+        value = data[key]
+        if value is None:
+            value = ''
+        if not isinstance(value, str):
+            raise ValueError(f'{label}: informe um texto.')
+        value = value.strip()
+        if len(value) > limit:
+            raise ValueError(f'{label}: use no máximo {limit} caracteres.')
+        values[key] = value
+    return values
+
+
+def _history_field_labels(cursor, company_id):
+    from prof_saude_api import _prefere_layout
+    from psycopg2 import sql
+
+    professional = _logged_professional_info(company_id)
+    if not professional or not professional[0]:
+        return {}
+    layout = _prefere_layout(cursor)
+    if not layout or not layout.get('tenant_column'):
+        return {}
+    mapping = dict(zip(
+        (f'param{i}' for i in range(1, 7)),
+        ('temp', 'peso', 'pressao', 'param1', 'param2', 'param3'),
+    ))
+    names = [name for name in mapping if name in layout['fields']]
+    if not names:
+        return {}
+    cursor.execute(
+        sql.SQL('SELECT {} FROM public.{} WHERE BTRIM(CAST({} AS TEXT)) = %s AND {} = %s LIMIT 1').format(
+            sql.SQL(', ').join(sql.Identifier(layout['fields'][name]) for name in names),
+            sql.Identifier(layout['table']), sql.Identifier(layout['id_column']),
+            sql.Identifier(layout['tenant_column']),
+        ),
+        (str(professional[0]).strip(), company_id),
+    )
+    row = cursor.fetchone()
+    if not row:
+        return {}
+    return {mapping[name]: str(value).strip() for name, value in zip(names, row)
+            if value is not None and str(value).strip()}
+
+
 @consultas_bp.route('/api/consultas-paciente', methods=['POST'])
 def consultas_paciente():
     data = request.json
@@ -247,7 +333,8 @@ def consultas_paciente():
             SELECT
                 c.cod, c.codpac, c.dtvisita, c.diag, c.teraup, c.exame,
                 c.temp, c.historico, c.peso, c.pressao, c.datatualiza,
-                c.codmed, COALESCE(m.nomed, '') AS medico_nome
+                c.codmed, COALESCE(m.nomed, '') AS medico_nome,
+                c.param1, c.param2, c.param3
             FROM public.consulta c
             INNER JOIN public.pacient p ON p.codcli = c.codpac
             LEFT JOIN public.nomed m
@@ -256,13 +343,14 @@ def consultas_paciente():
             WHERE p.codcli = %s
               AND p.codclin = %s
               AND c.codclin = %s
+              AND LOWER(COALESCE((to_jsonb(c)->>'ativo'), '')) NOT IN ('n', 'nao', 'não', 'false', '0', 'inativo')
             ORDER BY c.dtvisita DESC NULLS LAST, c.cod DESC
         '''
         company_id = current_company_id()
         cur.execute(query, (codpac_int, company_id, company_id))
         rows = cur.fetchall()
         for row in rows:
-            cod, codpac_row, dtvisita, diag, teraup, exame, temp, historico, peso, pressao, datatualiza, codmed, medico_nome = row
+            cod, codpac_row, dtvisita, diag, teraup, exame, temp, historico, peso, pressao, datatualiza, codmed, medico_nome, param1, param2, param3 = row
             if isinstance(historico, memoryview):
                 historico = historico.tobytes()
             if isinstance(historico, bytes):
@@ -286,12 +374,18 @@ def consultas_paciente():
                 'historico': historico or '',
                 'peso': peso or '',
                 'pressao': pressao or '',
+                'param1': param1 or '',
+                'param2': param2 or '',
+                'param3': param3 or '',
                 'datatualiza': datatualiza.strftime('%d/%m/%Y %H:%M') if datatualiza else '',
                 'codmed': codmed,
                 'medico_nome': medico_nome or '',
             })
-        con.close()
-        return jsonify({'success': True, 'consultas': consultas})
+        try:
+            field_labels = _history_field_labels(cur, company_id)
+        finally:
+            con.close()
+        return jsonify({'success': True, 'consultas': consultas, 'field_labels': field_labels})
     except DBConnectionError as e:
         return jsonify({'success': False, 'message': str(e), 'consultas': []}), 503
     except Exception as e:
@@ -321,9 +415,15 @@ def incluir_consulta_paciente():
     if not historico:
         return jsonify({'success': False, 'message': 'Informe o histórico da consulta.'}), 400
 
+    try:
+        fields = _consulta_fields(data)
+    except ValueError as error:
+        return jsonify({'success': False, 'message': str(error)}), 400
+
     con = None
     try:
         con = get_db_connection(_database_path())
+        active_type = _consulta_active_type(con)
         cur = con.cursor()
         company_id = current_company_id()
         cur.execute(
@@ -346,13 +446,19 @@ def incluir_consulta_paciente():
         cur.execute('LOCK TABLE public.consulta IN EXCLUSIVE MODE')
         cur.execute('SELECT COALESCE(MAX(cod), 0) + 1 FROM public.consulta')
         novo_cod = cur.fetchone()[0]
+        active_column = ', ativo' if active_type else ''
+        active_placeholder = ', %s' if active_type else ''
+        active_values = (_consulta_active_value(active_type, True),) if active_type else ()
         cur.execute(
-            '''
+            f'''
             INSERT INTO public.consulta
-                (codpac, dtvisita, cod, historico, datatualiza, codclin, codmed)
-            VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP, %s, %s)
+                (codpac, dtvisita, cod, historico, datatualiza, codclin, codmed,
+                 diag, teraup, exame, temp, peso, pressao, param1, param2, param3{active_column})
+            VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP, %s, %s,
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s{active_placeholder})
             ''',
-            (codpac, dtvisita, novo_cod, historico.encode('utf-8'), company_id, logged_professional_id),
+            (codpac, dtvisita, novo_cod, historico.encode('utf-8'), company_id, logged_professional_id,
+             *(fields.get(key, '') for key in _CONSULTA_FIELDS), *active_values),
         )
         cur.execute(
             '''
@@ -412,9 +518,15 @@ def alterar_consulta_paciente(consulta_cod):
     if not historico:
         return jsonify({'success': False, 'message': 'Informe o histórico da consulta.'}), 400
 
+    try:
+        fields = _consulta_fields(data)
+    except ValueError as error:
+        return jsonify({'success': False, 'message': str(error)}), 400
+
     con = None
     try:
         con = get_db_connection(_database_path())
+        active_type = _consulta_active_type(con)
         cur = con.cursor()
         company_id = current_company_id()
         user_row = _logged_professional_info(company_id)
@@ -432,13 +544,24 @@ def alterar_consulta_paciente(consulta_cod):
                SET dtvisita = %s,
                    historico = %s,
                    datatualiza = CURRENT_TIMESTAMP,
-                   codmed = %s
+                   codmed = %s,
+                   diag = COALESCE(%s, diag),
+                   teraup = COALESCE(%s, teraup),
+                   exame = COALESCE(%s, exame),
+                   temp = COALESCE(%s, temp),
+                   peso = COALESCE(%s, peso),
+                   pressao = COALESCE(%s, pressao),
+                   param1 = COALESCE(%s, param1),
+                   param2 = COALESCE(%s, param2),
+                   param3 = COALESCE(%s, param3)
              WHERE cod = %s
                AND codpac = %s
                AND codclin = %s
+               AND LOWER(COALESCE((to_jsonb(consulta)->>'ativo'), '')) NOT IN ('n', 'nao', 'não', 'false', '0', 'inativo')
              RETURNING cod
             ''',
-            (dtvisita, historico.encode('utf-8'), logged_professional_id, consulta_cod, codpac, company_id),
+            (dtvisita, historico.encode('utf-8'), logged_professional_id,
+             *(fields.get(key) for key in _CONSULTA_FIELDS), consulta_cod, codpac, company_id),
         )
         if not cur.fetchone():
             return jsonify({'success': False, 'message': 'Histórico não encontrado para alteração.'}), 404
@@ -446,7 +569,7 @@ def alterar_consulta_paciente(consulta_cod):
         cur.execute(
             '''
             UPDATE public.pacient
-               SET datult_ = (SELECT MAX(dtvisita) FROM public.consulta WHERE codpac = %s AND codclin = %s)
+               SET datult_ = (SELECT MAX(dtvisita) FROM public.consulta WHERE codpac = %s AND codclin = %s AND LOWER(COALESCE((to_jsonb(consulta)->>'ativo'), '')) NOT IN ('n', 'nao', 'não', 'false', '0', 'inativo'))
              WHERE codcli = %s
                AND codclin = %s
             RETURNING datult_
@@ -476,6 +599,59 @@ def alterar_consulta_paciente(consulta_cod):
         if con:
             con.rollback()
         return jsonify({'success': False, 'message': f'ERRO_HISTORICO_ALTERACAO_DIAG: {exc}'}), 500
+    finally:
+        if con:
+            con.close()
+
+
+@consultas_bp.route('/api/consultas-paciente/itens/<int:consulta_cod>', methods=['DELETE'])
+def inativar_consulta_paciente(consulta_cod):
+    data = request.get_json(silent=True) or {}
+    try:
+        codpac = int(data.get('codpac'))
+        if codpac <= 0 or consulta_cod <= 0:
+            raise ValueError
+    except (TypeError, ValueError):
+        return jsonify({'success': False, 'message': 'Código da consulta ou do paciente inválido.'}), 400
+
+    con = None
+    try:
+        company_id = current_company_id()
+        con = get_db_connection(_database_path())
+        active_type = _consulta_active_type(con)
+        if not active_type:
+            return jsonify({'success': False, 'message': 'Para excluir históricos, o administrador do banco precisa criar o campo consulta.ativo. Execute a migração migracao_consulta_ativo.sql com o proprietário da tabela.'}), 409
+        cur = con.cursor()
+        cur.execute("""
+            UPDATE public.consulta
+               SET ativo = %s, datatualiza = CURRENT_TIMESTAMP
+             WHERE cod = %s AND codpac = %s AND codclin = %s
+               AND LOWER(COALESCE((to_jsonb(consulta)->>'ativo'), '')) NOT IN ('n', 'nao', 'não', 'false', '0', 'inativo')
+            RETURNING cod
+        """, (_consulta_active_value(active_type, False), consulta_cod, codpac, company_id))
+        if not cur.fetchone():
+            return jsonify({'success': False, 'message': 'Histórico não encontrado ou já inativo.'}), 404
+        cur.execute("""
+            UPDATE public.pacient
+               SET datult_ = (
+                   SELECT MAX(dtvisita) FROM public.consulta
+                   WHERE codpac = %s AND codclin = %s
+                     AND LOWER(COALESCE((to_jsonb(consulta)->>'ativo'), '')) NOT IN ('n', 'nao', 'não', 'false', '0', 'inativo')
+               )
+             WHERE codcli = %s AND codclin = %s
+             RETURNING datult_
+        """, (codpac, company_id, codpac, company_id))
+        if not cur.fetchone():
+            raise ValueError('Paciente não encontrado para atualizar a última consulta.')
+        con.commit()
+        return jsonify({'success': True, 'message': 'Histórico marcado como inativo com sucesso.'})
+    except DBConnectionError as error:
+        return jsonify({'success': False, 'message': str(error)}), 503
+    except Exception as error:
+        if con:
+            con.rollback()
+        log_exception('HISTORICO', 'falha ao inativar histórico', error)
+        return jsonify({'success': False, 'message': 'Não foi possível inativar o histórico.'}), 500
     finally:
         if con:
             con.close()
