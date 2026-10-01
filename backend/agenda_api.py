@@ -382,6 +382,16 @@ def _notification_settings():
                     if name in ('smtp_tls', 'smtp_ssl', 'whatsapp_simplified')
                     else value
                 )
+        # Bancos atualizados a partir de versões antigas receberam "N" como
+        # padrão mesmo sem possuir as credenciais da API oficial. Nessa
+        # situação, mantenha o envio funcional pela sessão Baileys conectada.
+        business_configured = all((
+            settings['whatsapp_phone_number_id'],
+            settings['whatsapp_access_token'],
+            settings['whatsapp_api_version'],
+        ))
+        if not settings['whatsapp_simplified'] and not business_configured:
+            settings['whatsapp_simplified'] = True
         return settings
     except Exception:
         current_app.logger.exception('Falha ao carregar configurações de notificação; usando ambiente.')

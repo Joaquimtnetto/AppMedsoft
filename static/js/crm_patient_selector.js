@@ -205,7 +205,14 @@
             CrudUI.openForm({title:'Enviar mensagem', submitLabel:'Enviar', fields:[{name:'codigo_texto',label:'Mensagem padrão',type:'select',required:true,wide:true,options:[{value:'',label:'Selecione'}].concat(data.textos)}], onSubmit:async function(values) {
                 var sendResponse = await fetch('/api/relatorios/pacientes/enviar-mensagem', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({canal:channel,codigo_texto:values.codigo_texto,pacientes:patients.map(function(p){return valueOf(p,['codcli','codigo']);})})});
                 var sendData = await sendResponse.json();
-                if (!sendResponse.ok || sendData.success === false) throw new Error(sendData.message || 'Não foi possível enviar as mensagens.');
+                if (!sendResponse.ok || sendData.success === false) {
+                    var details = (sendData.resultados || []).filter(function (item) {
+                        return !item.sucesso;
+                    }).map(function (item) {
+                        return (item.paciente || item.paciente_id) + ': ' + (item.erro || 'falha não identificada');
+                    }).join('\n');
+                    throw new Error((sendData.message || 'Não foi possível enviar as mensagens.') + (details ? '\n' + details : ''));
+                }
                 CrudUI.notify(sendData.message || 'Mensagens processadas.');
             }});
         }

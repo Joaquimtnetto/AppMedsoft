@@ -415,22 +415,38 @@ def enviar_mensagem_pacientes():
                 id_column = _pick(columns, BASE_FIELD_CANDIDATES['codcli'])
                 name_column = _pick(columns, BASE_FIELD_CANDIDATES['nomecli'])
                 tenant_column = _pick(columns, BASE_FIELD_CANDIDATES['codclin'])
-                contact_column = (
-                    _pick(columns, FIELD_CANDIDATES['email']) if channel == 'email'
-                    else _pick(columns, BASE_FIELD_CANDIDATES['telres'])
-                )
+                contact_column = _pick(columns, FIELD_CANDIDATES['email']) if channel == 'email' else None
+                whatsapp_columns = [
+                    column for column in (
+                        _pick(columns, BASE_FIELD_CANDIDATES['telres']),
+                        _pick(columns, BASE_FIELD_CANDIDATES['telcom']),
+                    ) if column
+                ]
                 if not id_column or not name_column or not tenant_column:
                     raise ValueError('Tabela de pacientes sem os campos obrigatórios.')
-                if not contact_column:
+                if channel == 'email' and not contact_column:
                     raise ValueError('Cadastro de pacientes sem o contato necessário para este envio.')
+                if channel == 'whatsapp' and not whatsapp_columns:
+                    raise ValueError('Cadastro de pacientes sem o contato necessário para este envio.')
+                if channel == 'email':
+                    contact_expression = sql.SQL("COALESCE(CAST({} AS TEXT), '')").format(
+                        sql.Identifier(contact_column)
+                    )
+                else:
+                    contact_expression = sql.SQL("COALESCE({}, '')").format(
+                        sql.SQL(', ').join(
+                            sql.SQL("NULLIF(BTRIM(CAST({} AS TEXT)), '')").format(sql.Identifier(column))
+                            for column in whatsapp_columns
+                        )
+                    )
                 cursor.execute(sql.SQL('''
-                    SELECT {}, {}, COALESCE(CAST({} AS TEXT), '')
+                    SELECT {}, {}, {}
                     FROM public.pacient
                     WHERE {} = %s AND {} = ANY(%s)
                     ORDER BY {}
                 ''').format(
                     sql.Identifier(id_column), sql.Identifier(name_column),
-                    sql.Identifier(contact_column), sql.Identifier(tenant_column),
+                    contact_expression, sql.Identifier(tenant_column),
                     sql.Identifier(id_column), sql.Identifier(name_column),
                 ), (current_company_id(), patient_ids))
                 patients = cursor.fetchall()

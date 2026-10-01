@@ -83,7 +83,7 @@ def _company_parameter():
 def _ensure_simplified_column(cursor):
     cursor.execute('''
         ALTER TABLE public.medsoft_configuracao
-        ADD COLUMN IF NOT EXISTS whatzapsimplificado VARCHAR(1) NOT NULL DEFAULT 'N'
+        ADD COLUMN IF NOT EXISTS whatzapsimplificado VARCHAR(1) NOT NULL DEFAULT 'S'
     ''')
 
 
