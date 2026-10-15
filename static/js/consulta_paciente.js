@@ -1536,7 +1536,9 @@
                 var term = searchTerm();
                 var field = searchField();
                 if (!term) throw new Error('Digite o valor que deseja buscar.');
-                var data = await api('/api/consulta-paciente', 'POST', {termo: term, campo: field});
+                var situacaoInput = document.getElementById('paciente-situacao');
+                var situacao = situacaoInput ? situacaoInput.value : 'ativos';
+                var data = await api('/api/consulta-paciente', 'POST', {termo: term, campo: field, situacao: situacao});
                 return data.pacientes || [];
             },
             create: function (values) {

@@ -94,7 +94,7 @@ def _select_optional(columns, logical_name):
         )
     if logical_name == 'ativo':
         return sql.SQL(
-            "CASE WHEN LOWER(COALESCE(CAST({} AS TEXT), '')) "
+            "CASE WHEN LOWER(TRIM(COALESCE(CAST({} AS TEXT), ''))) "
             "IN ('n', 'nao', 'não', 'false', '0', 'inativo') THEN FALSE ELSE TRUE END AS {}"
         ).format(sql.Identifier(column_name), sql.Identifier(logical_name))
     if logical_name == 'foto':
@@ -140,6 +140,9 @@ def consulta_paciente():
     data = request.json
     termo = data.get('termo', '').strip() if data else ''
     campo_busca = str(data.get('campo') or 'nome').strip().lower() if data else 'nome'
+    situacao = str(data.get('situacao') or 'ativos').strip().lower() if data else 'ativos'
+    if situacao not in ('ativos', 'inativos', 'todos'):
+        return jsonify({'success': False, 'message': 'Situação de paciente inválida.', 'pacientes': []}), 400
     if not termo:
         return jsonify({'success': False, 'message': 'Informe o nome ou código do paciente.', 'pacientes': []}), 400
     try:
@@ -203,13 +206,16 @@ def consulta_paciente():
                 filtro = sql.SQL('(') + sql.SQL(' OR ').join(filtros_telefone) + sql.SQL(')')
                 quantidade_parametros = len(colunas_telefone)
                 termo_busca = ''.join(c for c in termo_limpo if c.isdigit()) + '%'
-            filtro_ativo = (
-                sql.SQL(
-                    "LOWER(COALESCE(CAST({} AS TEXT), '')) "
-                    "NOT IN ('n', 'nao', 'não', 'false', '0', 'inativo')"
-                ).format(sql.Identifier(ativo_column))
-                if ativo_column else sql.SQL('TRUE')
-            )
+            filtro_ativo = sql.SQL('TRUE')
+            if situacao != 'todos':
+                if ativo_column:
+                    operador = 'IN' if situacao == 'inativos' else 'NOT IN'
+                    filtro_ativo = sql.SQL(
+                        "LOWER(TRIM(COALESCE(CAST({} AS TEXT), ''))) "
+                        "{} ('n', 'nao', 'não', 'false', '0', 'inativo')"
+                    ).format(sql.Identifier(ativo_column), sql.SQL(operador))
+                elif situacao == 'inativos':
+                    filtro_ativo = sql.SQL('FALSE')
             query = sql.SQL('''
                 SELECT {}
                 FROM public.pacient
