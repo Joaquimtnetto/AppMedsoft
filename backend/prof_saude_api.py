@@ -15,6 +15,7 @@ TABLE_CANDIDATES = ('nomed',)
 ID_CANDIDATES = ('codmed', 'cod', 'codigo', 'id')
 FIELD_CANDIDATES = {
     'nome': ('nomed', 'nome', 'nomeprof', 'nome_prof'),
+    'inetrvaloconsult': ('inetrvaloconsult',),
     'cep': ('cep',),
     'uf': ('uf', 'ufmed', 'uf_prof'),
     'municipio': ('municipio', 'cidade', 'cidmed'),
@@ -791,6 +792,14 @@ def _prof_data(data, layout):
 
     values = {}
     for logical_name, column_name in layout['fields'].items():
+        if logical_name == 'inetrvaloconsult':
+            if logical_name not in data:
+                continue
+            raw = str(data.get(logical_name) or '').strip()
+            if not raw.isdigit() or not 1 <= int(raw) <= 240:
+                raise ValueError('Informe um intervalo de atendimento entre 1 e 240 minutos.')
+            values[column_name] = int(raw)
+            continue
         value = (data.get(logical_name) or '').strip()
         metadata = layout.get('field_metadata', {}).get(logical_name, {})
         if value and logical_name in MAX_LENGTHS and len(value) > MAX_LENGTHS[logical_name]:

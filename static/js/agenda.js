@@ -378,9 +378,12 @@
         try {
             var data = await api('/api/agenda/disponibilidade', 'POST', {
                 data: selectedDate(),
-                profissional: selectedProfessional(),
-                intervalo: selectedInterval()
+                profissional: selectedProfessional()
             });
+            var intervalSelect = document.getElementById('agenda-interval');
+            if (intervalSelect) {
+                intervalSelect.innerHTML = '<option value="' + Number(data.intervalo) + '">' + Number(data.intervalo) + ' min</option>';
+            }
             renderAvailability(data);
         } catch (error) {
             document.getElementById('agenda-availability').innerHTML =

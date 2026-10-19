@@ -22,7 +22,6 @@ from baileys_api import send_baileys_text
 
 agenda_api_bp = Blueprint('agenda_api', __name__)
 STATUS_VALUES = {'AT', 'AG', 'CO', 'SC'}
-INTERVAL_VALUES = {10, 20, 30, 40, 50, 60}
 CONFIRMATION_TOKEN_SALT = 'medsoft-appointment-confirmation'
 CONFIRMATION_TOKEN_MAX_AGE = 60 * 60 * 24 * 14
 COMMON_EMAIL_DOMAIN_TYPOS = {
@@ -112,11 +111,11 @@ def _minutes_to_time(value):
 
 
 def _parse_slot_interval(value):
-    digits = re.sub(r'\D', '', str(value or ''))
-    if not digits:
+    text = str(value or '').strip()
+    if not text.isdigit():
         return 30
-    minutes = int(digits)
-    if minutes not in INTERVAL_VALUES:
+    minutes = int(text)
+    if not 1 <= minutes <= 240:
         return 30
     return minutes
 
@@ -942,7 +941,7 @@ def availability():
         return jsonify({'success': False, 'message': 'Informe o Prof. Saude.'}), 400
     try:
         data_obj = datetime.datetime.strptime(data_str, '%Y-%m-%d').date()
-        schedule_columns = [column for config in WEEKDAY_SCHEDULE.values() for column in config] + ['consulta']
+        schedule_columns = [column for config in WEEKDAY_SCHEDULE.values() for column in config] + ['consulta', 'inetrvaloconsult']
         select_columns = ', '.join(schedule_columns)
         with _connection() as con:
             with con.cursor() as cur:
@@ -964,7 +963,7 @@ def availability():
                     for row in cur.fetchall()
                     if _format_time(row[0])
                 }
-        interval_minutes = _parse_slot_interval(data.get('intervalo'))
+        interval_minutes = _parse_slot_interval(schedule_data.get('inetrvaloconsult'))
         intervals = _schedule_intervals(schedule_data, data_obj.weekday())
         return jsonify({
             'success': True,

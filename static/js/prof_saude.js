@@ -250,6 +250,7 @@
         ];
         var fields = [
             {name: 'horario_titulo', label: '', type: 'static', value: 'Horários de atendimento', page: 2, className: 'prof-field-horario-titulo'},
+            {name: 'inetrvaloconsult', label: 'Intervalo de atendimento (Min.)', type: 'number', value: item.inetrvaloconsult || 30, min: 1, max: 240, step: 1, required: true, page: 2, className: 'prof-field-intervalo'},
             {name: 'horario_dia_header', label: '', type: 'static', value: 'Dia', page: 2, className: 'prof-field-horario-head'},
             {name: 'horario_inicio_header', label: '', type: 'static', value: 'Início', page: 2, className: 'prof-field-horario-head'},
             {name: 'horario_termino_header', label: '', type: 'static', value: 'Término', page: 2, className: 'prof-field-horario-head'}
@@ -340,6 +341,7 @@
 
         return {
             nome: values.nome,
+            inetrvaloconsult: values.inetrvaloconsult,
             param1: values.param1,
             param2: values.param2,
             param3: values.param3,

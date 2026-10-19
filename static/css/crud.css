@@ -2039,3 +2039,10 @@
 }
 
 .prof-saude-form .prof-field-anamnese-instrucao { grid-column: 1 / -1; }
+
+.prof-saude-form .prof-field-horario-titulo { grid-column: 1 / 3; align-self: center; }
+.prof-saude-form .prof-field-intervalo { grid-column: 3; }
+@media (max-width: 600px) {
+    .prof-saude-form .prof-field-horario-titulo,
+    .prof-saude-form .prof-field-intervalo { grid-column: 1 / -1; }
+}

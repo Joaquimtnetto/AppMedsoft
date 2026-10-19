@@ -1127,7 +1127,9 @@ class AgendaCrudApiTest(unittest.TestCase):
         self.assertEqual(agenda_api._parse_slot_interval(''), 30)
         self.assertEqual(agenda_api._parse_slot_interval('30'), 30)
         self.assertEqual(agenda_api._parse_slot_interval('60'), 60)
-        self.assertEqual(agenda_api._parse_slot_interval('15'), 30)
+        self.assertEqual(agenda_api._parse_slot_interval('15'), 15)
+        self.assertEqual(agenda_api._parse_slot_interval('0'), 30)
+        self.assertEqual(agenda_api._parse_slot_interval('241'), 30)
 
     def test_formats_whatsapp_phone_with_brazil_country_code(self):
         self.assertEqual(agenda_api._whatsapp_phone('(21) 98649-6127'), '5521986496127')
@@ -1411,6 +1413,16 @@ class ConsultaHistoryApiTest(unittest.TestCase):
                 self.assertIn('Medicamentos:\nNovalgina quatro vezes ao dia', organized)
 
 class ProfSaudeScheduleMappingTest(unittest.TestCase):
+    def test_consultation_interval_is_validated_and_saved_as_integer(self):
+        layout = {'fields': {'nome': 'nomed', 'inetrvaloconsult': 'inetrvaloconsult'}}
+        for interval in ('15', 45, '120'):
+            values = prof_saude_api._prof_data({'nome': 'Teste', 'inetrvaloconsult': interval}, layout)
+            self.assertEqual(values['inetrvaloconsult'], int(interval))
+        for interval in ('0', '-1', '241', 'abc', '15.5'):
+            with self.assertRaises(ValueError):
+                prof_saude_api._prof_data({'nome': 'Teste', 'inetrvaloconsult': interval}, layout)
+        self.assertNotIn('inetrvaloconsult', prof_saude_api._prof_data({'nome': 'Teste'}, layout))
+
     def test_maps_legacy_schedule_columns(self):
         layout = {
             'fields': {
