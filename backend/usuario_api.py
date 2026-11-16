@@ -32,7 +32,9 @@ INTEGER_FIELDS = {'codmed', 'codclin'}
 
 
 def _database_name():
-    return session.get('db_path') or None
+    # User accounts belong to the central authentication database, even when
+    # the active company stores its clinical records in a separate database.
+    return None
 
 
 @contextmanager

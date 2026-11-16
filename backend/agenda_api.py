@@ -941,8 +941,10 @@ def availability():
         return jsonify({'success': False, 'message': 'Informe o Prof. Saude.'}), 400
     try:
         data_obj = datetime.datetime.strptime(data_str, '%Y-%m-%d').date()
-        schedule_columns = [column for config in WEEKDAY_SCHEDULE.values() for column in config] + ['consulta', 'inetrvaloconsult']
-        select_columns = ', '.join(schedule_columns)
+        schedule_columns = [column for config in WEEKDAY_SCHEDULE.values() for column in config] + ['consulta']
+        # Older databases may not have the optional appointment interval column.
+        # Reading it from the row JSON preserves configured values when present.
+        select_columns = ', '.join(schedule_columns) + ", to_jsonb(nomed)->>'inetrvaloconsult'"
         with _connection() as con:
             with con.cursor() as cur:
                 cur.execute(
@@ -952,7 +954,7 @@ def availability():
                 schedule = cur.fetchone()
                 if not schedule:
                     return jsonify({'success': False, 'message': 'Profissional nao encontrado.'}), 404
-                schedule_data = dict(zip(schedule_columns, schedule))
+                schedule_data = dict(zip(schedule_columns + ['inetrvaloconsult'], schedule))
                 cur.execute('''
                     SELECT horacons, nomepaci, atend
                     FROM public.agenda

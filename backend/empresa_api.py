@@ -191,6 +191,10 @@ def _empresa_values(data, layout):
         'titulo2': titulo2 or None,
     }
     for logical_name, value in optional_values.items():
+        # Omit an unselected plan so INSERT uses the database default and
+        # UPDATE preserves the current plan instead of writing NULL.
+        if logical_name == 'plano' and value is None:
+            continue
         if logical_name in layout['fields']:
             values[layout['fields'][logical_name]] = value
     return values

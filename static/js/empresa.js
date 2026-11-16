@@ -54,7 +54,7 @@
             {name: 'email', label: 'E-mail', value: item.email || '', type: 'email', maxLength: 120, wide: true},
             {name: 'telefone', label: 'Telefone', value: item.telefone || '', type: 'tel', maxLength: 20},
             {name: 'whatsapp', label: 'WhatsApp', value: item.whatsapp || '', type: 'tel', maxLength: 20},
-            {name: 'plano', label: 'Plano', value: item.plano || '', type: 'select', options: planOptions},
+            {name: 'plano', label: 'Plano', value: item.plano || '', type: 'select', options: planOptions, required: true},
             {name: 'datainico', label: 'Data de Início', value: item.datainico || '', type: 'date'},
             {
                 name: 'pago', label: 'Pago', value: item.pago === 'S' ? 'S' : 'N', type: 'select',
