@@ -170,7 +170,7 @@
             create: function (values) { return api('/api/planos/itens', 'POST', values); },
             update: function (item, values) {
                 if (optionsMode) return api('/api/planos/itens', 'POST', values);
-                return api('/api/planos/itens/' + encodeURIComponent(item.id), 'PUT', values);
+                return api('/api/planos/itens', 'PUT', Object.assign({}, values, { id: item.id }));
             },
             delete: function (item) { return api('/api/planos/itens/' + encodeURIComponent(item.id), 'DELETE'); },
             confirmDelete: function (item) {

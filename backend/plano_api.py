@@ -344,11 +344,17 @@ def create_plan():
         return _error_response(exc)
 
 
+@plano_api_bp.route('/api/planos/itens', methods=['PUT'])
 @plano_api_bp.route('/api/planos/itens/<plan_id>', methods=['PUT'])
-def update_plan(plan_id):
+def update_plan(plan_id=None):
     try:
+        data = request.get_json(silent=True) or {}
+        if plan_id is None:
+            plan_id = data.get('id')
+            if not isinstance(plan_id, str) or not plan_id.strip():
+                raise ValueError('Informe o identificador do plano.')
         layout = _layout()
-        item = _plan_data(request.get_json(silent=True) or {}, layout)
+        item = _plan_data(data, layout)
         visible_name = item[layout['fields']['nome']]
         with _connection() as connection:
             with connection.cursor() as cursor:
