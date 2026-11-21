@@ -69,3 +69,4 @@ whatsapp-baileys/message-history/
 
 # Configuração local do PostgreSQL
 /config.ini
+/backend/config.ini
