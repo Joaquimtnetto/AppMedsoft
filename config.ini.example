@@ -1,0 +1,16 @@
+[DATABASE]
+selecionado=DATABASE_PRIMARIO
+
+[DATABASE_PRIMARIO]
+host=
+port=5432
+database=medsoft_medmigra
+user=
+password=
+
+[DATABASE_SECUNDARIO]
+host=
+port=5432
+database=medsoft_medmigra
+user=
+password=
