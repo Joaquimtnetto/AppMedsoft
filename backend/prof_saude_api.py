@@ -1052,7 +1052,10 @@ def list_anamneses():
                 rows = cursor.fetchall()
         return jsonify({
             'success': True,
-            'anamneses': [_row_dict(['id', 'nome', 'texto', 'atalho', 'msghtml'], row) for row in rows],
+            'anamneses': [
+                dict(_row_dict(['id', 'nome', 'texto', 'atalho', 'msghtml'], row), chave_registro=row[0])
+                for row in rows
+            ],
         })
     except Exception as exc:
         return _error_response(exc)
@@ -1181,7 +1184,7 @@ def update_anamnese(record_id):
             '1', 'true', 't', 'sim', 's', 'on'
         )
         message_html = atalho == 'E' and message_html
-        old_id = str(record_id).strip()
+        old_id = record_id
         with _connection() as connection:
             with connection.cursor() as cursor:
                 layout = _texto_layout(cursor)
@@ -1249,7 +1252,7 @@ def delete_anamnese(record_id):
                         sql.Identifier('public'), sql.Identifier(layout['table']), sql.Identifier(id_col),
                         sql.Identifier(tenant_col),
                     ),
-                    (str(record_id).strip(), current_company_id())
+                    (record_id, current_company_id())
                 )
                 if cursor.rowcount == 0:
                     return jsonify({'success': False, 'message': 'Padrão não encontrado.'}), 404
