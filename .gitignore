@@ -66,3 +66,7 @@ whatsapp-baileys/message-history/
 
 # Artefatos gerados fora da aplicacao
 /output/
+
+# Configuração local do PostgreSQL
+/config.ini
+/backend/config.ini

@@ -1,4 +1,5 @@
 import os
+from configparser import ConfigParser
 from pathlib import Path
 import secrets
 import sys
@@ -11,6 +12,32 @@ PG_DB = os.environ.get('MEDSOFT_PG_DB', 'medsoft_medmigra')
 PG_USER = os.environ.get('MEDSOFT_PG_USER', 'medsoft_master')
 PG_PASS = os.environ.get('MEDSOFT_PG_PASS', 'Alemanha2025@')
 PG_CLIENT_ENCODING = os.environ.get('MEDSOFT_PG_CLIENT_ENCODING', '')
+
+# A instalação existente pode continuar usando as variáveis de ambiente.
+_APP_DIR = (
+    Path(sys.executable).resolve().parent
+    if getattr(sys, 'frozen', False)
+    else Path(__file__).resolve().parent.parent
+)
+_DATABASE_CONFIG_PATH = _APP_DIR / 'config.ini'
+_DATABASE_CONFIG = ConfigParser(interpolation=None)
+if _DATABASE_CONFIG.read(_DATABASE_CONFIG_PATH, encoding='utf-8-sig'):
+    selected = _DATABASE_CONFIG.get('DATABASE', 'selecionado', fallback='').strip()
+    if not selected or not _DATABASE_CONFIG.has_section(selected):
+        raise ValueError('Selecione uma seção de banco existente em [DATABASE] no config.ini.')
+
+    database_profile = _DATABASE_CONFIG[selected]
+    for option in ('host', 'port', 'user', 'password'):
+        if not database_profile.get(option, '').strip():
+            raise ValueError(f'Preencha {option} na seção [{selected}] do config.ini.')
+
+    PG_HOST = database_profile['host']
+    PG_PORT = database_profile.getint('port')
+    if not 1 <= PG_PORT <= 65535:
+        raise ValueError(f'Porta fora do intervalo na seção [{selected}] do config.ini.')
+    PG_DB = database_profile.get('database', '').strip() or PG_DB
+    PG_USER = database_profile['user']
+    PG_PASS = database_profile['password']
 
 # Secret
 _SECRET_KEY_ENV = os.environ.get('MEDSOFT_SECRET_KEY')
