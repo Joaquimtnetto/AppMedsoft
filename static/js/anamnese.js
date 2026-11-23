@@ -48,7 +48,7 @@
                 options: [{value: '', label: 'Selecione um padrão'}].concat(
                     ((controller && controller.items) || []).map(function (source) {
                         return {
-                            value: source.id,
+                            value: itemKey(source),
                             label: typeLabel(source.atalho) + ' - ' + source.nome
                         };
                     })
@@ -106,7 +106,11 @@
             textarea.selectionStart = textarea.selectionEnd = start + token.length;
             refreshPreview();
         });
-        type.addEventListener('change', toggleMode);
+        var destinationTypeSelected = false;
+        type.addEventListener('change', function () {
+            destinationTypeSelected = true;
+            toggleMode();
+        });
         htmlCheck.addEventListener('change', toggleMode);
         textarea.addEventListener('input', function () {
             if (type.value === 'E' && htmlCheck.checked) refreshPreview();
@@ -130,11 +134,10 @@
                     CrudUI.notify('Selecione um padrão para copiar.', 'error');
                     return;
                 }
-                type.value = source.atalho || 'A';
-                htmlCheck.checked = !!source.msghtml;
+                if (!destinationTypeSelected) type.value = source.atalho || 'A';
+                htmlCheck.checked = type.value === 'E' && !!source.msghtml;
                 textarea.value = source.texto || '';
-                type.dispatchEvent(new Event('change'));
-                textarea.dispatchEvent(new Event('input'));
+                toggleMode();
                 CrudUI.notify('Padrão copiado. Informe um novo nome e salve.');
             });
             copyField.classList.add('crud-field-wide');
@@ -162,6 +165,10 @@
         }[value] || 'An - Anamnese';
     }
 
+    function itemKey(item) {
+        return optionsMode ? item._option_key : (item.chave_registro ?? item.id);
+    }
+
     function renderItem(item) {
         var resumo = item.atalho === 'E' && item.msghtml ? 'Modelo HTML editável' : (item.texto || '');
         if (resumo.length > 160) resumo = resumo.slice(0, 160) + '...';
@@ -176,17 +183,17 @@
                 CrudUI.escapeHtml(item.empresa_id || '') + '</span>' : '') +
             '</div><div class="crud-actions">' +
             '<button class="crud-button crud-button-secondary" data-crud-edit="' +
-            CrudUI.escapeHtml(optionsMode ? item._option_key : item.id) +
+            CrudUI.escapeHtml(itemKey(item)) +
             '" title="Alterar padrão"><i class="fa fa-pencil"></i>' +
             '<span class="crud-button-label"> Alterar</span></button>' +
-            '<button class="crud-button crud-button-danger" data-crud-delete="' + CrudUI.escapeHtml(item.id) +
+            '<button class="crud-button crud-button-danger" data-crud-delete="' + CrudUI.escapeHtml(itemKey(item)) +
             '" title="Excluir padrão"><i class="fa fa-trash"></i>' +
             '<span class="crud-button-label"> Excluir</span></button></div></article>';
     }
 
     function createController() {
         return new CrudUI.Controller({
-            getId: function (item) { return optionsMode ? item._option_key : item.id; },
+            getId: itemKey,
             createTitle: 'Incluir Padrão',
             editTitle: 'Alterar Padrão',
             formClass: 'anamnese-form',
@@ -197,14 +204,18 @@
             list: async function () {
                 var endpoint = optionsMode ? '/api/anamnese/opcoes' : '/api/anamnese';
                 var data = await api(endpoint, 'POST', {termo: searchTerm()});
-                return data.anamneses || [];
+                return (data.anamneses || []).map(function (item) {
+                    var type = String(item.atalho || '').toUpperCase();
+                    item.atalho = {ME: 'E', MZ: 'Z'}[type] || type;
+                    return item;
+                });
             },
             create: function (values) { return api('/api/anamnese/itens', 'POST', payload(values)); },
             update: function (item, values) {
                 if (optionsMode) return api('/api/anamnese/itens', 'POST', payload(values));
-                return api('/api/anamnese/itens/' + encodeURIComponent(item.id), 'PUT', payload(values));
+                return api('/api/anamnese/itens/' + encodeURIComponent(itemKey(item)), 'PUT', payload(values));
             },
-            delete: function (item) { return api('/api/anamnese/itens/' + encodeURIComponent(item.id), 'DELETE'); },
+            delete: function (item) { return api('/api/anamnese/itens/' + encodeURIComponent(itemKey(item)), 'DELETE'); },
             confirmDelete: function (item) {
                 return 'Excluir o padrão ' + item.nome + '?';
             }

@@ -219,13 +219,14 @@ def _confirmation_pattern_record(pattern_type, message_code=None):
         with _connection() as connection:
             with connection.cursor() as cursor:
                 code_filter = ' AND codigo = %s' if message_code not in (None, '') else ''
-                parameters = [pattern_type.upper(), current_company_id()]
+                pattern_type = pattern_type.upper()
+                parameters = [(pattern_type, 'M' + pattern_type), current_company_id()]
                 if code_filter:
                     parameters.append(message_code)
                 cursor.execute(('''
                     SELECT codigo, texto, COALESCE(msghtml, FALSE)
                     FROM public.texto
-                    WHERE UPPER(BTRIM(atalho)) = %s AND codclin = %s
+                    WHERE UPPER(BTRIM(atalho)) IN %s AND codclin = %s
                     {code_filter}
                     ORDER BY nome
                     LIMIT 1
@@ -1339,9 +1340,9 @@ def list_confirmation_patterns():
                 cursor.execute('''
                     SELECT codigo, nome
                     FROM public.texto
-                    WHERE UPPER(BTRIM(atalho)) = %s AND codclin = %s
+                    WHERE UPPER(BTRIM(atalho)) IN %s AND codclin = %s
                     ORDER BY nome
-                ''', (pattern_type, current_company_id()))
+                ''', ((pattern_type, 'M' + pattern_type), current_company_id()))
                 patterns = [
                     {'value': str(row[0]), 'label': '{} - {}'.format(row[0], row[1] or '')}
                     for row in cursor.fetchall()
