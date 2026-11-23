@@ -143,7 +143,7 @@ def consulta_paciente():
     situacao = str(data.get('situacao') or 'ativos').strip().lower() if data else 'ativos'
     if situacao not in ('ativos', 'inativos', 'todos'):
         return jsonify({'success': False, 'message': 'Situação de paciente inválida.', 'pacientes': []}), 400
-    if not termo:
+    if not termo or (campo_busca in ('codigo', 'nome_exato') and not termo.strip('%')):
         return jsonify({'success': False, 'message': 'Informe o nome ou código do paciente.', 'pacientes': []}), 400
     try:
         # Usa a conexão PostgreSQL configurada.
@@ -177,6 +177,16 @@ def consulta_paciente():
                 filtro = sql.SQL('{} ILIKE %s').format(sql.Identifier(nome_column))
                 quantidade_parametros = 1
                 termo_busca = f"{termo_limpo}%"
+            elif campo_busca == 'codigo':
+                if not termo_limpo.isascii() or not termo_limpo.isdigit():
+                    raise ValueError('Código de paciente inválido.')
+                filtro = sql.SQL('{} = %s').format(sql.Identifier(codigo_column))
+                quantidade_parametros = 1
+                termo_busca = int(termo_limpo)
+            elif campo_busca == 'nome_exato':
+                filtro = sql.SQL('LOWER(BTRIM({})) = LOWER(%s)').format(sql.Identifier(nome_column))
+                quantidade_parametros = 1
+                termo_busca = termo_limpo
             elif campo_busca == 'sobrenome':
                 filtro = sql.SQL('{} ILIKE %s').format(sql.Identifier(nome_column))
                 quantidade_parametros = 1

@@ -733,6 +733,38 @@
     box-shadow: 0 18px 50px rgba(22, 35, 55, 0.28);
 }
 
+.crud-modal:has(.paciente-form) {
+    width: min(100%, 840px);
+}
+
+.paciente-form .paciente-field-uf .crud-input {
+    width: 100%;
+    max-width: 5.5rem;
+}
+
+@media (min-width: 761px) {
+    .crud-form.paciente-form {
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .paciente-form .crud-field:not(.crud-field-wide) {
+        grid-column: span 4;
+        min-width: 0;
+    }
+
+    .paciente-form .crud-field.paciente-field-two-thirds {
+        grid-column: span 8;
+    }
+
+    .paciente-form .crud-field.paciente-field-uf {
+        grid-column: 1 / span 2;
+    }
+
+    .paciente-form .crud-field.paciente-field-endereco {
+        grid-column: 3 / -1;
+    }
+}
+
 .crud-modal:has(.plano-form) {
     width: min(100%, 760px);
 }
@@ -2045,4 +2077,58 @@
 @media (max-width: 600px) {
     .prof-saude-form .prof-field-horario-titulo,
     .prof-saude-form .prof-field-intervalo { grid-column: 1 / -1; }
+}
+
+.agenda-atendimento-aberto > :not(.agenda-atendimento) {
+    display: none;
+}
+.agenda-atendimento { margin-bottom: 16px; }
+.agenda-atendimento-title {
+    color: #21334d;
+    font-size: 1.12rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    overflow-wrap: anywhere;
+}
+.agenda-atendimento-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.agenda-atendimento-tabs [aria-pressed="true"] {
+    background: #2465cc;
+    color: #fff;
+}
+.agenda-atendimento-content {
+    background: #fff;
+    border: 1px solid #dce5f1;
+    border-radius: 12px;
+    padding: 16px;
+}
+.agenda-atendimento-dados {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+    gap: 12px 16px;
+    margin: 12px 0 0;
+    overflow-wrap: anywhere;
+}
+.agenda-atendimento-dados dt { font-weight: 600; }
+.agenda-atendimento-dados dd { margin: 4px 0 0; }
+.agenda-atendimento-dados img { max-width: 100%; max-height: 120px; }
+.historico-modal.historico-embutido {
+    position: static;
+    display: block;
+    padding: 0;
+    background: transparent;
+}
+.historico-embutido .historico-dialog {
+    width: 100%;
+    max-width: none;
+    max-height: none;
+    box-shadow: none;
+}
+.historico-embutido .historico-header > div:first-child,
+.historico-embutido [hidden] {
+    display: none !important;
 }

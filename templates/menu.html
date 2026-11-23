@@ -687,6 +687,7 @@
         for (var permissionId = 1; permissionId <= 15; permissionId++) {
             if (!menuPermissions[permissionId]) menuPermissions[permissionId] = {open: true, edit: true};
         }
+        window.MedsoftPatientPermission = menuPermissions[1];
         document.querySelectorAll('[data-menu-id]').forEach(function(item) {
             var permission = menuPermissions[Number(item.dataset.menuId)];
             if (permission && !permission.open) item.hidden = true;
@@ -936,6 +937,7 @@
 
         function carregarModuloAgenda() {
             carregarScriptUmaVez('/static/js/crud.js')
+                .then(function() { return carregarScriptUmaVez('/static/js/consulta_paciente.js'); })
                 .then(function() { return carregarScriptUmaVez('/static/js/agenda.js'); })
                 .then(function() { window.AgendaCrud.init(); })
                 .catch(function() {

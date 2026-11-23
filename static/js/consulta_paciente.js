@@ -900,7 +900,7 @@
         ['param3', 'Parâmetro 3', 5]
     ];
 
-    function showHistoricoModal(codcli, nomecli, consultas, patient, fieldLabels) {
+    function showHistoricoModal(codcli, nomecli, consultas, patient, fieldLabels, target) {
         fieldLabels = fieldLabels || {};
         closeHistoricoModal();
         consultas = consultas || [];
@@ -985,7 +985,15 @@
             '<button type="submit" class="crud-button crud-button-primary"><i class="fa fa-check"></i><span> Salvar</span></button>' +
             '</div></form>' + body + '</div>';
 
-        document.body.appendChild(modal);
+        if (target) {
+            modal.classList.add('historico-embutido');
+            modal.firstElementChild.removeAttribute('role');
+            modal.firstElementChild.removeAttribute('aria-modal');
+            modal.querySelector('.historico-close').hidden = true;
+            target.replaceChildren(modal);
+        } else {
+            document.body.appendChild(modal);
+        }
         var dialog = modal.querySelector('.historico-dialog');
         var form = modal.querySelector('.historico-form');
         var includeButton = modal.querySelector('.historico-include');
@@ -994,6 +1002,10 @@
         var receitaButton = modal.querySelector('.historico-receita');
         var cancelButton = modal.querySelector('.historico-form-cancel');
         var submitButton = form.querySelector('[type="submit"]');
+        if (target && (window.MedsoftCurrentMenuEditable === false ||
+                (window.MedsoftPatientPermission && !window.MedsoftPatientPermission.edit))) {
+            [includeButton, alterButton, deleteButton, receitaButton].forEach(function (button) { button.hidden = true; });
+        }
         var historicoMemo = form.querySelector('[name="historico"]');
         var dictationButton = form.querySelector('.historico-dictation');
         var organizeButton = form.querySelector('.historico-organizar-texto');
@@ -1054,11 +1066,12 @@
             try {
                 var result = await api('/api/consultas-paciente/itens/' + encodeURIComponent(selected.cod), 'DELETE', {codpac: codcli});
                 CrudUI.notify(result.message);
+                if (target && !target.isConnected) return;
                 closeHistoricoModal();
-                if (controller) {
+                if (!target && controller) {
                     try { await controller.reload(); } catch (error) { console.warn('Histórico inativado; atualize a lista de pacientes.', error); }
                 }
-                window.abrirHistoricoPaciente(codcli, nomecli, patient);
+                window.abrirHistoricoPaciente(codcli, nomecli, patient, target);
             } catch (error) {
                 CrudUI.notify(error.message || 'Não foi possível inativar o histórico.', 'error');
                 deleteButton.disabled = false;
@@ -1260,7 +1273,7 @@
                 var visitDate = String(values.get('dtvisita') || '');
                 if (patient) patient.datult = visitDate;
                 var updatedPatient = patient;
-                if (controller) {
+                if (!target && controller) {
                     try {
                         await controller.reload();
                         updatedPatient = controller.find(codcli) || patient;
@@ -1269,8 +1282,9 @@
                     }
                 }
                 CrudUI.notify(result.message || (editingConsultation ? 'Histórico alterado com sucesso.' : 'Histórico incluído com sucesso.'));
+                if (target && !target.isConnected) return;
                 closeHistoricoModal();
-                window.abrirHistoricoPaciente(codcli, nomecli, updatedPatient || patient);
+                window.abrirHistoricoPaciente(codcli, nomecli, updatedPatient || patient, target);
             } catch (error) {
                 CrudUI.notify(error.message || 'Erro ao salvar histórico.', 'error');
                 submitButton.disabled = false;
@@ -1638,12 +1652,72 @@
         }
     }
 
-    window.PacienteCrud = {init: init};
+    function mostrarCadastroAtendimento(patient, target, afterSave) {
+        var permission = window.MedsoftPatientPermission;
+        if (permission && !permission.open) return;
+        var config = createController().options;
+        var details = document.createElement('dl');
+        details.className = 'agenda-atendimento-dados';
+        fields(patient).forEach(function (field) {
+            var group = document.createElement('div');
+            var label = document.createElement('dt');
+            label.textContent = field.label;
+            var value = document.createElement('dd');
+            var selected = (field.options || []).find(function (option) {
+                return String(option.value) === String(field.value);
+            });
+            if (field.type === 'image' && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(field.value)) {
+                var photo = document.createElement('img');
+                photo.src = field.value;
+                photo.alt = 'Foto do paciente';
+                value.appendChild(photo);
+            } else {
+                value.textContent = (field.type !== 'image' && (selected ? selected.label : field.value)) || '—';
+            }
+            group.append(label, value);
+            details.appendChild(group);
+        });
+        target.replaceChildren(details);
+        if (window.MedsoftCurrentMenuEditable === false || (permission && !permission.edit)) return;
+        var edit = document.createElement('button');
+        edit.type = 'button';
+        edit.className = 'crud-button crud-button-secondary';
+        edit.textContent = 'Alterar cadastro';
+        edit.onclick = async function () {
+            edit.disabled = true;
+            try {
+                await config.beforeOpen(patient);
+                if (!edit.isConnected) return;
+                CrudUI.openForm({
+                    title: config.editTitle,
+                    formClass: config.formClass,
+                    fields: fields(patient),
+                    onFormReady: config.onFormReady,
+                    onSubmit: async function (values) {
+                        var result = await config.update(patient, values);
+                        CrudUI.notify(result.message || 'Cadastro salvo.');
+                        try {
+                            await afterSave();
+                        } catch (error) {
+                            CrudUI.notify('Cadastro salvo. Reabra a aba para atualizar os dados.', 'error');
+                        }
+                    }
+                });
+            } catch (error) {
+                CrudUI.notify(error.message, 'error');
+            } finally {
+                edit.disabled = false;
+            }
+        };
+        target.prepend(edit);
+    }
+
+    window.PacienteCrud = {init: init, mostrarCadastroAtendimento: mostrarCadastroAtendimento};
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
 
     // Função para abrir histórico do paciente
-    window.abrirHistoricoPaciente = function(codcli, nomecli, patient) {
+    window.abrirHistoricoPaciente = function(codcli, nomecli, patient, target) {
         if (window.MedsoftProfileViews && !window.MedsoftProfileViews.historico) {
             CrudUI.notify('Seu perfil não permite visualizar o histórico clínico.', 'error');
             return;
@@ -1662,8 +1736,15 @@
         .then(resp => resp.json())
         .then(data => {
             if (!data.success) throw new Error(data.message || 'Erro ao buscar historico.');
-            showHistoricoModal(codcli, nomecli, data.consultas || [], patient, data.field_labels);
+            if (target && !target.isConnected) return;
+            showHistoricoModal(codcli, nomecli, data.consultas || [], patient, data.field_labels, target);
         })
-        .catch(err => CrudUI.notify('Erro ao buscar histórico: ' + err.message, 'error'));
+        .catch(function (error) {
+            if (target) {
+                if (target.isConnected) target.textContent = 'Erro ao buscar histórico: ' + error.message;
+            } else {
+                CrudUI.notify('Erro ao buscar histórico: ' + error.message, 'error');
+            }
+        });
     };
 }());

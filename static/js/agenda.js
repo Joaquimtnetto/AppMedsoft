@@ -604,6 +604,8 @@
             '<button class="crud-button crud-button-secondary" data-crud-action="confirmation-email" data-crud-id="' +
             item.CODAGEND + '" title="Confirmação por E-mail">' +
             '<i class="fa fa-envelope"></i><span class="crud-button-label"> E-mail</span></button>' +
+            '<button type="button" class="crud-button crud-button-primary" data-crud-action="atender" data-crud-id="' +
+            CrudUI.escapeHtml(item.CODAGEND) + '"><i class="fa fa-user-doctor"></i> Atender</button>' +
             '<button class="crud-button crud-button-danger" data-crud-delete="' + item.CODAGEND +
             '" title="Excluir agenda de paciente"><i class="fa fa-trash"></i>' +
             '<span class="crud-button-label"> Excluir</span></button></div></article>';
@@ -713,7 +715,125 @@
         document.body.appendChild(backdrop);
     }
 
-    function createController() {
+    function setupAtendimento(page) {
+        var nav = document.createElement('section');
+        nav.className = 'agenda-atendimento';
+        nav.hidden = true;
+        nav.innerHTML = '<div class="agenda-atendimento-title" aria-live="polite"></div>' +
+            '<div class="agenda-atendimento-tabs" aria-label="Atendimento">' +
+            '<button type="button" class="crud-button crud-button-secondary" data-atendimento="agenda">Agenda</button>' +
+            '<button type="button" class="crud-button crud-button-secondary" data-atendimento="cadastro">Cadastro</button>' +
+            '<button type="button" class="crud-button crud-button-secondary" data-atendimento="historico">Histórico</button></div>' +
+            '<div class="agenda-atendimento-content" aria-live="polite" hidden></div>';
+        page.prepend(nav);
+        var title = nav.querySelector('.agenda-atendimento-title');
+        var content = nav.querySelector('.agenda-atendimento-content');
+        var buttons = Array.from(nav.querySelectorAll('[data-atendimento]'));
+        var historyButton = buttons[2];
+        var patient = null;
+        var requestId = 0;
+        var currentTab = 'agenda';
+
+        function heading() {
+            title.textContent = [patient.nomecli, patient.nomeplano1, patient.profcli]
+                .map(function (value) { return String(value || '').trim(); }).filter(Boolean).join(' / ');
+        }
+
+        function show(tab) {
+            if (tab === currentTab || content.querySelector('.historico-form button[type="submit"]:disabled')) return;
+            var form = content.querySelector('.historico-form:not([hidden])');
+            if (form && !window.confirm('Sair da edição do histórico sem salvar?')) return;
+            var history = content.querySelector('#paciente-historico-modal');
+            if (history && history.cleanupSpeech) history.cleanupSpeech();
+            currentTab = tab;
+            page.classList.toggle('agenda-atendimento-aberto', tab !== 'agenda');
+            buttons.forEach(function (button) {
+                button.setAttribute('aria-pressed', String(button.dataset.atendimento === tab));
+            });
+            content.replaceChildren();
+            content.hidden = tab === 'agenda';
+            if (tab === 'cadastro') {
+                window.PacienteCrud.mostrarCadastroAtendimento(patient, content, async function () {
+                    var refreshed = await api('/api/consulta-paciente', 'POST', {
+                        termo: String(patient.codcli), campo: 'codigo', situacao: 'todos'
+                    });
+                    if (!page.isConnected || currentTab !== 'cadastro' || !refreshed.pacientes.length) return;
+                    patient = refreshed.pacientes[0];
+                    heading();
+                    currentTab = '';
+                    show('cadastro');
+                });
+            }
+            if (tab === 'historico') {
+                var target = document.createElement('div');
+                target.textContent = 'Carregando histórico…';
+                content.replaceChildren(target);
+                window.abrirHistoricoPaciente(patient.codcli, patient.nomecli, patient, target);
+            }
+        }
+
+        buttons.forEach(function (button) {
+            button.onclick = function () { if (patient) show(button.dataset.atendimento); };
+        });
+
+        return async function (item) {
+            var permission = window.MedsoftPatientPermission;
+            if (permission && !permission.open) {
+                CrudUI.notify('Seu perfil não permite abrir o cadastro de pacientes.', 'error');
+                return;
+            }
+            var id = ++requestId;
+            var name = String(item.NOMEPACI || '').trim();
+            if (!name) return;
+            try {
+                var data = await api('/api/consulta-paciente', 'POST', {
+                    termo: name, campo: 'nome_exato', situacao: 'todos'
+                });
+                if (id !== requestId || !page.isConnected) return;
+                var matches = data.pacientes || [];
+                var exact = matches.length > 0;
+                if (!exact) {
+                    data = await api('/api/consulta-paciente', 'POST', {
+                        termo: name, campo: 'nome', situacao: 'todos'
+                    });
+                    if (id !== requestId || !page.isConnected) return;
+                    matches = data.pacientes || [];
+                }
+                function select(item) {
+                    patient = item;
+                    heading();
+                    nav.hidden = false;
+                    historyButton.hidden = !!(window.MedsoftProfileViews && !window.MedsoftProfileViews.historico);
+                    show('cadastro');
+                    nav.scrollIntoView({block: 'nearest'});
+                }
+                if (exact && matches.length === 1) {
+                    select(matches[0]);
+                } else if (matches.length) {
+                    CrudUI.openForm({
+                        title: 'Selecionar cadastro para atendimento',
+                        fields: [{name: 'paciente', label: 'Paciente', type: 'select', required: true,
+                            options: [{value: '', label: 'Selecione'}].concat(matches.map(function (item) {
+                                return {value: String(item.codcli), label: [
+                                    item.nomecli, '#' + item.codcli, item.telefone, item.nascimento
+                                ].filter(Boolean).join(' / ')};
+                            }))}],
+                        onSubmit: function (values) {
+                            if (id !== requestId || !page.isConnected) return;
+                            var selected = matches.find(function (item) { return String(item.codcli) === values.paciente; });
+                            if (selected) select(selected);
+                        }
+                    });
+                } else {
+                    CrudUI.notify('Nenhum cadastro correspondente. Confira o paciente do agendamento.', 'error');
+                }
+            } catch (error) {
+                if (id === requestId && page.isConnected) CrudUI.notify(error.message, 'error');
+            }
+        };
+    }
+
+    function createController(atender) {
         return new CrudUI.Controller({
             getId: function (item) { return item.CODAGEND; },
             createTitle: 'Incluir agenda de paciente',
@@ -753,6 +873,7 @@
                 await loadAvailability();
             },
             onAction: async function (action, item) {
+                if (action === 'atender' && item) await atender(item);
                 if (action === 'patient' && item && window.carregarTela) {
                     window.pacienteAgendaPendente = item.NOMEPACI.trim();
                     window.carregarTela('consulta_paciente.html');
@@ -790,7 +911,7 @@
         }
         renderProfessionalFilter();
         var includeButton = document.getElementById('agenda-include');
-        controller = createController().mount({
+        controller = createController(setupAtendimento(page)).mount({
             root: page,
             list: document.getElementById('agenda-result'),
             includeButton: includeButton
