@@ -124,23 +124,16 @@
         return [
             {name: 'nome', label: 'Nome', value: item.nomecli || '', required: true, wide: true},
             {
-                name: 'nomed',
+                name: 'nomed', className: 'paciente-field-two-thirds',
                 label: 'Prof. Saúde',
                 type: 'select',
                 value: item.nomed || '',
-                options: professionalOptionsFor(item),
-                wide: true
+                options: professionalOptionsFor(item)
             },
+            {name: 'profcli', label: 'Profissão', value: item.profcli || '', maxLength: 25},
             {
                 name: 'telefone', label: 'Telefone', value: item.telefone || '', inputMode: 'numeric',
                 mask: 'phone-br', placeholder: '(99)99999-9999', maxLength: 14
-            },
-            {
-                name: 'plano',
-                label: 'Plano',
-                type: 'select',
-                value: item.nomeplano1 || '',
-                options: planOptionsFor(item)
             },
             {name: 'email', label: 'E-mail', value: item.email || '', type: 'email'},
             {
@@ -151,13 +144,12 @@
                     {value: 'N', label: 'NÃO'}
                 ]
             },
-            {name: 'nascimento', label: 'Nascimento', type: 'date', value: item.nascimento || '', complement: true},
+            {name: 'nascimento', label: 'Nascimento', type: 'date', value: item.nascimento || ''},
             {
                 name: 'sexo',
                 label: 'Sexo',
                 type: 'select',
                 value: item.sexo || '',
-                complement: true,
                 options: [
                     {value: '', label: ''},
                     {value: 'M', label: 'M'},
@@ -166,31 +158,10 @@
                 ]
             },
             {
-                name: 'cpf', label: 'CPF', value: item.cpf || '', mask: 'cpf-br',
-                placeholder: '999.999.999-99', maxLength: 14, inputMode: 'numeric', complement: true
-            },
-            {name: 'rg', label: 'RG', value: item.rg || '', maxLength: 25, complement: true},
-            {
-                name: 'cep', label: 'CEP', value: item.cep || '', mask: 'cep-br',
-                placeholder: '99999-99', maxLength: 9, inputMode: 'numeric', complement: true
-            },
-            {
-                name: 'uf',
-                label: 'UF',
-                type: 'select',
-                value: item.uf || '',
-                complement: true,
-                options: ufOptions()
-            },
-            {name: 'endereco', label: 'Endereço', value: item.endereco || '', wide: true, complement: true},
-            {name: 'cidade', label: 'Cidade', value: item.cidade || '', complement: true},
-            {name: 'bairro', label: 'Bairro', value: item.bairro || '', complement: true},
-            {
                 name: 'estado_civil',
                 label: 'Estado civil',
                 type: 'select',
                 value: item.estado_civil || '',
-                complement: true,
                 options: [
                     {value: '', label: ''},
                     {value: 'S', label: 'Solteiro'},
@@ -201,11 +172,36 @@
                 ]
             },
             {
+                name: 'cpf', label: 'CPF', value: item.cpf || '', mask: 'cpf-br',
+                placeholder: '999.999.999-99', maxLength: 14, inputMode: 'numeric'
+            },
+            {name: 'rg', label: 'RG', value: item.rg || '', maxLength: 25},
+            {
+                name: 'cep', label: 'CEP', value: item.cep || '', mask: 'cep-br',
+                placeholder: '99999-99', maxLength: 9, inputMode: 'numeric'
+            },
+            {
+                name: 'uf', className: 'paciente-field-uf',
+                label: 'UF',
+                type: 'select',
+                value: item.uf || '',
+                options: ufOptions()
+            },
+            {name: 'endereco', className: 'paciente-field-endereco', label: 'Endereço', value: item.endereco || ''},
+            {name: 'cidade', label: 'Cidade', value: item.cidade || ''},
+            {name: 'bairro', label: 'Bairro', value: item.bairro || ''},
+            {
+                name: 'natcli',
+                label: 'Natural',
+                type: 'select',
+                value: item.natcli || '',
+                options: ufOptions()
+            },
+            {
                 name: 'cor',
                 label: 'Côr',
                 type: 'select',
                 value: item.cor || '',
-                complement: true,
                 options: [
                     {value: '', label: ''},
                     {value: 'B', label: 'Branco'},
@@ -215,32 +211,29 @@
                     {value: 'O', label: 'Outro'}
                 ]
             },
-            {name: 'foto', label: 'Foto', type: 'image', value: item.foto || '', wide: true, page: 3},
-            {name: 'cont1', label: 'Nr do Plano', value: item.cont1 || '', maxLength: 40, page: 3},
-            {name: 'validade_carteira1', label: 'Validade do plano', type: 'date', value: item.validade_carteira1 || '', page: 3},
-            {name: 'nompai', label: 'Nome do Pai', value: item.nompai || '', maxLength: 30, page: 3},
-            {name: 'nommae', label: 'Nome da Mãe', value: item.nommae || '', maxLength: 30, page: 3},
-            {name: 'profcli', label: 'Profissão', value: item.profcli || '', maxLength: 25, page: 3},
+            {name: 'foto', className: 'paciente-field-two-thirds', label: 'Foto', type: 'image', value: item.foto || ''},
             {
-                name: 'natcli',
-                label: 'Natural',
+                name: 'plano',
+                label: 'Plano',
                 type: 'select',
-                value: item.natcli || '',
-                options: ufOptions(),
-                page: 3
+                value: item.nomeplano1 || '',
+                options: planOptionsFor(item)
             },
-            {name: 'recom', label: 'Recomendação', value: item.recom || '', maxLength: 40, page: 3},
+            {name: 'cont1', label: 'Nr do Plano', value: item.cont1 || '', maxLength: 40},
+            {name: 'validade_carteira1', label: 'Validade do plano', type: 'date', value: item.validade_carteira1 || ''},
             {
                 name: 'plano2',
                 label: 'Plano 2',
                 type: 'select',
                 value: item.nomeplano2 || '',
-                options: plan2OptionsFor(item),
-                page: 3
+                options: plan2OptionsFor(item)
             },
-            {name: 'datult', label: 'Data da última consulta', type: 'date', value: item.datult || '', page: 3},
-            {name: 'matricula', label: 'Matrícula', value: item.matricula || '', maxLength: 15, page: 3},
-            {name: 'obs', label: 'Observação', value: item.obs || '', maxLength: 30, wide: true, page: 3},
+            {name: 'matricula', label: 'Matrícula', value: item.matricula || '', maxLength: 15},
+            {name: 'datult', label: 'Data da última consulta', type: 'date', value: item.datult || ''},
+            {name: 'nompai', label: 'Nome do Pai', value: item.nompai || '', maxLength: 30},
+            {name: 'nommae', label: 'Nome da Mãe', value: item.nommae || '', maxLength: 30},
+            {name: 'recom', label: 'Recomendação', value: item.recom || '', maxLength: 40},
+            {name: 'obs', label: 'Observação', value: item.obs || '', maxLength: 30, wide: true},
         ];
     }
 
@@ -265,15 +258,9 @@
             '<span><strong>Ativo:</strong> ' + (isActive(item) ? 'SIM' : 'NÃO') + '</span>' +
             '</div><div class="crud-actions">' +
             historyButton + examButton +
-            '<button class="crud-button crud-button-secondary" data-crud-action="complement" data-crud-id="' +
-            item.codcli + '" title="Cadastro 2/3 do paciente"><i class="fa fa-address-card"></i>' +
-            '<span class="crud-button-label"> Cadastro 2/3</span></button>' +
-            '<button class="crud-button crud-button-secondary" data-crud-action="extra" data-crud-id="' +
-            item.codcli + '" title="Cadastro 3/3 do paciente"><i class="fa fa-id-card"></i>' +
-            '<span class="crud-button-label"> Cadastro 3/3</span></button>' +
-            '<button class="crud-button crud-button-secondary" data-crud-edit="' + item.codcli +
-            '" title="Alterar paciente"><i class="fa fa-pencil"></i>' +
-            '<span class="crud-button-label"> Alterar</span></button>' +
+            '<button class="crud-button crud-button-secondary" data-crud-edit="' + CrudUI.escapeHtml(item.codcli) +
+            '" title="Cadastro do paciente"><i class="fa fa-address-card"></i>' +
+            '<span class="crud-button-label"> Cadastro</span></button>' +
             '<button class="crud-button crud-button-danger" data-crud-delete="' + item.codcli +
             '" title="Excluir paciente"><i class="fa fa-trash"></i>' +
             '<span class="crud-button-label"> Excluir</span></button></div></article>';
@@ -898,7 +885,11 @@
         if (patient.nomeplano1) {
             parts.push('Plano: ' + CrudUI.escapeHtml(patient.nomeplano1));
         }
-        return parts.join(' ');
+        var profissao = String(patient.profcli || '').trim();
+        var endereco = String(patient.endereco || '').trim();
+        if (profissao) parts.push('Profissão: ' + CrudUI.escapeHtml(profissao));
+        if (endereco) parts.push('Endereço: ' + CrudUI.escapeHtml(endereco));
+        return parts.filter(Boolean).join(' / ');
     }
 
     var historicoFixedFields = [
@@ -1507,27 +1498,9 @@
         return new CrudUI.Controller({
             getId: function (item) { return item.codcli; },
             createTitle: 'Incluir paciente',
-            editTitle: 'Alterar paciente',
+            editTitle: 'Cadastro do paciente',
+            formClass: 'paciente-form',
             emptyMessage: 'Nenhum paciente encontrado.',
-            hasComplement: true,
-            pageCount: 3,
-            complementDisabled: function (item) { return !item; },
-            complementHeader: function (item) {
-                return item && item.nomecli ? 'Paciente: ' + item.nomecli : '';
-            },
-            keepOpenAfterCreate: true,
-            itemFromCreate: function (values, result) {
-                return {
-                    codcli: result.id,
-                    nomecli: values.nome,
-                    nomed: values.nomed,
-                    telefone: values.telefone,
-                    nomeplano1: values.plano,
-                    email: values.email,
-                    ativo: values.ativo !== 'N',
-                    nomeplano2: values.plano2
-                };
-            },
             beforeOpen: loadFormOptions,
             onFormReady: setupCepLookup,
             fields: fields,
@@ -1617,12 +1590,6 @@
                 }
                 if (action === 'exams' && item) {
                     showExamModal(item);
-                }
-                if (action === 'complement' && item && controller) {
-                    controller.openEditor(item, {initialPage: 2});
-                }
-                if (action === 'extra' && item && controller) {
-                    controller.openEditor(item, {initialPage: 3});
                 }
             }
         });
