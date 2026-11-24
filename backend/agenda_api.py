@@ -945,11 +945,12 @@ def availability():
         schedule_columns = [column for config in WEEKDAY_SCHEDULE.values() for column in config] + ['consulta']
         # Older databases may not have the optional appointment interval column.
         # Reading it from the row JSON preserves configured values when present.
-        select_columns = ', '.join(schedule_columns) + ", to_jsonb(nomed)->>'inetrvaloconsult'"
+        select_columns = ', '.join(schedule_columns) + ", to_jsonb(profissional)->>'inetrvaloconsult'"
         with _connection() as con:
             with con.cursor() as cur:
                 cur.execute(
-                    f'SELECT {select_columns} FROM public.nomed WHERE nomed = %s AND codclin = %s LIMIT 1',
+                    f'SELECT {select_columns} FROM public.nomed AS profissional '
+                    'WHERE profissional.nomed = %s AND profissional.codclin = %s LIMIT 1',
                     (professional, current_company_id()),
                 )
                 schedule = cur.fetchone()
