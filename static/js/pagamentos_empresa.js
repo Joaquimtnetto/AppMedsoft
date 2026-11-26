@@ -29,6 +29,9 @@
             campo.append(titulo, valor);
             campos.append(campo);
         }
+        cartao.append(campos);
+        if (!editar) return cartao;
+
         const acoes = document.createElement('div');
         acoes.className = 'crud-card-actions';
         const botaoEditar = document.createElement('button');
@@ -47,7 +50,7 @@
         botaoExcluir.textContent = 'Excluir';
         botaoExcluir.addEventListener('click', () => excluir(botaoExcluir));
         acoes.append(botaoEditar, botaoDuplicar, botaoExcluir);
-        cartao.append(campos, acoes);
+        cartao.append(acoes);
         return cartao;
     }
 
@@ -58,6 +61,31 @@
         const resultado = document.getElementById('pagamentos-empresa-result');
         const empresa = document.getElementById('pagamentos-empresa-selecao');
         const incluir = document.getElementById('pagamentos-empresa-incluir');
+        if (!empresa) {
+            status.textContent = 'Carregando pagamentos da sua empresa.';
+            try {
+                const dados = await CrudUI.request(endpoint, {cache: 'no-store'});
+                const links = document.getElementById('pagamentos-empresa-links');
+                for (const [tipo, rotulo] of [['pix', 'Pagar via Pix'], ['cartao', 'Assinar no cartão']]) {
+                    const endereco = dados.links && dados.links[tipo];
+                    if (!endereco) continue;
+                    const botao = document.createElement('a');
+                    botao.className = 'crud-button';
+                    botao.href = endereco;
+                    botao.target = '_blank';
+                    botao.rel = 'noopener noreferrer';
+                    botao.textContent = rotulo;
+                    links.append(botao);
+                }
+                if (!links.childElementCount) links.textContent = 'O pagamento online ainda não está configurado para sua empresa.';
+                links.hidden = false;
+                resultado.replaceChildren(...dados.pagamentos.map(pagamento => criarCartao(pagamento)));
+                status.textContent = dados.pagamentos.length ? '' : 'Nenhum pagamento cadastrado para sua empresa.';
+            } catch (erro) {
+                status.textContent = erro.message || 'Erro ao consultar os pagamentos.';
+            }
+            return;
+        }
         let consulta = 0;
 
         function url(codigo, id, acao = '') {

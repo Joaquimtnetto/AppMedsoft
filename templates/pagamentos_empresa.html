@@ -3,8 +3,14 @@
 <section class="crud-page" id="pagamentos-empresa-page">
     <header class="crud-header">
         <h2>Pagamentos</h2>
+        {% if is_master %}
         <button type="button" class="crud-button" id="pagamentos-empresa-incluir" disabled>Incluir pagamento</button>
+        {% endif %}
     </header>
+    {% if not is_master %}
+    <div id="pagamentos-empresa-links" class="crud-toolbar" hidden></div>
+    {% endif %}
+    {% if is_master %}
     <div class="crud-toolbar">
         <div class="crud-field">
             <label for="pagamentos-empresa-selecao">Empresa</label>
@@ -13,6 +19,7 @@
             </select>
         </div>
     </div>
+    {% endif %}
     <div id="pagamentos-empresa-status" role="status"></div>
     <div id="pagamentos-empresa-result" class="crud-list"></div>
 </section>

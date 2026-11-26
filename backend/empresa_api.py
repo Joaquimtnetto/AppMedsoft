@@ -341,13 +341,18 @@ def _pagamento_values(data):
 @empresa_api_bp.post('/api/empresas/pagamentos/<int:payment_id>/duplicar')
 def pagamentos_empresa(payment_id=None):
     try:
-        if not _is_master_profile(session.get('perfil')):
-            raise PermissionError('Apenas usuários com perfil MASTER podem acessar Pagamentos.')
-
-        company_id = request.args.get('empresa')
+        if not session.get('idusuario'):
+            return jsonify(success=False, message='Faça login para consultar pagamentos.'), 401
+        is_master = _is_master_profile(session.get('perfil'))
+        if is_master:
+            company_id = request.args.get('empresa')
+        else:
+            if request.method not in ('GET', 'HEAD') or 'empresa' in request.args:
+                raise PermissionError('Consulte os pagamentos da empresa da sessão.')
+            company_id = str(current_company_id())
         with _connection() as connection:
             with connection.cursor() as cursor:
-                if request.method == 'GET' and company_id is None:
+                if request.method in ('GET', 'HEAD') and company_id is None:
                     layout = _detect_layout(cursor)
                     cursor.execute(sql.SQL('SELECT {id}::text, {nome} FROM public.{tabela} ORDER BY {nome}, {id}').format(
                         id=sql.Identifier(layout['id_column']),
@@ -363,7 +368,7 @@ def pagamentos_empresa(payment_id=None):
                 company_id = int(company_id)
                 if request.method == 'POST' and payment_id is not None:
                     return _duplicate_pagamento(cursor, company_id, payment_id)
-                if request.method != 'GET':
+                if request.method not in ('GET', 'HEAD'):
                     return _write_pagamento(cursor, company_id, payment_id)
 
                 cursor.execute('''
@@ -384,7 +389,18 @@ def pagamentos_empresa(payment_id=None):
                     }
                     for codigo, previsto, realizado, valorprev, valorpag, tipopag in cursor.fetchall()
                 ]
-        return jsonify(success=True, empresa=company_id, pagamentos=pagamentos)
+                links = {}
+                if not is_master:
+                    cursor.execute('''
+                        SELECT titulo1, titulo2 FROM public.ic_empresa_geral WHERE idempresa = %s
+                    ''', (company_id,))
+                    for key, value in zip(('pix', 'cartao'), cursor.fetchone() or ()):
+                        link = (value or '').strip()
+                        if link.startswith(('https://mpago.la/', 'https://www.mercadopago.com.br/', 'https://mercadopago.com.br/')):
+                            links[key] = link
+        return jsonify(success=True, empresa=company_id, pagamentos=pagamentos, links=links), {
+            'Cache-Control': 'private, no-store',
+        }
     except (errors.InsufficientPrivilege, errors.UndefinedColumn):
         current_app.logger.exception('Estrutura ou permissões de Pagamentos incompletas')
         return jsonify(

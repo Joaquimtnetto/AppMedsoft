@@ -1021,9 +1021,9 @@ def empresa_html():
 
 @app.route('/pagamentos-empresa')
 def pagamentos_empresa_html():
-    if (session.get('perfil') or '').strip().upper() != 'MASTER':
-        return 'Apenas usuários com perfil MASTER podem acessar Pagamentos.', 403
-    return render_template('pagamentos_empresa.html', build_version=BUILD_VERSION)
+    is_master = (session.get('perfil') or '').strip().upper() == 'MASTER'
+    html = render_template('pagamentos_empresa.html', build_version=BUILD_VERSION, is_master=is_master)
+    return html, {'Cache-Control': 'private, no-store'}
 
 
 @app.route('/plano-empresa')

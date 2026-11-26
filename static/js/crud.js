@@ -72,7 +72,7 @@
             var fieldClass = field.className ? ' ' + escapeHtml(field.className) : '';
             var commonAttrs = ' class="crud-input" id="crud-field-' + escapeHtml(field.name) +
                 '" name="' + escapeHtml(field.name) + '"' + required + placeholder + maxLength + inputMode +
-                min + max + step + mask;
+                min + max + step + mask + (field.preserveLegacyPhone ? ' data-preserve-legacy-phone' : '');
             var control = '';
             if (field.type === 'textarea') {
                 control = '<textarea' + commonAttrs + ' rows="' + Number(field.rows || 4) + '">' +
@@ -268,7 +268,10 @@
                 input.value = formatted;
             }
             input.addEventListener('input', applyPhoneMask);
-            applyPhoneMask();
+            // Preserve older text values until the user edits this field.
+            if (!input.hasAttribute('data-preserve-legacy-phone') || /^[0-9()\s-]*$/.test(input.value)) {
+                applyPhoneMask();
+            }
         });
         backdrop.querySelectorAll('[data-crud-mask="cep-br"]').forEach(function (input) {
             function applyCepMask() {

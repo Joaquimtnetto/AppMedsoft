@@ -211,7 +211,6 @@
                     {value: 'O', label: 'Outro'}
                 ]
             },
-            {name: 'foto', className: 'paciente-field-two-thirds', label: 'Foto', type: 'image', value: item.foto || ''},
             {
                 name: 'plano',
                 label: 'Plano',
@@ -230,10 +229,14 @@
             },
             {name: 'matricula', label: 'Matrícula', value: item.matricula || '', maxLength: 15},
             {name: 'datult', label: 'Data da última consulta', type: 'date', value: item.datult || ''},
-            {name: 'nompai', label: 'Nome do Pai', value: item.nompai || '', maxLength: 30},
+            {
+                name: 'nompai', label: 'Telefone 2', value: item.nompai || '', type: 'tel',
+                mask: 'phone-br', preserveLegacyPhone: true, placeholder: '(99)99999-9999', maxLength: 14
+            },
             {name: 'nommae', label: 'Nome da Mãe', value: item.nommae || '', maxLength: 30},
             {name: 'recom', label: 'Recomendação', value: item.recom || '', maxLength: 40},
             {name: 'obs', label: 'Observação', value: item.obs || '', maxLength: 30, wide: true},
+            {name: 'foto', label: 'Foto', type: 'image', value: item.foto || '', wide: true},
         ];
     }
 

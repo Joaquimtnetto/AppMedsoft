@@ -60,8 +60,8 @@
                 name: 'pago', label: 'Pago', value: item.pago === 'S' ? 'S' : 'N', type: 'select',
                 options: [{value: 'S', label: 'Sim'}, {value: 'N', label: 'Não'}]
             },
-            {name: 'titulo1', label: 'Título 1', value: item.titulo1 || '', maxLength: 120, wide: true},
-            {name: 'titulo2', label: 'Título 2', value: item.titulo2 || '', maxLength: 120, wide: true},
+            {name: 'titulo1', label: 'Link de pagamento via Pix', value: item.titulo1 || '', maxLength: 120, wide: true},
+            {name: 'titulo2', label: 'Link da assinatura no cartão', value: item.titulo2 || '', maxLength: 120, wide: true},
             {
                 name: 'ativo',
                 label: 'Situação',

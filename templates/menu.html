@@ -552,11 +552,9 @@
                 <div class="submenu-item" data-menu-id="15" onclick="carregarTela('empresa');fecharSidebarMobile();" title="Empresa">
                     <i class="fa fa-building"></i> <span>Empresa</span>
                 </div>
-                {% if perfil == 'MASTER' %}
                 <div class="submenu-item" onclick="carregarTela('pagamentos-empresa');fecharSidebarMobile();" title="Pagamentos">
                     <i class="fa fa-credit-card"></i> <span>Pagamentos</span>
                 </div>
-                {% endif %}
                 <div class="submenu-item" data-menu-id="15" onclick="carregarTela('plano-empresa');fecharSidebarMobile();" title="Plano Med">
                     <i class="fa fa-layer-group"></i> <span>Plano Med</span>
                 </div>
@@ -749,7 +747,7 @@
             window.MedsoftCurrentMenuEditable = permission.edit;
             mainContent.classList.toggle('medsoft-readonly', !permission.edit);
             const previousScreen = currentScreen;
-            fetch(url)
+            fetch(url, url === 'pagamentos-empresa' ? {cache: 'no-store'} : undefined)
                 .then(function(resp) {
                     if (!resp.ok) throw new Error('Tela não disponível no servidor (HTTP ' + resp.status + ').');
                     return resp.text();
