@@ -1,0 +1,21 @@
+<link rel="stylesheet" href="/static/css/crud.css?v={{ build_version|default('1') }}">
+
+<section class="crud-page" id="pagamentos-empresa-page">
+    <header class="crud-header">
+        <h2>Pagamentos</h2>
+        <button type="button" class="crud-button" id="pagamentos-empresa-incluir" disabled>Incluir pagamento</button>
+    </header>
+    <div class="crud-toolbar">
+        <div class="crud-field">
+            <label for="pagamentos-empresa-selecao">Empresa</label>
+            <select class="crud-input" id="pagamentos-empresa-selecao" disabled>
+                <option value="">Selecione a empresa</option>
+            </select>
+        </div>
+    </div>
+    <div id="pagamentos-empresa-status" role="status"></div>
+    <div id="pagamentos-empresa-result" class="crud-list"></div>
+</section>
+
+<script src="/static/js/crud.js?v={{ build_version|default('1') }}"></script>
+<script src="/static/js/pagamentos_empresa.js?v={{ build_version|default('1') }}"></script>

@@ -1,5 +1,6 @@
 from contextlib import contextmanager
 from datetime import date
+from decimal import Decimal
 import re
 
 from flask import Blueprint, current_app, jsonify, request, session
@@ -308,6 +309,149 @@ def list_empresas():
         })
     except Exception as exc:
         return _error_response(exc)
+
+
+def _pagamento_values(data):
+    def optional_date(field):
+        value = data.get(field)
+        return date.fromisoformat(value) if value else None
+
+    def optional_money(field):
+        raw_value = data.get(field)
+        value = str(raw_value if raw_value is not None else '').strip().replace(',', '.')
+        if not value:
+            return None
+        if not re.fullmatch(r'-?[0-9]{1,16}(?:\.[0-9]{1,2})?', value):
+            raise ValueError('Informe um valor monetário com até duas casas decimais.')
+        return Decimal(value)
+
+    try:
+        previsto = optional_date('dataprevpag')
+        realizado = optional_date('datapagrealiz')
+    except (TypeError, ValueError) as exc:
+        raise ValueError('Informe datas válidas.') from exc
+    return (
+        previsto, realizado, optional_money('valorprev'), optional_money('valorpag'),
+        str(data.get('tipopag') or '').strip() or None,
+    )
+
+
+@empresa_api_bp.route('/api/empresas/pagamentos', methods=['GET', 'POST'])
+@empresa_api_bp.route('/api/empresas/pagamentos/<int:payment_id>', methods=['PUT', 'DELETE'])
+@empresa_api_bp.post('/api/empresas/pagamentos/<int:payment_id>/duplicar')
+def pagamentos_empresa(payment_id=None):
+    try:
+        if not _is_master_profile(session.get('perfil')):
+            raise PermissionError('Apenas usuários com perfil MASTER podem acessar Pagamentos.')
+
+        company_id = request.args.get('empresa')
+        with _connection() as connection:
+            with connection.cursor() as cursor:
+                if request.method == 'GET' and company_id is None:
+                    layout = _detect_layout(cursor)
+                    cursor.execute(sql.SQL('SELECT {id}::text, {nome} FROM public.{tabela} ORDER BY {nome}, {id}').format(
+                        id=sql.Identifier(layout['id_column']),
+                        nome=sql.Identifier(layout['fields']['nome']),
+                        tabela=sql.Identifier(layout['table']),
+                    ))
+                    return jsonify(success=True, empresas=[
+                        {'id': codigo, 'nome': nome} for codigo, nome in cursor.fetchall()
+                    ])
+
+                if not re.fullmatch(r'[0-9]{1,18}', company_id or '') or int(company_id) <= 0:
+                    raise ValueError('Selecione uma empresa válida.')
+                company_id = int(company_id)
+                if request.method == 'POST' and payment_id is not None:
+                    return _duplicate_pagamento(cursor, company_id, payment_id)
+                if request.method != 'GET':
+                    return _write_pagamento(cursor, company_id, payment_id)
+
+                cursor.execute('''
+                    SELECT idpagamento::text, dataprevpag, datapagrealiz,
+                           valorprev::numeric::text, valorpag::numeric::text, tipopag
+                    FROM public.ic_pagamento
+                    WHERE idempresa = %s
+                    ORDER BY dataprevpag DESC NULLS LAST, datapagrealiz DESC NULLS LAST, idpagamento DESC
+                ''', (company_id,))
+                pagamentos = [
+                    {
+                        'id': codigo,
+                        'dataprevpag': previsto.isoformat() if previsto is not None else None,
+                        'datapagrealiz': realizado.isoformat() if realizado is not None else None,
+                        'valorprev': valorprev,
+                        'valorpag': valorpag,
+                        'tipopag': tipopag,
+                    }
+                    for codigo, previsto, realizado, valorprev, valorpag, tipopag in cursor.fetchall()
+                ]
+        return jsonify(success=True, empresa=company_id, pagamentos=pagamentos)
+    except (errors.InsufficientPrivilege, errors.UndefinedColumn):
+        current_app.logger.exception('Estrutura ou permissões de Pagamentos incompletas')
+        return jsonify(
+            success=False,
+            message='Aplique a migração de Pagamentos no banco para configurar a tabela e as permissões.',
+        ), 503
+    except Exception as exc:
+        return _error_response(exc)
+
+
+def _duplicate_pagamento(cursor, company_id, payment_id):
+    cursor.execute('''
+        SELECT (dataprevpag + INTERVAL '1 month')::date, valorprev::numeric
+        FROM public.ic_pagamento
+        WHERE idempresa = %s AND idpagamento = %s
+        FOR UPDATE
+    ''', (company_id, payment_id))
+    source = cursor.fetchone()
+    if source is None:
+        return jsonify(success=False, message='Pagamento não encontrado para esta empresa.'), 404
+    next_date, amount = source
+    if next_date is None:
+        raise ValueError('Informe a data prevista no pagamento antes de duplicá-lo.')
+    cursor.execute('''
+        INSERT INTO public.ic_pagamento (idempresa, dataprevpag, valorprev, datapagrealiz, valorpag, tipopag)
+        SELECT %s, %s, %s::numeric::money, NULL, NULL, NULL
+        WHERE NOT EXISTS (
+            SELECT 1 FROM public.ic_pagamento
+            WHERE idempresa = %s AND dataprevpag = %s
+                AND valorprev::numeric IS NOT DISTINCT FROM %s::numeric
+        )
+    ''', (company_id, next_date, amount) * 2)
+    if cursor.rowcount == 0:
+        return jsonify(success=False, message='Já existe uma cobrança igual para essa data.'), 409
+    return jsonify(success=True, dataprevpag=next_date.isoformat()), 201
+
+
+def _write_pagamento(cursor, company_id, payment_id):
+    if request.method == 'DELETE':
+        cursor.execute('DELETE FROM public.ic_pagamento WHERE idempresa = %s AND idpagamento = %s',
+                       (company_id, payment_id))
+    else:
+        data = request.get_json(silent=True)
+        if not isinstance(data, dict):
+            raise ValueError('Informe os campos do pagamento.')
+        values = _pagamento_values(data)
+        if request.method == 'POST':
+            layout = _detect_layout(cursor)
+            cursor.execute(sql.SQL('SELECT 1 FROM public.{} WHERE {} = %s').format(
+                sql.Identifier(layout['table']), sql.Identifier(layout['id_column'])
+            ), (company_id,))
+            if cursor.fetchone() is None:
+                return jsonify(success=False, message='Empresa não encontrada.'), 404
+            cursor.execute('''
+                INSERT INTO public.ic_pagamento (idempresa, dataprevpag, datapagrealiz, valorprev, valorpag, tipopag)
+                VALUES (%s, %s, %s, %s::numeric::money, %s::numeric::money, %s)
+            ''', (company_id, *values))
+            return jsonify(success=True), 201
+        cursor.execute('''
+            UPDATE public.ic_pagamento
+            SET dataprevpag = %s, datapagrealiz = %s, valorprev = %s::numeric::money,
+                valorpag = %s::numeric::money, tipopag = %s
+            WHERE idempresa = %s AND idpagamento = %s
+        ''', (*values, company_id, payment_id))
+    if cursor.rowcount == 0:
+        return jsonify(success=False, message='Pagamento não encontrado para esta empresa.'), 404
+    return jsonify(success=True)
 
 
 @empresa_api_bp.route('/api/empresas/permissao', methods=['POST'])

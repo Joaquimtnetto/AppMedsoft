@@ -552,6 +552,11 @@
                 <div class="submenu-item" data-menu-id="15" onclick="carregarTela('empresa');fecharSidebarMobile();" title="Empresa">
                     <i class="fa fa-building"></i> <span>Empresa</span>
                 </div>
+                {% if perfil == 'MASTER' %}
+                <div class="submenu-item" onclick="carregarTela('pagamentos-empresa');fecharSidebarMobile();" title="Pagamentos">
+                    <i class="fa fa-credit-card"></i> <span>Pagamentos</span>
+                </div>
+                {% endif %}
                 <div class="submenu-item" data-menu-id="15" onclick="carregarTela('plano-empresa');fecharSidebarMobile();" title="Plano Med">
                     <i class="fa fa-layer-group"></i> <span>Plano Med</span>
                 </div>
@@ -788,6 +793,8 @@
                         carregarModuloPerfil();
                     } else if (url === 'empresa') {
                         carregarModuloEmpresa();
+                    } else if (url === 'pagamentos-empresa') {
+                        carregarModuloPagamentosEmpresa();
                     } else if (url === 'plano-empresa') {
                         carregarModuloPlanoEmpresa();
                     } else if (url === 'relatorios') {
@@ -1077,6 +1084,16 @@
                     var status = document.getElementById('empresa-result');
                     if (status) status.innerHTML =
                         '<div class="crud-error">Erro ao carregar os recursos de Empresa.</div>';
+                });
+        }
+
+        function carregarModuloPagamentosEmpresa() {
+            var status = document.getElementById('pagamentos-empresa-status');
+            carregarScriptUmaVez('/static/js/crud.js')
+                .then(function() { return carregarScriptUmaVez('/static/js/pagamentos_empresa.js'); })
+                .then(function() { window.PagamentosEmpresa.init(); })
+                .catch(function() {
+                    if (status) status.textContent = 'Erro ao carregar a tela de pagamentos.';
                 });
         }
 
